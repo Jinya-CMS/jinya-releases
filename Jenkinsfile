@@ -36,6 +36,9 @@ spec:
     }
     stages {
         stage('Build container') {
+            when {
+              branch 'main'
+            }
             steps {
                 container('docker') {
                     sh "docker build -t registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER ."
