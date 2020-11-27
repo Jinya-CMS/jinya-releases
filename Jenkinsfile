@@ -41,9 +41,11 @@ spec:
             }
             steps {
                 container('docker') {
-                    image = docker.build "registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER"
-                    docker.withRegistry('https://registry-hosted.imanuel.dev', 'nexus.imanuel.dev') {
-                        image.push()
+                    script {
+                        def image = docker.build "registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER"
+                        docker.withRegistry('https://registry-hosted.imanuel.dev', 'nexus.imanuel.dev') {
+                            image.push()
+                        }
                     }
                 }
             }
