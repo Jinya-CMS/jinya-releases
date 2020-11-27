@@ -41,9 +41,9 @@ spec:
             }
             steps {
                 container('docker') {
-                    sh "docker build -t registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER ."
-                    withDockerRegistry(credentialsId: '00bd190f-fb9c-4297-87ee-0729a40b026c', url: 'https://registry-hosted.imanuel.dev') {
-                        sh "docker push registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER"
+                    image = docker.build "registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER"
+                    docker.withRegistry('https://registry-hosted.imanuel.dev', 'nexus.imanuel.dev') {
+                        image.push()
                     }
                 }
             }
