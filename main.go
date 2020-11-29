@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
@@ -37,12 +38,21 @@ func main() {
 			return
 		}
 
-		json := map[string]string{}
+		data := map[string]string{}
 		for _, file := range files {
 			name := file.Name()
 			name = strings.ReplaceAll(name, ".zip", "")
-			json[name] = "https://releases.jinya.de/cms/" + file.Name()
+			data[name] = "https://releases.jinya.de/cms/" + file.Name()
 		}
+
+		encodedJson, err := json.Marshal(data)
+		if err != nil {
+			_, _ = w.Write([]byte(err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		_, _ = w.Write(encodedJson)
 	})
 	rtr.HandleFunc("/cms/push/{version}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
