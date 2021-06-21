@@ -39,11 +39,18 @@ spec:
             }
             steps {
                 container('docker') {
-                    script {
-                        def image = docker.build "registry-hosted.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER"
-                        docker.withRegistry('https://registry-hosted.imanuel.dev', 'nexus.imanuel.dev') {
-                            image.push()
-                        }
+                    sh "docker build -t quay.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER -f ./Dockerfile ."
+                    sh "docker tag quay.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER quay.imanuel.dev/jinya/jinya-releases:latest"
+                    sh "docker tag quay.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER jinyacms/jinya-releases:$BUILD_NUMBER"
+                    sh "docker tag quay.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER jinyacms/jinya-releases:latest"
+
+                    withDockerRegistry(credentialsId: 'quay.imanuel.dev', url: 'https://quay.imanuel.dev') {
+                        sh "docker push quay.imanuel.dev/jinya/jinya-releases:$BUILD_NUMBER"
+                        sh "docker push quay.imanuel.dev/jinya/jinya-releases:latest"
+                    }
+                    withDockerRegistry(credentialsId: 'hub.docker.com', url: '') {
+                        sh "docker push jinyacms/jinya-releases:$BUILD_NUMBER"
+                        sh "docker push jinyacms/jinya-releases:latest"
                     }
                 }
             }
