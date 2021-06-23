@@ -1,4 +1,4 @@
-FROM golang:1.15-buster
+FROM quay.imanuel.dev/dockerhub/library---golang:1.16-alpine
 WORKDIR /app
 COPY . .
 
