@@ -21,7 +21,7 @@ spec:
     args:
     - infinity
   - name: docker
-    image: quay.imanuel.dev/dockerhub/library---docker:latest
+    image: quay.imanuel.dev/dockerhub/library---docker:stable
     command:
     - cat
     tty: true
