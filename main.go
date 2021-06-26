@@ -6,11 +6,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/hashicorp/go-version"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -38,11 +40,19 @@ func main() {
 			return
 		}
 
-		data := map[string]string{}
-		for _, file := range files {
+		versions := make([]*version.Version, len(files))
+		for i, file := range files {
 			name := file.Name()
 			name = strings.ReplaceAll(name, ".zip", "")
-			data[name] = "https://releases.jinya.de/cms/" + file.Name()
+			ver, _ := version.NewVersion(name)
+			versions[i] = ver
+		}
+
+		sort.Sort(version.Collection(versions))
+
+		data := map[string]string{}
+		for _, ver := range versions {
+			data[ver.Original()] = "https://releases.jinya.de/cms/" + ver.Original() + ".zip"
 		}
 
 		encodedJson, err := json.Marshal(data)
