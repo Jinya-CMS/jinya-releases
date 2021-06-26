@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/go-version"
 	"golang.org/x/crypto/bcrypt"
@@ -50,19 +50,14 @@ func main() {
 
 		sort.Sort(version.Collection(versions))
 
-		data := map[string]string{}
-		for _, ver := range versions {
-			data[ver.Original()] = "https://releases.jinya.de/cms/" + ver.Original() + ".zip"
+		data := make([]string, len(versions))
+		for i, ver := range versions {
+			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/"+ver.Original()+".zip")
 		}
 
-		encodedJson, err := json.Marshal(data)
-		if err != nil {
-			_, _ = w.Write([]byte(err.Error()))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		json := strings.Join(data, ",")
 
-		_, _ = w.Write(encodedJson)
+		w.Write([]byte(fmt.Sprintf("{%s}", json)))
 	})
 	rtr.HandleFunc("/cms/push/{version}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
