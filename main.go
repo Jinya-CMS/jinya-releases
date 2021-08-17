@@ -32,6 +32,7 @@ func generateRandomBytes(n int) ([]byte, error) {
 
 func main() {
 	rtr := mux.NewRouter()
+
 	rtr.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
 		files, err := ioutil.ReadDir("./cms/unstable")
 		if err != nil {
@@ -46,19 +47,16 @@ func main() {
 			name = strings.ReplaceAll(name, ".zip", "")
 			ver, _ := version.NewVersion(name)
 			versions[i] = ver
-			fmt.Println(name)
 		}
 
-		json := ""
-		if len(versions) > 0 {
-			sort.Sort(version.Collection(versions))
-			data := make([]string, len(versions))
-			for i, ver := range versions {
-				data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/unstable/"+ver.Original()+".zip")
-			}
+		sort.Sort(version.Collection(versions))
 
-			json = strings.Join(data, ",")
+		data := make([]string, len(versions))
+		for i, ver := range versions {
+			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/unstable/"+ver.Original()+".zip")
 		}
+
+		json := strings.Join(data, ",")
 
 		w.Write([]byte(fmt.Sprintf("{%s}", json)))
 	})
