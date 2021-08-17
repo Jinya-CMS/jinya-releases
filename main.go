@@ -118,6 +118,92 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 	})
 
+	rtr.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
+		files, err := ioutil.ReadDir("./cms/unstable")
+		if err != nil {
+			_, _ = w.Write([]byte("Files not found"))
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		versions := make([]*version.Version, len(files))
+		for i, file := range files {
+			name := file.Name()
+			name = strings.ReplaceAll(name, ".zip", "")
+			ver, _ := version.NewVersion(name)
+			versions[i] = ver
+		}
+
+		sort.Sort(version.Collection(versions))
+
+		data := make([]string, len(versions))
+		for i, ver := range versions {
+			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/unstable/"+ver.Original()+".zip")
+		}
+
+		json := strings.Join(data, ",")
+
+		w.Write([]byte(fmt.Sprintf("{%s}", json)))
+	})
+	rtr.HandleFunc("/cms/unstable/push/{version}", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		if r.Header.Get("JinyaAuthKey") == authKey {
+			err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+		}
+
+		vars := mux.Vars(r)
+		version := vars["version"]
+		if _, err := os.Stat("./cms/unstable/"); os.IsNotExist(err) {
+			err = os.MkdirAll("./cms/unstable/", os.ModePerm)
+			if err != nil {
+				_, _ = w.Write([]byte(err.Error()))
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
+
+		writer, err := os.OpenFile("./cms/unstable/"+version+".zip", os.O_CREATE|os.O_WRONLY, 0777)
+		if err != nil {
+			_, _ = w.Write([]byte(err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		defer writer.Close()
+
+		reader := bufio.NewReader(r.Body)
+		_, err = reader.WriteTo(writer)
+		if err != nil {
+			_, _ = w.Write([]byte(err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	})
+	rtr.HandleFunc("/cms/unstable/{version}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		version := vars["version"]
+		file, err := os.OpenFile("./cms/unstable/"+version, os.O_RDONLY, os.ModeAppend)
+		if err != nil {
+			_, _ = w.Write([]byte("File not found"))
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		reader := bufio.NewReader(file)
+		reader.WriteTo(w)
+		w.WriteHeader(http.StatusOK)
+	})
+
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
 		key, err := generateRandomBytes(128)
 		if err != nil {
