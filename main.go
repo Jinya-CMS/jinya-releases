@@ -46,16 +46,19 @@ func main() {
 			name = strings.ReplaceAll(name, ".zip", "")
 			ver, _ := version.NewVersion(name)
 			versions[i] = ver
+			fmt.Println(name)
 		}
 
-		sort.Sort(version.Collection(versions))
+		json := ""
+		if len(versions) > 0 {
+			sort.Sort(version.Collection(versions))
+			data := make([]string, len(versions))
+			for i, ver := range versions {
+				data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/unstable/"+ver.Original()+".zip")
+			}
 
-		data := make([]string, len(versions))
-		for i, ver := range versions {
-			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/unstable/"+ver.Original()+".zip")
+			json = strings.Join(data, ",")
 		}
-
-		json := strings.Join(data, ",")
 
 		w.Write([]byte(fmt.Sprintf("{%s}", json)))
 	})
