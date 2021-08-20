@@ -1,13 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/go-version"
 	"golang.org/x/crypto/bcrypt"
+	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,179 +31,43 @@ func generateRandomBytes(n int) ([]byte, error) {
 	return b, nil
 }
 
+type Build struct {
+	Version string
+	Link    string
+	Created string
+}
+
 func main() {
 	rtr := mux.NewRouter()
 
-	rtr.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
-		files, err := ioutil.ReadDir("./cms/unstable")
+	rtr.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		file, err := os.Open("./templates/homepage.html")
 		if err != nil {
-			_, _ = w.Write([]byte("Files not found"))
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error rendering homepage"))
 			return
 		}
 
-		versions := make([]*version.Version, len(files))
-		for i, file := range files {
-			name := file.Name()
-			name = strings.ReplaceAll(name, ".zip", "")
-			ver, _ := version.NewVersion(name)
-			versions[i] = ver
-		}
-
-		sort.Sort(version.Collection(versions))
-
-		data := make([]string, len(versions))
-		for i, ver := range versions {
-			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/unstable/"+ver.Original()+".zip")
-		}
-
-		json := strings.Join(data, ",")
-
-		w.Write([]byte(fmt.Sprintf("{%s}", json)))
+		io.Copy(w, file)
+	})
+	rtr.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
+		sendFileOverview(w, r, "Unstable")
 	})
 	rtr.HandleFunc("/cms/unstable/push/{version}", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		if r.Header.Get("JinyaAuthKey") == authKey {
-			err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-		}
-
-		vars := mux.Vars(r)
-		version := vars["version"]
-		if _, err := os.Stat("./cms/unstable/"); os.IsNotExist(err) {
-			err = os.MkdirAll("./cms/unstable/", os.ModePerm)
-			if err != nil {
-				_, _ = w.Write([]byte(err.Error()))
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		}
-
-		writer, err := os.OpenFile("./cms/unstable/"+version+".zip", os.O_CREATE|os.O_WRONLY, 0777)
-		if err != nil {
-			_, _ = w.Write([]byte(err.Error()))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		defer writer.Close()
-
-		reader := bufio.NewReader(r.Body)
-		_, err = reader.WriteTo(writer)
-		if err != nil {
-			_, _ = w.Write([]byte(err.Error()))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusNoContent)
+		pushNewVersion(w, r, "unstable")
 	})
 	rtr.HandleFunc("/cms/unstable/{version}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		version := vars["version"]
-		file, err := os.OpenFile("./cms/unstable/"+version, os.O_RDONLY, os.ModeAppend)
-		if err != nil {
-			_, _ = w.Write([]byte("File not found"))
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		reader := bufio.NewReader(file)
-		reader.WriteTo(w)
-		w.WriteHeader(http.StatusOK)
+		downloadFile(w, r, "unstable")
 	})
 
 	rtr.HandleFunc("/cms", func(w http.ResponseWriter, r *http.Request) {
-		files, err := ioutil.ReadDir("./cms/stable")
-		if err != nil {
-			_, _ = w.Write([]byte("Files not found"))
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		versions := make([]*version.Version, len(files))
-		for i, file := range files {
-			name := file.Name()
-			name = strings.ReplaceAll(name, ".zip", "")
-			ver, _ := version.NewVersion(name)
-			versions[i] = ver
-		}
-
-		sort.Sort(version.Collection(versions))
-
-		data := make([]string, len(versions))
-		for i, ver := range versions {
-			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/"+ver.Original()+".zip")
-		}
-
-		json := strings.Join(data, ",")
-
-		w.Write([]byte(fmt.Sprintf("{%s}", json)))
+		sendFileOverview(w, r, "Stable")
 	})
 	rtr.HandleFunc("/cms/push/{version}", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		if r.Header.Get("JinyaAuthKey") == authKey {
-			err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-		}
-
-		vars := mux.Vars(r)
-		version := vars["version"]
-		if _, err := os.Stat("./cms/stable/"); os.IsNotExist(err) {
-			err = os.MkdirAll("./cms/stable/", os.ModePerm)
-			if err != nil {
-				_, _ = w.Write([]byte(err.Error()))
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		}
-
-		writer, err := os.OpenFile("./cms/stable/"+version+".zip", os.O_CREATE|os.O_WRONLY, 0777)
-		if err != nil {
-			_, _ = w.Write([]byte(err.Error()))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		defer writer.Close()
-
-		reader := bufio.NewReader(r.Body)
-		_, err = reader.WriteTo(writer)
-		if err != nil {
-			_, _ = w.Write([]byte(err.Error()))
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusNoContent)
+		pushNewVersion(w, r, "stable")
 	})
 	rtr.HandleFunc("/cms/{version}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		version := vars["version"]
-		file, err := os.OpenFile("./cms/stable/"+version, os.O_RDONLY, os.ModeAppend)
-		if err != nil {
-			_, _ = w.Write([]byte("File not found"))
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		reader := bufio.NewReader(file)
-		reader.WriteTo(w)
-		w.WriteHeader(http.StatusOK)
+		downloadFile(w, r, "stable")
 	})
 
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
@@ -232,4 +97,133 @@ func main() {
 
 	log.Println("Serving at localhost:8090...")
 	log.Fatal(http.ListenAndServe(":8090", rtr))
+}
+
+func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
+	vars := mux.Vars(r)
+	ver := vars["version"]
+	file, err := os.OpenFile("./cms/"+stability+"/"+ver, os.O_RDONLY, os.ModeAppend)
+	if err != nil {
+		_, _ = w.Write([]byte("File not found"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	defer file.Close()
+
+	io.Copy(w, file)
+	w.WriteHeader(http.StatusOK)
+}
+
+func pushNewVersion(w http.ResponseWriter, r *http.Request, stability string) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if r.Header.Get("JinyaAuthKey") == authKey {
+		err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
+
+	vars := mux.Vars(r)
+	ver := vars["version"]
+	if _, err := os.Stat("./cms/" + stability); os.IsNotExist(err) {
+		err = os.MkdirAll("./cms/"+stability, os.ModePerm)
+		if err != nil {
+			_, _ = w.Write([]byte(err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
+	writer, err := os.OpenFile("./cms/"+stability+"/"+ver+".zip", os.O_CREATE|os.O_WRONLY, 0777)
+	if err != nil {
+		_, _ = w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	defer writer.Close()
+
+	_, err = io.Copy(writer, r.Body)
+	if err != nil {
+		_, _ = w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) {
+	stability := strings.ToLower(buildType)
+	basePath := "./cms/" + stability + "/"
+	if stability == "stable" {
+		stability = ""
+	} else {
+		stability += "/"
+	}
+	files, err := ioutil.ReadDir(basePath)
+	if err != nil {
+		_, _ = w.Write([]byte("Files not found"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	versions := make([]*version.Version, len(files))
+	for i, file := range files {
+		name := file.Name()
+		name = strings.ReplaceAll(name, ".zip", "")
+		ver, _ := version.NewVersion(name)
+		versions[i] = ver
+	}
+
+	sort.Sort(version.Collection(versions))
+
+	if strings.Contains(r.Header.Get("Accept"), "text/html") {
+		tmpl, err := template.New("page").ParseFiles("./templates/builds.gohtml")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		sort.Sort(sort.Reverse(version.Collection(versions)))
+		builds := make([]Build, len(versions))
+		for i, ver := range versions {
+			stat, err := os.Stat(basePath + ver.Original() + ".zip")
+			var created string
+			if err != nil {
+				created = ""
+			} else {
+				created = stat.ModTime().Format("2006-01-02")
+			}
+			builds[i] = Build{
+				Link:    "https://releases.jinya.de/cms/" + stability + ver.Original() + ".zip",
+				Version: ver.Original(),
+				Created: created,
+			}
+		}
+		tmpl.ExecuteTemplate(w, "page", struct {
+			Builds    []Build
+			Stability string
+		}{
+			Builds:    builds,
+			Stability: buildType,
+		})
+
+		w.Header().Add("Content-Type", "text/html")
+	} else {
+		data := make([]string, len(versions))
+		for i, ver := range versions {
+			data[i] = fmt.Sprintf("\"%s\": \"%s\"", ver.Original(), "https://releases.jinya.de/cms/"+stability+ver.Original()+".zip")
+		}
+
+		json := strings.Join(data, ",")
+		w.Header().Add("Content-Type", "application/json")
+		w.Write([]byte(fmt.Sprintf("{%s}", json)))
+	}
 }
