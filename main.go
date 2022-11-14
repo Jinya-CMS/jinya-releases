@@ -9,7 +9,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -82,13 +81,13 @@ func main() {
 			log.Fatal(err.Error())
 		}
 
-		err = ioutil.WriteFile(authFile, key, os.ModePerm)
+		err = os.WriteFile(authFile, key, os.ModePerm)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
 	}
 
-	key, err := ioutil.ReadFile(authFile)
+	key, err := os.ReadFile(authFile)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -167,7 +166,7 @@ func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) 
 	} else {
 		stability += "/"
 	}
-	files, err := ioutil.ReadDir(basePath)
+	files, err := os.ReadDir(basePath)
 	if err != nil {
 		_, _ = w.Write([]byte("Files not found"))
 		w.WriteHeader(http.StatusNotFound)
