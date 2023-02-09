@@ -69,6 +69,8 @@ func main() {
 		downloadFile(w, r, "stable")
 	})
 
+	rtr.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
 		key, err := generateRandomBytes(128)
 		if err != nil {

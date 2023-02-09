@@ -7,42 +7,49 @@
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Jinya Releases</title>
-        <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/base-min.css">
-        <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/tables-min.css">
-        <style>
-            body {
-                padding: 0 20%;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="/static/pico.css">
+        <link rel="stylesheet" type="text/css" href="/static/jinya.css">
+        <link href="/static/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
+        <link href="/static/favicon-512x512.png" rel="icon" sizes="512x512" type="image/png">
+        <link href="/static/favicon-192x192.png" rel="icon" sizes="192x192" type="image/png">
+        <link href="/static/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+        <link href="/static/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+        <link href="/static/favicon.ico" rel="shortcut icon">
+        <meta content="Jinya CMS Releases" name="apple-mobile-web-app-title">
+        <meta content="Jinya CMS Releases" name="application-name">
+        <meta content="#514b57" name="msapplication-TileColor">
+        <meta content="#514b57" name="theme-color">
     </head>
     <body>
-    <h1>{{.Stability}} Builds</h1>
-    <p>
-        Please choose the version you would like to download. For the best experience we recommend the most recent ones.
-    </p>
-    <table class="pure-table pure-table-striped pure-table-horizontal">
-        <thead>
-        <tr>
-            <th>Version</th>
-            <th>Publish date</th>
-            <th>Download link</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Latest</td>
-            <td>{{(index .Builds 0).Created}}</td>
-            <td><a href="{{(index .Builds 0).Link}}">{{(index .Builds 0).Link}}</a></td>
-        </tr>
-        {{range .Builds}}
-            <tr>
-                <td>{{.Version}}</td>
-                <td>{{.Created}}</td>
-                <td><a href="{{.Link}}">{{.Link}}</a></td>
-            </tr>
-        {{end}}
-        </tbody>
-    </table>
+    <main class="container">
+        <article>
+            <h1>{{.Stability}} Builds</h1>
+            <p>
+                Please choose the version you would like to download. For the best experience we recommend the most
+                recent one.
+            </p>
+            <a href="{{(index .Builds 0).Link}}" role="button">Download latest version</a>
+            <h2>Specific versions</h2>
+            <table role="grid">
+                <thead>
+                <tr>
+                    <th>Version</th>
+                    <th>Publish date</th>
+                    <th>Download link</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{range .Builds}}
+                    <tr>
+                        <td>{{.Version}}</td>
+                        <td>{{.Created}}</td>
+                        <td><a href="{{.Link}}">{{.Link}}</a></td>
+                    </tr>
+                {{end}}
+                </tbody>
+            </table>
+        </article>
+    </main>
     </body>
     </html>
 {{end}}
