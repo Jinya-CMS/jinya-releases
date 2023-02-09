@@ -69,7 +69,7 @@ func main() {
 		_, _ = io.Copy(w, file)
 	})
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
-		key, err := generateRandomBytes(128)
+		key, err := generateRandomBytes(64)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -207,7 +207,7 @@ func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) 
 				created = stat.ModTime().Format("2006-01-02")
 			}
 			builds[i] = Build{
-				Link:    stability + ver.Original() + ".zip",
+				Link:    "cms/" + stability + ver.Original() + ".zip",
 				Version: ver.Original(),
 				Created: created,
 			}
