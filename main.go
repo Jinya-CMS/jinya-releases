@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/hashicorp/go-version"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
@@ -37,40 +36,38 @@ type Build struct {
 }
 
 func main() {
-	rtr := mux.NewRouter()
-
-	rtr.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open("./templates/homepage.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Error rendering homepage"))
-			return
-		}
-
-		io.Copy(w, file)
-	})
-	rtr.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
 		sendFileOverview(w, r, "Unstable")
 	})
-	rtr.HandleFunc("/cms/unstable/push/{version}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/cms/unstable/push/", func(w http.ResponseWriter, r *http.Request) {
 		pushNewVersion(w, r, "unstable")
 	})
-	rtr.HandleFunc("/cms/unstable/{version}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/cms/unstable/", func(w http.ResponseWriter, r *http.Request) {
 		downloadFile(w, r, "unstable")
 	})
 
-	rtr.HandleFunc("/cms", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/cms", func(w http.ResponseWriter, r *http.Request) {
 		sendFileOverview(w, r, "Stable")
 	})
-	rtr.HandleFunc("/cms/push/{version}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/cms/push/", func(w http.ResponseWriter, r *http.Request) {
 		pushNewVersion(w, r, "stable")
 	})
-	rtr.HandleFunc("/cms/{version}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/cms/", func(w http.ResponseWriter, r *http.Request) {
 		downloadFile(w, r, "stable")
 	})
 
-	rtr.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		file, err := os.Open("./templates/homepage.html")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Error rendering homepage"))
+			return
+		}
+
+		_, _ = io.Copy(w, file)
+	})
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
 		key, err := generateRandomBytes(128)
 		if err != nil {
@@ -97,12 +94,11 @@ func main() {
 	authKey = string(key)
 
 	log.Println("Serving at localhost:8090...")
-	log.Fatal(http.ListenAndServe(":8090", rtr))
+	log.Fatal(http.ListenAndServe(":8090", nil))
 }
 
 func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
-	vars := mux.Vars(r)
-	ver := vars["version"]
+	ver := getVersionFromUri(stability, r)
 	file, err := os.OpenFile("./cms/"+stability+"/"+ver, os.O_RDONLY, os.ModeAppend)
 	if err != nil {
 		_, _ = w.Write([]byte("File not found"))
@@ -112,8 +108,17 @@ func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
 
 	defer file.Close()
 
-	io.Copy(w, file)
-	w.WriteHeader(http.StatusOK)
+	_, _ = io.Copy(w, file)
+}
+
+func getVersionFromUri(stability string, r *http.Request) string {
+	var ver string
+	if stability == "stable" {
+		ver = strings.TrimLeft(r.URL.Path, "/cms/")
+	} else {
+		ver = strings.TrimLeft(r.URL.Path, "/cms/unstable/")
+	}
+	return ver
 }
 
 func pushNewVersion(w http.ResponseWriter, r *http.Request, stability string) {
@@ -130,8 +135,7 @@ func pushNewVersion(w http.ResponseWriter, r *http.Request, stability string) {
 		}
 	}
 
-	vars := mux.Vars(r)
-	ver := vars["version"]
+	ver := getVersionFromUri(stability, r)
 	if _, err := os.Stat("./cms/" + stability); os.IsNotExist(err) {
 		err = os.MkdirAll("./cms/"+stability, os.ModePerm)
 		if err != nil {
@@ -203,12 +207,12 @@ func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) 
 				created = stat.ModTime().Format("2006-01-02")
 			}
 			builds[i] = Build{
-				Link:    "https://releases.jinya.de/cms/" + stability + ver.Original() + ".zip",
+				Link:    stability + ver.Original() + ".zip",
 				Version: ver.Original(),
 				Created: created,
 			}
 		}
-		tmpl.ExecuteTemplate(w, "page", struct {
+		_ = tmpl.ExecuteTemplate(w, "page", struct {
 			Builds    []Build
 			Stability string
 		}{
@@ -225,6 +229,6 @@ func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) 
 
 		json := strings.Join(data, ",")
 		w.Header().Add("Content-Type", "application/json")
-		w.Write([]byte(fmt.Sprintf("{%s}", json)))
+		_, _ = w.Write([]byte(fmt.Sprintf("{%s}", json)))
 	}
 }
