@@ -98,7 +98,12 @@ func main() {
 }
 
 func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
-	ver := getVersionFromUri(stability, r)
+	var ver string
+	if stability == "stable" {
+		ver = strings.TrimLeft(r.URL.Path, "/cms/")
+	} else {
+		ver = strings.TrimLeft(r.URL.Path, "/cms/unstable/")
+	}
 	file, err := os.OpenFile("./cms/"+stability+"/"+ver, os.O_RDONLY, os.ModeAppend)
 	if err != nil {
 		_, _ = w.Write([]byte("File not found"))
@@ -111,31 +116,24 @@ func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
 	_, _ = io.Copy(w, file)
 }
 
-func getVersionFromUri(stability string, r *http.Request) string {
-	var ver string
-	if stability == "stable" {
-		ver = strings.TrimLeft(r.URL.Path, "/cms/")
-	} else {
-		ver = strings.TrimLeft(r.URL.Path, "/cms/unstable/")
-	}
-	return ver
-}
-
 func pushNewVersion(w http.ResponseWriter, r *http.Request, stability string) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	if r.Header.Get("JinyaAuthKey") == authKey {
-		err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+	err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
-	ver := getVersionFromUri(stability, r)
+	var ver string
+	if stability == "stable" {
+		ver = strings.TrimLeft(r.URL.Path, "/cms/push/")
+	} else {
+		ver = strings.TrimLeft(r.URL.Path, "/cms/unstable/push/")
+	}
 	if _, err := os.Stat("./cms/" + stability); os.IsNotExist(err) {
 		err = os.MkdirAll("./cms/"+stability, os.ModePerm)
 		if err != nil {
