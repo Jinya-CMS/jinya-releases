@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/hashicorp/go-version"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
@@ -36,40 +37,42 @@ type Build struct {
 }
 
 func main() {
-	http.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
-		sendFileOverview(w, r, "Unstable")
-	})
-	http.HandleFunc("/cms/unstable/push/", func(w http.ResponseWriter, r *http.Request) {
-		pushNewVersion(w, r, "unstable")
-	})
-	http.HandleFunc("/cms/unstable/", func(w http.ResponseWriter, r *http.Request) {
-		downloadFile(w, r, "unstable")
-	})
+	rtr := mux.NewRouter()
 
-	http.HandleFunc("/cms", func(w http.ResponseWriter, r *http.Request) {
-		sendFileOverview(w, r, "Stable")
-	})
-	http.HandleFunc("/cms/push/", func(w http.ResponseWriter, r *http.Request) {
-		pushNewVersion(w, r, "stable")
-	})
-	http.HandleFunc("/cms/", func(w http.ResponseWriter, r *http.Request) {
-		downloadFile(w, r, "stable")
-	})
-
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	rtr.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		file, err := os.Open("./templates/homepage.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Error rendering homepage"))
+			w.Write([]byte("Error rendering homepage"))
 			return
 		}
 
-		_, _ = io.Copy(w, file)
+		io.Copy(w, file)
 	})
+	rtr.HandleFunc("/cms/unstable", func(w http.ResponseWriter, r *http.Request) {
+		sendFileOverview(w, r, "Unstable")
+	})
+	rtr.HandleFunc("/cms/unstable/push/{version}", func(w http.ResponseWriter, r *http.Request) {
+		pushNewVersion(w, r, "unstable")
+	})
+	rtr.HandleFunc("/cms/unstable/{version}", func(w http.ResponseWriter, r *http.Request) {
+		downloadFile(w, r, "unstable")
+	})
+
+	rtr.HandleFunc("/cms", func(w http.ResponseWriter, r *http.Request) {
+		sendFileOverview(w, r, "Stable")
+	})
+	rtr.HandleFunc("/cms/push/{version}", func(w http.ResponseWriter, r *http.Request) {
+		pushNewVersion(w, r, "stable")
+	})
+	rtr.HandleFunc("/cms/{version}", func(w http.ResponseWriter, r *http.Request) {
+		downloadFile(w, r, "stable")
+	})
+
+	rtr.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
-		key, err := generateRandomBytes(64)
+		key, err := generateRandomBytes(128)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -94,16 +97,12 @@ func main() {
 	authKey = string(key)
 
 	log.Println("Serving at localhost:8090...")
-	log.Fatal(http.ListenAndServe(":8090", nil))
+	log.Fatal(http.ListenAndServe(":8090", rtr))
 }
 
 func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
-	var ver string
-	if stability == "stable" {
-		ver = strings.TrimLeft(r.URL.Path, "/cms/")
-	} else {
-		ver = strings.TrimLeft(r.URL.Path, "/cms/unstable/")
-	}
+	vars := mux.Vars(r)
+	ver := vars["version"]
 	file, err := os.OpenFile("./cms/"+stability+"/"+ver, os.O_RDONLY, os.ModeAppend)
 	if err != nil {
 		_, _ = w.Write([]byte("File not found"))
@@ -113,7 +112,8 @@ func downloadFile(w http.ResponseWriter, r *http.Request, stability string) {
 
 	defer file.Close()
 
-	_, _ = io.Copy(w, file)
+	io.Copy(w, file)
+	w.WriteHeader(http.StatusOK)
 }
 
 func pushNewVersion(w http.ResponseWriter, r *http.Request, stability string) {
@@ -122,18 +122,16 @@ func pushNewVersion(w http.ResponseWriter, r *http.Request, stability string) {
 		return
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+	if r.Header.Get("JinyaAuthKey") == authKey {
+		err := bcrypt.CompareHashAndPassword([]byte(authKey), []byte(r.Header.Get("JinyaAuthKey")))
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
 
-	var ver string
-	if stability == "stable" {
-		ver = strings.TrimLeft(r.URL.Path, "/cms/push/")
-	} else {
-		ver = strings.TrimLeft(r.URL.Path, "/cms/unstable/push/")
-	}
+	vars := mux.Vars(r)
+	ver := vars["version"]
 	if _, err := os.Stat("./cms/" + stability); os.IsNotExist(err) {
 		err = os.MkdirAll("./cms/"+stability, os.ModePerm)
 		if err != nil {
@@ -205,12 +203,12 @@ func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) 
 				created = stat.ModTime().Format("2006-01-02")
 			}
 			builds[i] = Build{
-				Link:    "cms/" + stability + ver.Original() + ".zip",
+				Link:    "https://releases.jinya.de/cms/" + stability + ver.Original() + ".zip",
 				Version: ver.Original(),
 				Created: created,
 			}
 		}
-		_ = tmpl.ExecuteTemplate(w, "page", struct {
+		tmpl.ExecuteTemplate(w, "page", struct {
 			Builds    []Build
 			Stability string
 		}{
@@ -227,6 +225,6 @@ func sendFileOverview(w http.ResponseWriter, r *http.Request, buildType string) 
 
 		json := strings.Join(data, ",")
 		w.Header().Add("Content-Type", "application/json")
-		_, _ = w.Write([]byte(fmt.Sprintf("{%s}", json)))
+		w.Write([]byte(fmt.Sprintf("{%s}", json)))
 	}
 }
