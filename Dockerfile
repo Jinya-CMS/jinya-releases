@@ -6,6 +6,8 @@ RUN go build -o /jinya-releases
 
 FROM quay.imanuel.dev/dockerhub/library---alpine:latest
 
+WORKDIR /app
+
 COPY --from=build /jinya-releases /app/jinya-releases
 COPY --from=build /app/static /app/static
 COPY --from=build /app/templates /app/templates
