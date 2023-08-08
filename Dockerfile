@@ -12,4 +12,4 @@ COPY --from=build /app/templates /app/templates
 
 EXPOSE 8090
 
-CMD ["/jinya-releases"]
+CMD ["/app/jinya-releases"]
