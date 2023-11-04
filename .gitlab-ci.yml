@@ -1,27 +1,26 @@
 docker-build:
-  image: quay.imanuel.dev/dockerhub/library---docker:stable
-  stage: build
-  services:
-    - docker:dind
+  stage: deploy
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    pull_policy: always
+    entrypoint: [""]
   before_script:
-    - docker login -u "$QUAY_USER" -p "$QUAY_PASSWORD" quay.imanuel.dev
-    - docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
+    - echo $KANIKO_DOCKERHUB_AND_HARBOR > /kaniko/.docker/config.json
   script:
-    - docker build --pull -t "quay.imanuel.dev/jinya/jinya-releases:${CI_COMMIT_TAG}" -f ./Dockerfile .
-    - docker tag "quay.imanuel.dev/jinya/jinya-releases:${CI_COMMIT_TAG}" "quay.imanuel.dev/jinya/jinya-releases:latest"
-    - docker tag "quay.imanuel.dev/jinya/jinya-releases:${CI_COMMIT_TAG}" "jinyacms/jinya-releases:${CI_COMMIT_TAG}"
-    - docker tag "quay.imanuel.dev/jinya/jinya-releases:${CI_COMMIT_TAG}" jinyacms/jinya-releases:latest
-    - docker push "jinya/jinya-releases:${CI_COMMIT_TAG}"
-    - docker push "jinya/jinya-releases:latest"
-    - docker push "jinyacms/jinya-releases:${CI_COMMIT_TAG}"
-    - docker push "jinyacms/jinya-releases:latest"
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "harbor.ulbricht.casa/jinya/jinya-releases:${CI_COMMIT_TAG}"
+      --destination "harbor.ulbricht.casa/jinya/jinya-releases:latest"
+      --destination "jinyacms/jinya-releases:${CI_COMMIT_TAG}"
+      --destination "jinyacms/jinya-releases:latest"
   rules:
     - if: $CI_COMMIT_TAG
       exists:
         - Dockerfile
 
 build-merge-request:
-  image: quay.imanuel.dev/dockerhub/library---golang:1.20-alpine
+  image: harbor.ulbricht.casa/proxy/library/golang:1.21-alpine
   stage: build
   script:
     - go vet
