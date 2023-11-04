@@ -1,40 +1,42 @@
 [data-theme="light"],
 :root:not([data-theme="dark"]) {
-    --primary: #514b57;
-    --primary-hover: #38333c;
-    --primary-focus: rgba(81, 75, 87, 0.125);
+    --primary: #19324c;
+    --primary-hover: #14273C;
+    --primary-focus: rgba(20, 39, 60, 0.25);
     --primary-inverse: #FFF;
 
-    --secondary: #9d96a5;
-    --secondary-hover: #908899;
-    --secondary-focus: rgba(157, 150, 165, 0.25);
+    --secondary: #929292;
+    --secondary-hover: #7f7f7f;
+    --secondary-focus: rgba(127, 127, 127, 0.25);
     --secondary-inverse: #FFF;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
-        --primary: #966554;
-        --primary-hover: #754f42;
-        --primary-focus: rgba(150, 101, 84, 0.25);
+        --primary: #0f1e2e;
+        --primary-hover: #0C1824;
+        --primary-focus: rgba(12, 24, 36, 0.25);
         --primary-inverse: #FFF;
 
-        --secondary: #9d96a5;
-        --secondary-hover: #908899;
-        --secondary-focus: rgba(157, 150, 165, 0.25);
+        --secondary: #929292;
+        --secondary-hover: #7f7f7f;
+        --secondary-focus: rgba(127, 127, 127, 0.25);
         --secondary-inverse: #FFF;
+
+        --card-background-color: #070d14;
     }
 }
 
 [data-theme="dark"] {
-    --primary: #966554;
-    --primary-hover: #754f42;
-    --primary-focus: rgba(150, 101, 84, 0.25);
+    --primary: #0f1e2e;
+    --primary-hover: #0C1824;
+    --primary-focus: rgba(12, 24, 36, 0.25);
     --primary-inverse: #FFF;
 
-    --secondary: #9d96a5;
-    --secondary-hover: #908899;
-    --secondary-focus: rgba(157, 150, 165, 0.25);
-    --secondary-inverse: #FFF;
+    --secondary: #929292;
+    --secondary-hover: #7f7f7f;
+    --secondary-focus: rgba(127, 127, 127, 0.25);
+    --secondary-inverse: #000;
 }
 
 html {
@@ -42,4 +44,14 @@ html {
     background-size: 100% 100%;
     background-attachment: fixed;
     height: 100vh;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+    html {
+        background-image: url("background-dark.webp");
+    }
+
+    a {
+        color: #bbc6ce;
+    }
 }

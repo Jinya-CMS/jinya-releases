@@ -6,27 +6,26 @@
         <meta name="viewport"
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Jinya Releases</title>
+        <title>Jinya Releases – {{.Stability}} Builds</title>
         <link rel="stylesheet" type="text/css" href="/static/pico.css">
         <link rel="stylesheet" type="text/css" href="/static/jinya.css">
-        <link href="/static/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
-        <link href="/static/favicon-512x512.png" rel="icon" sizes="512x512" type="image/png">
-        <link href="/static/favicon-192x192.png" rel="icon" sizes="192x192" type="image/png">
-        <link href="/static/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
-        <link href="/static/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
-        <link href="/static/favicon.ico" rel="shortcut icon">
-        <meta content="Jinya CMS Releases" name="apple-mobile-web-app-title">
-        <meta content="Jinya CMS Releases" name="application-name">
-        <meta content="#514b57" name="msapplication-TileColor">
-        <meta content="#514b57" name="theme-color">
+        <link rel="icon" href="/static/favicon-light.png" type="image/png"/>
+        <link rel="icon" href="/static/favicon-dark.png" media="(prefers-color-scheme: dark)" type="image/png"/>
+        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+        <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#19324c"/>
+        <meta name="apple-mobile-web-app-title" content="Jinya CMS Releases"/>
+        <meta name="application-name" content="Jinya CMS Releases"/>
+        <meta name="msapplication-TileColor" content="#19324c"/>
+        <meta name="theme-color" content="#19324c"/>
     </head>
     <body>
     <main class="container">
         <article>
             <h1>{{.Stability}} Builds</h1>
             <p>
-                Please choose the version you would like to download. For the best experience we recommend the most
-                recent one.
+                Please choose the version you would like to download.
+                For the best experience, we recommend the most recent one.
             </p>
             <a href="{{(index .Builds 0).Link}}" role="button">Download latest version</a>
             <h2>Specific versions</h2>
@@ -43,7 +42,7 @@
                     <tr>
                         <td>{{.Version}}</td>
                         <td>{{.Created}}</td>
-                        <td><a href="/{{.Link}}">https://release.jinya.de/{{.Link}}</a></td>
+                        <td><a href="{{.Link}}">{{.Link}}</a></td>
                     </tr>
                 {{end}}
                 </tbody>
