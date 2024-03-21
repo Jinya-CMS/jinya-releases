@@ -5,5 +5,548 @@ info:
   version: 3.0.0
 servers:
   - url: 'https://releases.jinya.de'
+    description: Jinya Releases production instance
+security:
+  - accessToken: [ ]
 paths:
-  
+  /api/admin/application:
+    post:
+      operationId: createNewApplication
+      security:
+        - accessToken: [ ]
+      summary: "Creates a new application"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-application"
+      responses:
+        "201":
+          description: "Created new application"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application"
+    get:
+      operationId: getAllApplications
+      security:
+        - accessToken: [ ]
+      summary: "Get all applications"
+      responses:
+        "404":
+          description: "No applications found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "No applications found error"
+        "200":
+          description: "A list of all applications"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/application"
+  /api/admin/application/{id}:
+    get:
+      operationId: getApplicationById
+      security:
+        - accessToken: [ ]
+      summary: "Get application by id"
+      responses:
+        "404":
+          description: "Application not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Application not found error"
+        "200":
+          description: "The application with the given id"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application"
+    put:
+      operationId: updateApplicationById
+      security:
+        - accessToken: [ ]
+      summary: "Update application by id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/update-application"
+      responses:
+        "404":
+          description: "Application not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Application not found error"
+        "204":
+          description: "Update the application with the given id"
+    delete:
+      operationId: deleteById
+      security:
+        - accessToken: [ ]
+      summary: "Delete Application by id"
+      responses:
+        "404":
+          description: "The application was not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Application not found"
+        "204":
+          description: "Application successfully deleted"
+    parameters:
+      - name: "id"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+  /api/admin/application/{id}/logo:
+    post:
+      operationId: uploadApplicationLogo
+      security:
+        - accessToken: [ ]
+      summary: "Uploads the logo for an application"
+      requestBody:
+        required: true
+        content:
+          image/apng:
+            schema:
+              type: "string"
+              format: "binary"
+          image/avif:
+            schema:
+              type: "string"
+              format: "binary"
+          image/gif:
+            schema:
+              type: "string"
+              format: "binary"
+          image/jpeg:
+            schema:
+              type: "string"
+              format: "binary"
+          image/png:
+            schema:
+              type: "string"
+              format: "binary"
+          image/svg+xml:
+            schema:
+              type: "string"
+              format: "binary"
+          image/webp:
+            schema:
+              type: "string"
+              format: "binary"
+      responses:
+        "201":
+          description: "Upload successful"
+        "404":
+          description: "The image was not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Image not found error"
+  /api/admin/application/{applicationId}/track:
+    post:
+      operationId: createNewTrack
+      security:
+        - accessToken: [ ]
+      summary: "Creates a new track"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-track"
+      responses:
+        "201":
+          description: "Created new track"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/track"
+    get:
+      operationId: getAllTracks
+      security:
+        - accessToken: [ ]
+      summary: "Get all tracks"
+      responses:
+        "404":
+          description: "No tracks found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "No tracks found error"
+        "200":
+          description: "A list of all tracks"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/track"
+    parameters:
+      - name: "applicationId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+  /api/admin/application/{applicationId}/track/{id}:
+    get:
+      operationId: getTrackById
+      security:
+        - accessToken: [ ]
+      summary: "Get track by id"
+      responses:
+        "404":
+          description: "No tracks found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Track found error"
+        "200":
+          description: "Get track by id"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/track"
+    put:
+      operationId: updateTrackById
+      security:
+        - accessToken: [ ]
+      summary: "Update track by id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/update-track"
+      responses:
+        "404":
+          description: "Track not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Track not found error"
+        "204":
+          description: "Update the track with the given id"
+    delete:
+      operationId: deleteTrackById
+      security:
+        - accessToken: [ ]
+      summary: "Delete track by id"
+      responses:
+        "404":
+          description: "The track was not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Track not found"
+        "204":
+          description: "Track successfully deleted"
+    parameters:
+      - name: "id"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "applicationId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+  /api/admin/application/{applicationId}/track/{trackId}/version:
+    post:
+      operationId: createNewVersion
+      security:
+        - accessToken: [ ]
+      summary: "Creates a new version"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/version"
+      responses:
+        "201":
+          description: "Created new version"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/version"
+    get:
+      operationId: getAllVersions
+      security:
+        - accessToken: [ ]
+      summary: "Get all versions"
+      responses:
+        "404":
+          description: "No versions found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "No versions found error"
+        "200":
+          description: "A list of all versions"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/version"
+    parameters:
+      - name: "applicationId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "trackId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+  /api/admin/application/{applicationId}/track/{trackId}/version/{id}:
+    get:
+      operationId: getVersionById
+      security:
+        - accessToken: [ ]
+      summary: "Get version by id"
+      responses:
+        "404":
+          description: "Version not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Version not found error"
+        "200":
+          description: "The version with the given id"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/version"
+    delete:
+      operationId: deleteVersionById
+      security:
+        - accessToken: [ ]
+      summary: "Delete version by id"
+      responses:
+        "404":
+          description: "The version was not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "version not found"
+        "204":
+          description: "Version successfully deleted"
+    parameters:
+      - name: "id"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "applicationId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "trackId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+  /api/admin/application/{applicationId}/track/{trackId}/version/{id}/file:
+    post:
+      operationId: uploadVersion
+      security:
+        - accessToken: [ ]
+      summary: "Uploads the logo for an application"
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: "string"
+              format: "binary"
+      responses:
+        "201":
+          description: "Upload successful"
+        "404":
+          description: "The version was not found"
+          content:
+            text/plain:
+              example: "Not found"
+              schema:
+                description: "Version not found error"
+    parameters:
+      - name: "id"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "applicationId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "trackId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: Bearer
+  schemas:
+    create-application:
+      title: "Create Application request"
+      type: "object"
+      required:
+        - "name"
+        - "slug"
+        - "homepageTemplate"
+        - "trackpageTemplate"
+      properties:
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        homepageTemplate:
+          type: "string"
+        trackpageTemplate:
+          type: "string"
+        additionalCss:
+          type: "string"
+        additionalJavaScript:
+          type: "string"
+    update-application:
+      title: "Update Application request"
+      type: "object"
+      required:
+        - "name"
+        - "slug"
+        - "homepageTemplate"
+        - "trackpageTemplate"
+      properties:
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        homepageTemplate:
+          type: "string"
+        trackpageTemplate:
+          type: "string"
+        additionalCss:
+          type: "string"
+        additionalJavaScript:
+          type: "string"
+    application:
+      title: "Application"
+      type: "object"
+      required:
+        - "id"
+        - "name"
+        - "slug"
+        - "homepageTemplate"
+        - "trackpageTemplate"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        homepageTemplate:
+          type: "string"
+        trackpageTemplate:
+          type: "string"
+        additionalCss:
+          type: "string"
+        additionalJavaScript:
+          type: "string"
+    create-track:
+      title: "Create Track request"
+      type: "object"
+      required:
+        - "name"
+        - "slug"
+        - "isDefault"
+      properties:
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        isDefault:
+          type: "boolean"
+    update-track:
+      title: "Update Track request"
+      type: "object"
+      required:
+        - "name"
+        - "slug"
+        - "isDefault"
+      properties:
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        isDefault:
+          type: "boolean"
+    track:
+      title: "Track"
+      type: "object"
+      required:
+        - "id"
+        - "name"
+        - "slug"
+        - "isDefault"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        isDefault:
+          type: "boolean"
+    version:
+      title: "Version"
+      type: "object"
+      required: 
+        - "version"
+      properties: 
+        id:
+          type: "string"
+          format: "uuid"
+        version:
+          type: "string"
+        url:
+          type: "string"
+        uploadDate:
+          type: "string"
+          format: "date"
+    create-version:
+      title: "Create Version request"
+      type: "object"
+      required:
+        - "version"
+      properties:
+        version:
+          type: "string"
