@@ -72,7 +72,7 @@ func main() {
 	rtr.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	if _, err := os.Stat(authFile); os.IsNotExist(err) {
-		key, err := generateRandomBytes(128)
+		key, err := generateRandomBytes(64)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
