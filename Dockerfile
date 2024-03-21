@@ -1,4 +1,4 @@
-FROM library/golang:1.21-alpine AS build
+FROM library/golang:1.22-alpine AS build
 WORKDIR /app
 COPY . .
 
@@ -9,8 +9,6 @@ FROM library/alpine:latest
 WORKDIR /app
 
 COPY --from=build /jinya-releases /app/jinya-releases
-COPY --from=build /app/static /app/static
-COPY --from=build /app/templates /app/templates
 
 EXPOSE 8090
 
