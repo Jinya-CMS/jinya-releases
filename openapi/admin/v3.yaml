@@ -36,10 +36,9 @@ paths:
         "404":
           description: "No applications found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "No applications found error"
+                $ref: "#/components/schemas/error_details"
         "200":
           description: "A list of all applications"
           content:
@@ -82,10 +81,9 @@ paths:
         "404":
           description: "Application not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Application not found error"
+                $ref: "#/components/schemas/error_details"
         "204":
           description: "Update the application with the given id"
     delete:
@@ -97,10 +95,9 @@ paths:
         "404":
           description: "The application was not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Application not found"
+                $ref: "#/components/schemas/error_details"
         "204":
           description: "Application successfully deleted"
     parameters:
@@ -152,10 +149,9 @@ paths:
         "404":
           description: "The image was not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Image not found error"
+                $ref: "#/components/schemas/error_details"
   /api/admin/application/{applicationId}/track:
     post:
       operationId: createNewTrack
@@ -183,10 +179,9 @@ paths:
         "404":
           description: "No tracks found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "No tracks found error"
+                $ref: "#/components/schemas/error_details"
         "200":
           description: "A list of all tracks"
           content:
@@ -211,10 +206,9 @@ paths:
         "404":
           description: "No tracks found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Track found error"
+                $ref: "#/components/schemas/error_details"
         "200":
           description: "Get track by id"
           content:
@@ -235,10 +229,9 @@ paths:
         "404":
           description: "Track not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Track not found error"
+                $ref: "#/components/schemas/error_details"
         "204":
           description: "Update the track with the given id"
     delete:
@@ -250,10 +243,9 @@ paths:
         "404":
           description: "The track was not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Track not found"
+                $ref: "#/components/schemas/error_details"
         "204":
           description: "Track successfully deleted"
     parameters:
@@ -294,10 +286,9 @@ paths:
         "404":
           description: "No versions found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "No versions found error"
+                $ref: "#/components/schemas/error_details"
         "200":
           description: "A list of all versions"
           content:
@@ -327,10 +318,9 @@ paths:
         "404":
           description: "Version not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Version not found error"
+                $ref: "#/components/schemas/error_details"
         "200":
           description: "The version with the given id"
           content:
@@ -387,10 +377,9 @@ paths:
         "404":
           description: "The version was not found"
           content:
-            text/plain:
-              example: "Not found"
+            application/json:
               schema:
-                description: "Version not found error"
+                $ref: "#/components/schemas/error_details"
     parameters:
       - name: "id"
         required: true
@@ -403,6 +392,83 @@ paths:
         schema:
           type: "string"
       - name: "trackId"
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+  /api/admin/token:
+    post:
+      operationId: createNewPushtoken
+      security:
+        - accessToken: [ ]
+      summary: "Creates a new Pushtoken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-token"
+      responses:
+        "201":
+          description: "Created new pushtoken"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/token"
+    get:
+      operationId: getAllPushtokens
+      security:
+        - accessToken: [ ]
+      summary: "Get all pushtokens"
+      responses:
+        "404":
+          description: "No pushtokens found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_details"
+        "200":
+          description: "A list of all pushtokens"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/token"
+  /api/admin/token/{id}:
+    get:
+      operationId: getPushtokenById
+      security:
+        - accessToken: [ ]
+      summary: "Get pushtoken by id"
+      responses:
+        "404":
+          description: "Pushtoken not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_details"
+        "200":
+          description: "The pushtoken with the given id"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/token"
+    delete:
+      operationId: deletePushtokenById
+      security:
+        - accessToken: [ ]
+      summary: "Delete pushtoken by id"
+      responses:
+        "404":
+          description: "The pushtoken was not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_details"
+        "204":
+          description: "Pushtoken successfully deleted"
+    parameters:
+      - name: "id"
         required: true
         in: "path"
         schema:
@@ -550,3 +616,52 @@ components:
       properties:
         version:
           type: "string"
+    create-token:
+      title: "Create Pushtoken request"
+      type: "object"
+    token:
+      title: "Pushtoken"
+      type: "object"
+      required:
+        - "token"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        token:
+          type: "string"
+          format: "uuid"
+        allowedApps:
+          type: "array"
+        allowedTracks:
+          type: "array"
+    error_details:
+      title: "Root Type for ErrorDetails"
+      type: "object"
+      properties:
+        entityType:
+          type: string
+          enum:
+            - "application"
+            - "track"
+            - "version"
+            - "token"
+        errorType:
+          enum:
+            - "NotFound"
+            - "ExistsAlready"
+            - "InvalidData"
+            - "Io"
+            - "Db"
+            - "Serialization"
+            - "Validation"
+            - "InsufficientRights"
+            - "Unauthorized"
+            - "Unknown"
+          type: string
+        message:
+          type: string
+      required:
+        - entityType
+        - errorType
+        - message
