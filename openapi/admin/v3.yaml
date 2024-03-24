@@ -14,465 +14,579 @@ paths:
       operationId: createNewApplication
       security:
         - accessToken: [ ]
-      summary: "Creates a new application"
+      summary: Creates a new application
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/create-application"
+              $ref: '#/components/schemas/create-application'
       responses:
-        "201":
-          description: "Created new application"
+        '201':
+          description: Created new application
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/application"
+                $ref: '#/components/schemas/application'
+
+        '401':
+          description: No applications found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Application already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
     get:
       operationId: getAllApplications
       security:
         - accessToken: [ ]
-      summary: "Get all applications"
+      summary: Get all applications
       responses:
-        "404":
-          description: "No applications found"
+        '400':
+          description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "A list of all applications"
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: Application not found
           content:
             application/json:
               schema:
-                type: "array"
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: A list of all applications
+          content:
+            application/json:
+              schema:
+                type: array
                 items:
-                  $ref: "#/components/schemas/application"
+                  $ref: '#/components/schemas/application'
   /api/admin/application/{id}:
     get:
       operationId: getApplicationById
       security:
         - accessToken: [ ]
-      summary: "Get application by id"
+      summary: Get application by id
       responses:
-        "404":
-          description: "Application not found"
-          content:
-            text/plain:
-              example: "Not found"
-              schema:
-                description: "Application not found error"
-        "200":
-          description: "The application with the given id"
+        '400':
+          description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/application"
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: The application with the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application'
     put:
       operationId: updateApplicationById
       security:
         - accessToken: [ ]
-      summary: "Update application by id"
+      summary: Updated application by id
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/update-application"
+              $ref: '#/components/schemas/update-application'
       responses:
-        "404":
-          description: "Application not found"
+        '404':
+          description: Application not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "204":
-          description: "Update the application with the given id"
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Application already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Update the application with the given id
     delete:
       operationId: deleteById
       security:
         - accessToken: [ ]
-      summary: "Delete Application by id"
+      summary: Delete Application by id
       responses:
-        "404":
-          description: "The application was not found"
+        '404':
+          description: The application was not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "204":
-          description: "Application successfully deleted"
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Application successfully deleted
     parameters:
-      - name: "id"
+      - name: id
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
+          type: string
   /api/admin/application/{id}/logo:
     post:
       operationId: uploadApplicationLogo
       security:
         - accessToken: [ ]
-      summary: "Uploads the logo for an application"
+      summary: Uploads the logo for an application
       requestBody:
         required: true
         content:
           image/apng:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
           image/avif:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
           image/gif:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
           image/jpeg:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
           image/png:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
           image/svg+xml:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
           image/webp:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
       responses:
-        "201":
-          description: "Upload successful"
-        "404":
-          description: "The image was not found"
+        '201':
+          description: Upload successful
+        '400':
+          description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: File already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
   /api/admin/application/{applicationId}/track:
     post:
       operationId: createNewTrack
       security:
         - accessToken: [ ]
-      summary: "Creates a new track"
+      summary: Creates a new track
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/create-track"
+              $ref: '#/components/schemas/create-track'
       responses:
-        "201":
-          description: "Created new track"
+        '400':
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/track"
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Track already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '201':
+          description: Created new track
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/track'
     get:
       operationId: getAllTracks
       security:
         - accessToken: [ ]
-      summary: "Get all tracks"
+      summary: Get all tracks
       responses:
-        "404":
-          description: "No tracks found"
+        '404':
+          description: Application not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "A list of all tracks"
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: A list of all tracks
           content:
             application/json:
               schema:
-                type: "array"
+                type: array
                 items:
-                  $ref: "#/components/schemas/track"
+                  $ref: '#/components/schemas/track'
     parameters:
-      - name: "applicationId"
+      - name: applicationId
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
+          type: string
   /api/admin/application/{applicationId}/track/{id}:
     get:
       operationId: getTrackById
       security:
         - accessToken: [ ]
-      summary: "Get track by id"
+      summary: Get track by id
       responses:
-        "404":
-          description: "No tracks found"
+        '404':
+          description: Resource not found found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "Get track by id"
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: Get track by id
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/track"
+                $ref: '#/components/schemas/track'
     put:
       operationId: updateTrackById
       security:
         - accessToken: [ ]
-      summary: "Update track by id"
+      summary: Update track by id
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/update-track"
+              $ref: '#/components/schemas/update-track'
       responses:
-        "404":
-          description: "Track not found"
+        '400':
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "204":
-          description: "Update the track with the given id"
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Track already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Update the track with the given id
     delete:
       operationId: deleteTrackById
       security:
         - accessToken: [ ]
-      summary: "Delete track by id"
+      summary: Delete track by id
       responses:
-        "404":
-          description: "The track was not found"
+        '404':
+          description: Resource not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "204":
-          description: "Track successfully deleted"
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Track successfully deleted
     parameters:
-      - name: "id"
+      - name: id
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
-      - name: "applicationId"
+          type: string
+      - name: applicationId
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
+          type: string
   /api/admin/application/{applicationId}/track/{trackId}/version:
     post:
       operationId: createNewVersion
       security:
         - accessToken: [ ]
-      summary: "Creates a new version"
+      summary: Creates a new version
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/version"
+              $ref: '#/components/schemas/version'
       responses:
-        "201":
-          description: "Created new version"
+        '400':
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/version"
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Version already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '201':
+          description: Created new version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/version'
     get:
       operationId: getAllVersions
       security:
         - accessToken: [ ]
-      summary: "Get all versions"
+      summary: Get all versions
       responses:
-        "404":
-          description: "No versions found"
+        '404':
+          description: Resource found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "A list of all versions"
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: A list of all versions
           content:
             application/json:
               schema:
-                type: "array"
+                type: array
                 items:
-                  $ref: "#/components/schemas/version"
+                  $ref: '#/components/schemas/version'
     parameters:
-      - name: "applicationId"
+      - name: applicationId
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
-      - name: "trackId"
+          type: string
+      - name: trackId
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
+          type: string
   /api/admin/application/{applicationId}/track/{trackId}/version/{id}:
     get:
       operationId: getVersionById
       security:
         - accessToken: [ ]
-      summary: "Get version by id"
+      summary: Get version by id
       responses:
-        "404":
-          description: "Version not found"
+        '404':
+          description: Resource not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "The version with the given id"
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: The version with the given id
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/version"
+                $ref: '#/components/schemas/version'
     delete:
       operationId: deleteVersionById
       security:
         - accessToken: [ ]
-      summary: "Delete version by id"
+      summary: Delete version by id
       responses:
-        "404":
-          description: "The version was not found"
+        '404':
+          description: Resource was not found
           content:
             text/plain:
-              example: "Not found"
+              example: Not found
               schema:
-                description: "version not found"
-        "204":
-          description: "Version successfully deleted"
+                description: Version not found
+        '204':
+          description: Version successfully deleted
     parameters:
-      - name: "id"
+      - name: id
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
-      - name: "applicationId"
+          type: string
+      - name: applicationId
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
-      - name: "trackId"
+          type: string
+      - name: trackId
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
+          type: string
   /api/admin/application/{applicationId}/track/{trackId}/version/{id}/file:
     post:
       operationId: uploadVersion
       security:
         - accessToken: [ ]
-      summary: "Uploads the logo for an application"
+      summary: Uploads the logo for an application
       requestBody:
         required: true
         content:
           application/octet-stream:
             schema:
-              type: "string"
-              format: "binary"
+              type: string
+              format: binary
       responses:
-        "201":
-          description: "Upload successful"
-        "404":
-          description: "The version was not found"
+        '201':
+          description: Upload successful
+        '404':
+          description: Resource not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: File already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
     parameters:
-      - name: "id"
+      - name: id
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
-      - name: "applicationId"
+          type: 'string'
+      - name: 'applicationId'
         required: true
-        in: "path"
+        in: 'path'
         schema:
-          type: "string"
-      - name: "trackId"
+          type: 'string'
+      - name: 'trackId'
         required: true
-        in: "path"
+        in: 'path'
         schema:
-          type: "string"
+          type: 'string'
   /api/admin/token:
     post:
       operationId: createNewPushtoken
       security:
         - accessToken: [ ]
-      summary: "Creates a new Pushtoken"
+      summary: 'Creates a new Pushtoken'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/create-token"
+              $ref: '#/components/schemas/create-token'
       responses:
-        "201":
-          description: "Created new pushtoken"
+        '500':
+          description: 'Internal Server Error'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/token"
+                $ref: '#/components/schemas/error_details'
+        '201':
+          description: 'Created new pushtoken'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
     get:
       operationId: getAllPushtokens
       security:
         - accessToken: [ ]
-      summary: "Get all pushtokens"
+      summary: 'Get all pushtokens'
       responses:
-        "404":
-          description: "No pushtokens found"
+        '200':
+          description: 'A list of all pushtokens'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "A list of all pushtokens"
-          content:
-            application/json:
-              schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/token"
+                  $ref: '#/components/schemas/token'
   /api/admin/token/{id}:
     get:
       operationId: getPushtokenById
       security:
         - accessToken: [ ]
-      summary: "Get pushtoken by id"
+      summary: 'Get pushtoken by id'
       responses:
-        "404":
-          description: "Pushtoken not found"
+        '404':
+          description: 'Pushtoken not found'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "200":
-          description: "The pushtoken with the given id"
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: 'The pushtoken with the given id'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/token"
+                $ref: '#/components/schemas/token'
     delete:
       operationId: deletePushtokenById
       security:
         - accessToken: [ ]
-      summary: "Delete pushtoken by id"
+      summary: Delete pushtoken by id
       responses:
-        "404":
-          description: "The pushtoken was not found"
+        '404':
+          description: The pushtoken was not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error_details"
-        "204":
-          description: "Pushtoken successfully deleted"
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Pushtoken successfully deleted
     parameters:
-      - name: "id"
+      - name: id
         required: true
-        in: "path"
+        in: path
         schema:
-          type: "string"
+          type: string
 components:
   securitySchemes:
     accessToken:
@@ -480,184 +594,178 @@ components:
       scheme: Bearer
   schemas:
     create-application:
-      title: "Create Application request"
-      type: "object"
+      title: Create Application request
+      type: object
       required:
-        - "name"
-        - "slug"
-        - "homepageTemplate"
-        - "trackpageTemplate"
+        - name
+        - slug
+        - homepageTemplate
+        - trackpageTemplate
       properties:
         name:
-          type: "string"
+          type: string
         slug:
-          type: "string"
+          type: string
         homepageTemplate:
-          type: "string"
+          type: string
         trackpageTemplate:
-          type: "string"
+          type: string
         additionalCss:
-          type: "string"
+          type: string
         additionalJavaScript:
-          type: "string"
+          type: string
     update-application:
-      title: "Update Application request"
-      type: "object"
+      title: Update Application request
+      type: object
       required:
-        - "name"
-        - "slug"
-        - "homepageTemplate"
-        - "trackpageTemplate"
+        - name
+        - slug
+        - homepageTemplate
+        - trackpageTemplate
       properties:
         name:
-          type: "string"
+          type: string
         slug:
-          type: "string"
+          type: string
         homepageTemplate:
-          type: "string"
+          type: string
         trackpageTemplate:
-          type: "string"
+          type: string
         additionalCss:
-          type: "string"
+          type: string
         additionalJavaScript:
-          type: "string"
+          type: string
     application:
-      title: "Application"
-      type: "object"
+      title: Application
+      type: object
       required:
-        - "id"
-        - "name"
-        - "slug"
-        - "homepageTemplate"
-        - "trackpageTemplate"
+        - id
+        - name
+        - slug
+        - homepageTemplate
+        - trackpageTemplate
       properties:
         id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: uuid
         name:
-          type: "string"
+          type: string
         slug:
-          type: "string"
+          type: string
         homepageTemplate:
-          type: "string"
+          type: string
         trackpageTemplate:
-          type: "string"
+          type: string
         additionalCss:
-          type: "string"
+          type: string
         additionalJavaScript:
-          type: "string"
+          type: string
     create-track:
-      title: "Create Track request"
-      type: "object"
+      title: Create Track request
+      type: object
       required:
-        - "name"
-        - "slug"
-        - "isDefault"
+        - name
+        - slug
+        - isDefault
       properties:
         name:
-          type: "string"
+          type: string
         slug:
-          type: "string"
+          type: string
         isDefault:
-          type: "boolean"
+          type: boolean
     update-track:
-      title: "Update Track request"
-      type: "object"
+      title: Update Track request
+      type: object
       required:
-        - "name"
-        - "slug"
-        - "isDefault"
+        - name
+        - slug
+        - isDefault
       properties:
         name:
-          type: "string"
+          type: string
         slug:
-          type: "string"
+          type: string
         isDefault:
-          type: "boolean"
+          type: boolean
     track:
-      title: "Track"
-      type: "object"
+      title: Track
+      type: object
       required:
-        - "id"
-        - "name"
-        - "slug"
-        - "isDefault"
+        - id
+        - name
+        - slug
+        - isDefault
       properties:
         id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: uuid
         name:
-          type: "string"
+          type: string
         slug:
-          type: "string"
+          type: string
         isDefault:
-          type: "boolean"
+          type: boolean
     version:
-      title: "Version"
-      type: "object"
+      title: Version
+      type: object
       required: 
-        - "version"
+        - version
       properties: 
         id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: uuid
         version:
-          type: "string"
+          type: string
         url:
-          type: "string"
+          type: string
         uploadDate:
-          type: "string"
-          format: "date"
+          type: string
+          format: date
     create-version:
-      title: "Create Version request"
-      type: "object"
+      title: Create Version request
+      type: object
       required:
-        - "version"
+        - version
       properties:
         version:
-          type: "string"
+          type: string
     create-token:
-      title: "Create Pushtoken request"
-      type: "object"
+      title: Create Pushtoken request
+      type: object
     token:
-      title: "Pushtoken"
-      type: "object"
+      title: Pushtoken
+      type: object
       required:
-        - "token"
+        - token
       properties:
         id:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: uuid
         token:
-          type: "string"
-          format: "uuid"
+          type: string
+          format: uuid
         allowedApps:
-          type: "array"
+          type: array
         allowedTracks:
-          type: "array"
+          type: array
     error_details:
-      title: "Root Type for ErrorDetails"
-      type: "object"
+      title: Root Type for ErrorDetails
+      type: object
       properties:
         entityType:
           type: string
           enum:
-            - "application"
-            - "track"
-            - "version"
-            - "token"
+            - application
+            - track
+            - version
+            - token
         errorType:
           enum:
-            - "NotFound"
-            - "ExistsAlready"
-            - "InvalidData"
-            - "Io"
-            - "Db"
-            - "Serialization"
-            - "Validation"
-            - "InsufficientRights"
-            - "Unauthorized"
-            - "Unknown"
+            - NotFound
+            - ExistsAlready
+            - InvalidData
+            - Unknown
           type: string
         message:
           type: string
