@@ -1,0 +1,741 @@
+openapi: 3.0.3
+info:
+  title: Jinya Releases
+  description: Jinya Releases
+  version: 3.0.0
+  license:
+    name: MIT
+    url: https://github.com/Jinya-CMS/jinya-releases/blob/main/LICENSE
+servers:
+  - url: 'https://releases.jinya.de'
+    description: Jinya Releases production instance
+security:
+  - accessToken: [ ]
+paths:
+  /api/admin/application:
+    post:
+      operationId: createNewApplication
+      security:
+        - accessToken: [ ]
+      summary: Creates a new application
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-application'
+      responses:
+        '201':
+          description: Created new application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application'
+        '409':
+          description: Application already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+    get:
+      operationId: getAllApplications
+      security:
+        - accessToken: [ ]
+      summary: Get all applications
+      responses:
+        '200':
+          description: A list of all applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/application'
+  /api/admin/application/{id}:
+    get:
+      operationId: getApplicationById
+      security:
+        - accessToken: [ ]
+      summary: Get application by id
+      responses:
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: The application with the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application'
+    put:
+      operationId: updateApplicationById
+      security:
+        - accessToken: [ ]
+      summary: Updated application by id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-application'
+      responses:
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Application already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Update the application with the given id
+    delete:
+      operationId: deleteById
+      security:
+        - accessToken: [ ]
+      summary: Delete Application by id
+      responses:
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Application successfully deleted
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{id}/logo:
+    post:
+      operationId: uploadApplicationLogo
+      security:
+        - accessToken: [ ]
+      summary: Uploads the logo for an application
+      requestBody:
+        required: true
+        content:
+          image/apng:
+            schema:
+              type: string
+              format: binary
+          image/avif:
+            schema:
+              type: string
+              format: binary
+          image/gif:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Upload successful
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Error writing the file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{applicationId}/track:
+    post:
+      operationId: createNewTrack
+      security:
+        - accessToken: [ ]
+      summary: Creates a new track
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-track'
+      responses:
+        '400':
+          description: Track name or slug missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Track already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '201':
+          description: Created new track
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/track'
+    get:
+      operationId: getAllTracks
+      security:
+        - accessToken: [ ]
+      summary: Get all tracks
+      responses:
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: A list of all tracks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/track'
+    parameters:
+      - name: applicationId
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{applicationId}/track/{id}:
+    get:
+      operationId: getTrackById
+      security:
+        - accessToken: [ ]
+      summary: Get track by id
+      responses:
+        '404':
+          description: Application or track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: Get track by id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/track'
+    put:
+      operationId: updateTrackById
+      security:
+        - accessToken: [ ]
+      summary: Update track by id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-track'
+      responses:
+        '400':
+          description: Track name or slug missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: Application or track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Track already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Update the track with the given id
+    delete:
+      operationId: deleteTrackById
+      security:
+        - accessToken: [ ]
+      summary: Delete track by id
+      responses:
+        '404':
+          description: Application or track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Track successfully deleted
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: applicationId
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{applicationId}/track/{trackId}/version:
+    post:
+      operationId: createNewVersion
+      security:
+        - accessToken: [ ]
+      summary: Creates a new version
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-version'
+      responses:
+        '400':
+          description: Version missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: Version already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '201':
+          description: Created new version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/version'
+    get:
+      operationId: getAllVersions
+      security:
+        - accessToken: [ ]
+      summary: Get all versions
+      responses:
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: A list of all versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/version'
+    parameters:
+      - name: applicationId
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: trackId
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{applicationId}/track/{trackId}/version/{id}:
+    get:
+      operationId: getVersionById
+      security:
+        - accessToken: [ ]
+      summary: Get version by id
+      responses:
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: The version with the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/version'
+    delete:
+      operationId: deleteVersionById
+      security:
+        - accessToken: [ ]
+      summary: Delete version by id
+      responses:
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: File could not be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Version successfully deleted
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: applicationId
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: trackId
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{applicationId}/track/{trackId}/version/{id}/file:
+    post:
+      operationId: uploadVersion
+      security:
+        - accessToken: [ ]
+      summary: Uploads the logo for an application
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Upload successful
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '409':
+          description: File already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: applicationId
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: trackId
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/token:
+    post:
+      operationId: createNewPushtoken
+      security:
+        - accessToken: [ ]
+      summary: Creates a new Pushtoken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-token'
+      responses:
+        '201':
+          description: Created new pushtoken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        '404':
+          description: App or Track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+    get:
+      operationId: getAllPushtokens
+      security:
+        - accessToken: [ ]
+      summary: Get all pushtokens
+      responses:
+        '200':
+          description: A list of all pushtokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/token'
+  /api/admin/token/{id}:
+    get:
+      operationId: getPushtokenById
+      security:
+        - accessToken: [ ]
+      summary: Get pushtoken by id
+      responses:
+        '404':
+          description: Pushtoken not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '200':
+          description: The pushtoken with the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+    delete:
+      operationId: deletePushtokenById
+      security:
+        - accessToken: [ ]
+      summary: Delete pushtoken by id
+      responses:
+        '404':
+          description: The pushtoken was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_details'
+        '204':
+          description: Pushtoken successfully deleted
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: Bearer
+  schemas:
+    create-application:
+      title: Create Application request
+      type: object
+      required:
+        - name
+        - slug
+        - homepageTemplate
+        - trackpageTemplate
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        homepageTemplate:
+          type: string
+        trackpageTemplate:
+          type: string
+        additionalCss:
+          type: string
+        additionalJavaScript:
+          type: string
+    update-application:
+      title: Update Application request
+      type: object
+      required:
+        - name
+        - slug
+        - homepageTemplate
+        - trackpageTemplate
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        homepageTemplate:
+          type: string
+        trackpageTemplate:
+          type: string
+        additionalCss:
+          type: string
+        additionalJavaScript:
+          type: string
+    application:
+      title: Application
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - homepageTemplate
+        - trackpageTemplate
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        homepageTemplate:
+          type: string
+        trackpageTemplate:
+          type: string
+        additionalCss:
+          type: string
+        additionalJavaScript:
+          type: string
+    create-track:
+      title: Create Track request
+      type: object
+      required:
+        - name
+        - slug
+        - isDefault
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        isDefault:
+          type: boolean
+    update-track:
+      title: Update Track request
+      type: object
+      required:
+        - name
+        - slug
+        - isDefault
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        isDefault:
+          type: boolean
+    track:
+      title: Track
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - isDefault
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        isDefault:
+          type: boolean
+    version:
+      title: Version
+      type: object
+      required: 
+        - version
+      properties: 
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+        url:
+          type: string
+        uploadDate:
+          type: string
+          format: date
+    create-version:
+      title: Create Version request
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: string
+    create-token:
+      title: Create Pushtoken request
+      type: object
+    token:
+      title: Pushtoken
+      type: object
+      required:
+        - token
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          format: uuid
+        allowedApps:
+          type: array
+        allowedTracks:
+          type: array
+    error_details:
+      title: Root Type for ErrorDetails
+      type: object
+      properties:
+        entityType:
+          type: string
+          enum:
+            - application
+            - track
+            - version
+            - token
+        errorType:
+          type: string
+        message:
+          type: string
+      required:
+        - entityType
+        - errorType
+        - message
