@@ -3,6 +3,9 @@ info:
   title: Jinya Releases
   description: Jinya Releases
   version: 3.0.0
+  license:
+    name: MIT
+    url: https://github.com/Jinya-CMS/jinya-releases/blob/main/LICENSE
 servers:
   - url: 'https://releases.jinya.de'
     description: Jinya Releases production instance
@@ -27,13 +30,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/application'
-
-        '404':
-          description: No applications found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_details'
         '409':
           description: Application already exists
           content:
@@ -176,6 +172,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_details'
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
   /api/admin/application/{applicationId}/track:
     post:
       operationId: createNewTrack
@@ -189,7 +191,7 @@ paths:
               $ref: '#/components/schemas/create-track'
       responses:
         '400':
-          description: Bad Request
+          description: Track name or slug missing
           content:
             application/json:
               schema:
@@ -269,7 +271,7 @@ paths:
               $ref: '#/components/schemas/update-track'
       responses:
         '400':
-          description: Missing Fields
+          description: Track name or slug missing
           content:
             application/json:
               schema:
@@ -323,10 +325,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/version'
+              $ref: '#/components/schemas/create-version'
       responses:
         '400':
-          description: Missing fields
+          description: Version missing
           content:
             application/json:
               schema:
@@ -730,11 +732,6 @@ components:
             - version
             - token
         errorType:
-          enum:
-            - NotFound
-            - ExistsAlready
-            - InvalidData
-            - Unknown
           type: string
         message:
           type: string
