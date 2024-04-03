@@ -23,8 +23,7 @@ var (
 )
 
 var migrations = []migrator.Migration{
-	dbMigrations.SampleMigration{},
-	// Add migrations here :)
+	dbMigrations.CreateApplicationTable{},
 }
 
 type SpaHandler struct {
