@@ -3,6 +3,8 @@ package main
 import (
 	"embed"
 	"github.com/gorilla/mux"
+	"jinya-releases/api"
+	"jinya-releases/config"
 	"log"
 	"net/http"
 	"path"
@@ -45,6 +47,11 @@ func (handler SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := config.LoadConfiguration()
+	if err != nil {
+		panic(err)
+	}
+
 	router := mux.NewRouter()
 
 	router.PathPrefix("/openapi/admin").Handler(SpaHandler{
@@ -60,6 +67,11 @@ func main() {
 
 	router.PathPrefix("/static/").Handler(http.FileServerFS(static))
 
+	api.SetupApiRouter(router)
+
 	log.Println("Serving at localhost:8090...")
-	log.Fatal(http.ListenAndServe(":8090", router))
+	err = http.ListenAndServe(":8090", router)
+	if err != nil {
+		panic(err)
+	}
 }

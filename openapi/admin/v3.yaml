@@ -698,6 +698,8 @@ components:
           type: string
         slug:
           type: string
+        logo:
+          type: string
         homepageTemplate:
           type: string
         trackpageTemplate:
@@ -782,16 +784,28 @@ components:
       properties:
         allowedApps:
           type: array
+          items:
+            type: string
+            format: uuid
         allowedTracks:
           type: array
+          items:
+            type: string
+            format: uuid
     update-token:
       title: Update push token request
       type: object
       properties:
         allowedApps:
           type: array
+          items:
+            type: string
+            format: uuid
         allowedTracks:
           type: array
+          items:
+            type: string
+            format: uuid
     push-token:
       title: push token
       type: object
@@ -806,8 +820,14 @@ components:
           format: uuid
         allowedApps:
           type: array
+          items:
+            type: string
+            format: uuid
         allowedTracks:
           type: array
+          items:
+            type: string
+            format: uuid
     error-details:
       title: Root Type for ErrorDetails
       type: object
