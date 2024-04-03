@@ -1,7 +1,9 @@
 package storage
 
-import "jinya-releases/database"
+import (
+	"jinya-releases/database/models"
+)
 
-func UploadVersion(version *database.Version, data []byte) error {
+func UploadVersion(version *models.Version, data []byte) error {
 	return nil
 }

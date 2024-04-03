@@ -1,4 +1,4 @@
-package database
+package models
 
 type Track struct {
 	Id        string `json:"id"`

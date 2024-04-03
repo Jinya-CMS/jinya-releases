@@ -5,6 +5,8 @@ import (
 	"github.com/gorilla/mux"
 	"jinya-releases/api"
 	"jinya-releases/config"
+	migrator "jinya-releases/database/migrations"
+	dbMigrations "jinya-releases/migrations"
 	"log"
 	"net/http"
 	"path"
@@ -19,6 +21,11 @@ var (
 	//go:embed static
 	static embed.FS
 )
+
+var migrations = []migrator.Migration{
+	dbMigrations.SampleMigration{},
+	// Add migrations here :)
+}
 
 type SpaHandler struct {
 	embedFS      embed.FS
@@ -48,6 +55,11 @@ func (handler SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	err := config.LoadConfiguration()
+	if err != nil {
+		panic(err)
+	}
+
+	err = migrator.Migrate(migrations)
 	if err != nil {
 		panic(err)
 	}

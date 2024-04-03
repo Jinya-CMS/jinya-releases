@@ -1,0 +1,26 @@
+version: "3"
+services:
+  jinya-releases-postgres:
+    image: library/postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: jinya
+      POSTGRES_PASSWORD: jinya
+      POSTGRES_DB: jinya
+    restart: always
+  jinya-releases-minio:
+    image: quay.io/minio/minio
+    ports:
+      - 9201:9001
+      - 9200:9000
+    environment:
+      MINIO_ROOT_USER: jinya-releases
+      MINIO_ROOT_PASSWORD: jinya-releases
+    volumes:
+      - ./var/minio/data:/data
+    command:
+      - server
+      - /data
+      - --console-address
+      - ":9001"

@@ -1,4 +1,4 @@
-package database
+package models
 
 type Application struct {
 	Id                   string `json:"id"`

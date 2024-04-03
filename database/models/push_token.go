@@ -1,4 +1,4 @@
-package database
+package models
 
 type PushToken struct {
 	Id            string   `json:"id"`
