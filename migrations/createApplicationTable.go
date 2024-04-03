@@ -7,11 +7,11 @@ import (
 const createApplicationTable = `
 CREATE TABLE "application" (
 	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name text NOT NULL,
+    name text NOT NULL UNIQUE,
+    slug text NOT NULL UNIQUE,
     logo text NULL,
-    slug text UNIQUE NOT NULL,
-    homepage_template text NULL,
-    trackpage_template text NULL,
+    homepage_template text NOT NULL,
+    trackpage_template text NOT NULL,
     additional_css text NULL,
     additional_javascript text NULL
 )`

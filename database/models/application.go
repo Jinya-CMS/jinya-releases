@@ -2,21 +2,35 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"jinya-releases/database"
 )
 
 type Application struct {
-	Id                   string         `json:"id"`
-	Name                 string         `json:"name"`
-	Logo                 string         `json:"logo"`
-	Slug                 string         `json:"slug"`
-	HomepageTemplate     string         `json:"homepageTemplate"`
-	TrackpageTemplate    string         `json:"trackpageTemplate"`
-	AdditionalCss        sql.NullString `json:"additionalCss,omitempty"`
-	AdditionalJavaScript sql.NullString `json:"additionalJavaScript,omitempty"`
+	Id                   string         `json:"id" db:"id"`
+	Name                 string         `json:"name" db:"name"`
+	Logo                 sql.NullString `json:"logo" db:"logo"`
+	Slug                 string         `json:"slug" db:"slug"`
+	HomepageTemplate     string         `json:"homepageTemplate" db:"homepage_template"`
+	TrackpageTemplate    string         `json:"trackpageTemplate" db:"trackpage_template"`
+	AdditionalCss        sql.NullString `json:"additionalCss,omitempty" db:"additional_css"`
+	AdditionalJavaScript sql.NullString `json:"additionalJavaScript,omitempty" db:"additional_javascript"`
 }
 
 func CreateApplication(application Application) (*Application, error) {
+	if application.Name == "" {
+		return nil, errors.New("name is empty")
+	}
+	if application.Slug == "" {
+		return nil, errors.New("slug is empty")
+	}
+	if application.HomepageTemplate == "" {
+		return nil, errors.New("homepageTemplate is empty")
+	}
+	if application.TrackpageTemplate == "" {
+		return nil, errors.New("trackpageTemplate is empty")
+	}
+
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err

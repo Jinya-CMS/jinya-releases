@@ -6,7 +6,6 @@ import (
 	"jinya-releases/api"
 	"jinya-releases/config"
 	migrator "jinya-releases/database/migrations"
-	dbMigrations "jinya-releases/migrations"
 	"log"
 	"net/http"
 	"path"
@@ -21,10 +20,6 @@ var (
 	//go:embed static
 	static embed.FS
 )
-
-var migrations = []migrator.Migration{
-	dbMigrations.CreateApplicationTable{},
-}
 
 type SpaHandler struct {
 	embedFS      embed.FS
@@ -58,7 +53,7 @@ func main() {
 		panic(err)
 	}
 
-	err = migrator.Migrate(migrations)
+	err = migrator.Migrate()
 	if err != nil {
 		panic(err)
 	}
