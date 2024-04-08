@@ -63,7 +63,7 @@ func GetAllApplications() ([]Application, error) {
 	return applications, nil
 }
 
-func GetApplicationById(id int) (*Application, error) {
+func GetApplicationById(id string) (*Application, error) {
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func UpdateApplication(application Application) (*Application, error) {
 	return GetApplicationBySlug(application.Slug)
 }
 
-func DeleteApplicationById(id int) error {
+func DeleteApplicationById(id string) error {
 	db, err := database.Connect()
 	if err != nil {
 		return err
