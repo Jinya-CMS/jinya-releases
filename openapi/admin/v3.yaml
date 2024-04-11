@@ -46,6 +46,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/application'
+        '400':
+          description: Fields are missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-details'
         '409':
           description: Application already exists
           content:

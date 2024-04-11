@@ -1,34 +1,41 @@
 package models
 
 import (
-	"database/sql"
 	"errors"
 	"jinya-releases/database"
 )
 
 type Application struct {
-	Id                   string         `json:"id" db:"id"`
-	Name                 string         `json:"name" db:"name"`
-	Logo                 sql.NullString `json:"logo" db:"logo"`
-	Slug                 string         `json:"slug" db:"slug"`
-	HomepageTemplate     string         `json:"homepageTemplate" db:"homepage_template"`
-	TrackpageTemplate    string         `json:"trackpageTemplate" db:"trackpage_template"`
-	AdditionalCss        sql.NullString `json:"additionalCss,omitempty" db:"additional_css"`
-	AdditionalJavaScript sql.NullString `json:"additionalJavaScript,omitempty" db:"additional_javascript"`
+	Id                   string  `json:"id" db:"id"`
+	Name                 string  `json:"name" db:"name"`
+	Logo                 *string `json:"logo" db:"logo"`
+	Slug                 string  `json:"slug" db:"slug"`
+	HomepageTemplate     string  `json:"homepageTemplate" db:"homepage_template"`
+	TrackpageTemplate    string  `json:"trackpageTemplate" db:"trackpage_template"`
+	AdditionalCss        *string `json:"additionalCss,omitempty" db:"additional_css"`
+	AdditionalJavaScript *string `json:"additionalJavaScript,omitempty" db:"additional_javascript"`
 }
+
+var (
+	ErrNameEmpty              = errors.New("name is empty")
+	ErrSlugEmpty              = errors.New("slug is empty")
+	ErrHomepageTemplateEmpty  = errors.New("homepage template is empty")
+	ErrTrackpageTemplateEmpty = errors.New("trackpage template is empty")
+	ErrApplicationNotFound    = errors.New("application not found")
+)
 
 func CreateApplication(application Application) (*Application, error) {
 	if application.Name == "" {
-		return nil, errors.New("name is empty")
+		return nil, ErrNameEmpty
 	}
 	if application.Slug == "" {
-		return nil, errors.New("slug is empty")
+		return nil, ErrSlugEmpty
 	}
 	if application.HomepageTemplate == "" {
-		return nil, errors.New("homepageTemplate is empty")
+		return nil, ErrHomepageTemplateEmpty
 	}
 	if application.TrackpageTemplate == "" {
-		return nil, errors.New("trackpageTemplate is empty")
+		return nil, ErrTrackpageTemplateEmpty
 	}
 
 	db, err := database.Connect()
@@ -103,10 +110,18 @@ func UpdateApplication(application Application) (*Application, error) {
 
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE application SET name = $1, logo = $2, slug = $3, homepage_template = $4, trackpage_template = $5, additional_css = $6, additional_javascript = $7", application.Name, application.Logo, application.Slug, application.HomepageTemplate, application.TrackpageTemplate, application.AdditionalCss, application.AdditionalJavaScript)
-
+	result, err := db.Exec("UPDATE application SET name = $1, logo = $2, slug = $3, homepage_template = $4, trackpage_template = $5, additional_css = $6, additional_javascript = $7 WHERE id = $8", application.Name, application.Logo, application.Slug, application.HomepageTemplate, application.TrackpageTemplate, application.AdditionalCss, application.AdditionalJavaScript, application.Id)
 	if err != nil {
 		return nil, err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	if affected == 0 {
+		return nil, ErrApplicationNotFound
 	}
 
 	return GetApplicationBySlug(application.Slug)
@@ -120,15 +135,19 @@ func DeleteApplicationById(id string) error {
 
 	defer db.Close()
 
-	tx, err := db.Begin()
+	result, err := db.Exec("DELETE FROM application WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
 
-	_, err = tx.Exec("DELETE FROM application WHERE id = $1", id)
+	affected, err := result.RowsAffected()
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
-	return tx.Commit()
+	if affected == 0 {
+		return ErrApplicationNotFound
+	}
+
+	return nil
 }

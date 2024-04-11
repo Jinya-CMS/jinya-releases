@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"jinya-releases/config"
 	"jinya-releases/database"
 	migrator "jinya-releases/database/migrations"
@@ -46,6 +45,7 @@ func TestCreateApplication(t *testing.T) {
 		additionalApplications []Application
 		application            Application
 	}
+	testPtr := "test"
 	tests := []struct {
 		name    string
 		args    args
@@ -55,22 +55,13 @@ func TestCreateApplication(t *testing.T) {
 			name: "CreateNewApplicationSuccessfulAllFields",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
-					HomepageTemplate:  "test",
-					TrackpageTemplate: "test",
-					AdditionalCss: sql.NullString{
-						String: "test",
-						Valid:  true,
-					},
-					AdditionalJavaScript: sql.NullString{
-						String: "test",
-						Valid:  true,
-					},
-					Logo: sql.NullString{
-						String: "test",
-						Valid:  true,
-					},
+					Name:                 "test",
+					Slug:                 "test",
+					HomepageTemplate:     "test",
+					TrackpageTemplate:    "test",
+					AdditionalCss:        &testPtr,
+					AdditionalJavaScript: &testPtr,
+					Logo:                 &testPtr,
 				},
 			},
 			wantErr: false,
