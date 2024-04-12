@@ -51,15 +51,14 @@ func updateApplication(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	encoder := json.NewEncoder(w)
-	app, errDetails, errStatus := service.UpdateApplication(id, r.Body)
+	_, errDetails, errStatus := service.UpdateApplication(id, r.Body)
 	if errDetails != nil {
 		w.WriteHeader(errStatus)
 		_ = encoder.Encode(errDetails)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	_ = encoder.Encode(app)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func deleteApplication(w http.ResponseWriter, r *http.Request) {
