@@ -478,3 +478,84 @@ func TestUpdateApplication(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteApplication(t *testing.T) {
+	type args struct {
+		id          string
+		application models.Application
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantErr    bool
+		wantStatus int
+	}{
+		{
+			name: "DeleteApplicationByIdExists",
+			args: args{
+				id: "",
+				application: models.Application{
+					Name:              "test",
+					Slug:              "test",
+					HomepageTemplate:  "test",
+					TrackpageTemplate: "test",
+				},
+			},
+			wantErr:    false,
+			wantStatus: http.StatusNoContent,
+		},
+		{
+			name: "DeleteApplicationByIdDoesNotExist",
+			args: args{
+				id: "falseId",
+				application: models.Application{
+					Name:              "test",
+					Slug:              "test",
+					HomepageTemplate:  "test",
+					TrackpageTemplate: "test",
+				},
+			},
+			wantErr:    true,
+			wantStatus: http.StatusNotFound,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := models.CreateApplication(tt.args.application); err != nil {
+				t.Errorf("Prepare CreateApplication() error = %v", err)
+				test.CleanTables()
+				return
+			}
+
+			got, err := models.GetApplicationBySlug(tt.args.application.Slug)
+			if err != nil {
+				t.Errorf("Prepare GetApplicationBySlug() error = %v", err)
+				test.CleanTables()
+				return
+			}
+
+			if len(tt.args.id) > 0 {
+				err, status := DeleteApplication(tt.args.id)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("DeleteApplication() error = %v, wantErr %v", err, tt.wantErr)
+					test.CleanTables()
+					return
+				} else if tt.wantStatus != status {
+					t.Errorf("DeleteApplication() status = %v, wantStatus %v", status, tt.wantStatus)
+					return
+				}
+			} else {
+				err, status := DeleteApplication(got.Id)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("DeleteApplication() error = %v, wantErr %v", err, tt.wantErr)
+					test.CleanTables()
+					return
+				} else if tt.wantStatus != status {
+					t.Errorf("DeleteApplication() status = %v, wantStatus %v", status, tt.wantStatus)
+					return
+				}
+			}
+
+		})
+	}
+}

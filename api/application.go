@@ -64,9 +64,16 @@ func updateApplication(w http.ResponseWriter, r *http.Request) {
 
 func deleteApplication(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	log.Printf("Id: %s", id)
 
-	w.WriteHeader(http.StatusNotImplemented)
+	encoder := json.NewEncoder(w)
+	errDetails, status := service.DeleteApplication(id)
+	if errDetails != nil {
+		w.WriteHeader(status)
+		_ = encoder.Encode(errDetails)
+		return
+	}
+
+	w.WriteHeader(status)
 }
 
 func uploadLogo(w http.ResponseWriter, r *http.Request) {

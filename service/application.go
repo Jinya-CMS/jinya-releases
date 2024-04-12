@@ -221,3 +221,32 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	status = http.StatusNoContent
 	return
 }
+
+func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
+	err := models.DeleteApplicationById(id)
+	if err != nil {
+		errDetails = &ErrorDetails{
+			EntityType: "application",
+		}
+		var pgErr *pgconn.PgError
+		if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
+			return
+		} else if errors.As(err, &pgErr) {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown database error"
+			log.Println(err.Error())
+			return
+		} else {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown error"
+			errDetails.ErrorType = "server"
+			log.Println(err.Error())
+			return
+		}
+	}
+	status = http.StatusNoContent
+	return
+}
