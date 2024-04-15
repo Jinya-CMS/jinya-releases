@@ -203,19 +203,16 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 			if pgErr.Code == pgerrcode.UniqueViolation {
 				status = http.StatusConflict
 				errDetails.Message = "Application already exists"
-				return
 			} else {
 				status = http.StatusInternalServerError
 				errDetails.Message = "Unknown database error"
 				log.Println(err.Error())
-				return
 			}
 		} else {
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown error"
 			errDetails.ErrorType = "server"
 			log.Println(err.Error())
-			return
 		}
 	}
 	status = http.StatusNoContent
@@ -233,18 +230,15 @@ func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
 			status = http.StatusNotFound
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Application not found"
-			return
 		} else if errors.As(err, &pgErr) {
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown database error"
 			log.Println(err.Error())
-			return
 		} else {
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown error"
 			errDetails.ErrorType = "server"
 			log.Println(err.Error())
-			return
 		}
 	}
 	status = http.StatusNoContent
