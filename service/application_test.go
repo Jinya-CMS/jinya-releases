@@ -34,7 +34,8 @@ func TestMain(m *testing.M) {
 	}
 
 	if err := migrator.Migrate(); err != nil {
-		log.Fatalln("Failed to migrate database")
+		log.Println("Failed to migrate database")
+		log.Println("Running tests anyway, database might be migrated already")
 	}
 
 	code := m.Run()
