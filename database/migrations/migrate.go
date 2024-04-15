@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 
 var migrations = []Migration{
 	dbMigrations.CreateApplicationTable{},
+	dbMigrations.CreateTrackTable{},
 }
 
 func createMigrationsTable() error {

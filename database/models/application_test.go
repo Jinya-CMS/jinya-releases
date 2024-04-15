@@ -17,6 +17,8 @@ func cleanDatabase() error {
 		return err
 	}
 
+	_, _ = conn.Exec("ALTER TABLE track DROP CONSTRAINT track_applicationid_fkey")
+	_, _ = conn.Exec("DROP TABLE track CASCADE")
 	_, _ = conn.Exec("DROP TABLE application CASCADE")
 	_, _ = conn.Exec("DROP TABLE migrations CASCADE")
 

@@ -1,8 +1,140 @@
 package models
 
+import (
+	"errors"
+	"jinya-releases/database"
+)
+
 type Track struct {
-	Id        string `json:"id"`
-	Name      string `json:"name"`
-	Slug      string `json:"slug"`
-	IsDefault bool   `json:"isDefault"`
+	Id            string `json:"id"`
+	ApplicationId string `json:"applicationId"`
+	Name          string `json:"name"`
+	Slug          string `json:"slug"`
+	IsDefault     bool   `json:"isDefault"`
+}
+
+var (
+	ErrTrackNotFound = errors.New("track not found")
+)
+
+func CreateTrack(track Track) (*Track, error) {
+	if track.Name == "" {
+		return nil, ErrNameEmpty
+	}
+	if track.Slug == "" {
+		return nil, ErrSlugEmpty
+	}
+
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+
+	_, err = db.Exec("INSERT INTO track (applicationid, name, slug, isdefault) VALUES ($1, $2, $3, $4)", track.ApplicationId, track.Name, track.Slug, track.IsDefault)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return GetTrackBySlug(track.Slug, track.ApplicationId)
+}
+
+func GetAllTracks(applicationId string) ([]Track, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+	tracks := make([]Track, 0)
+
+	if err = db.Select(&tracks, "SELECT id, applicationid, name, slug, isdefault FROM track WHERE applicationid = $1 ORDER BY name", applicationId); err != nil {
+		return nil, err
+	}
+
+	return tracks, nil
+}
+
+func GetTrackById(id string, applicationId string) (*Track, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+	track := new(Track)
+
+	if err = db.Get(track, "SELECT id, applicationid, name, slug, isdefault FROM track WHERE id = $1 AND applicationid = $2", id, applicationId); err != nil {
+		return nil, err
+	}
+
+	return track, nil
+}
+
+func GetTrackBySlug(slug string, applicationId string) (*Track, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+	track := new(Track)
+
+	if err = db.Get(track, "SELECT id, applicationid, name, slug, isdefault FROM track WHERE slug = $1 AND applicationid = $2", slug, applicationId); err != nil {
+		return nil, err
+	}
+
+	return track, nil
+}
+
+func UpdateTrack(track Track) (*Track, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+
+	result, err := db.Exec("UPDATE track SET name = $1, slug = $2, isdefault = $3 WHERE id = $4 AND applicationid = $5", track.Name, track.Slug, track.IsDefault, track.Id, track.ApplicationId)
+	if err != nil {
+		return nil, err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	if affected == 0 {
+		return nil, ErrTrackNotFound
+	}
+
+	return GetTrackBySlug(track.Slug, track.ApplicationId)
+}
+
+func DeleteTrackById(id string, applicationId string) error {
+	db, err := database.Connect()
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	result, err := db.Exec("DELETE FROM track WHERE id = $1 AND applicationid = $2", id, applicationId)
+	if err != nil {
+		return err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected == 0 {
+		return ErrTrackNotFound
+	}
+
+	return nil
 }
