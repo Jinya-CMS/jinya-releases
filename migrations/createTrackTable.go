@@ -5,11 +5,11 @@ import "github.com/jmoiron/sqlx"
 const createTrackTable = `
 	CREATE TABLE "track" (
 	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-	applicationId uuid NOT NULL,
+	application_id uuid NOT NULL,
     name text NOT NULL UNIQUE,
     slug text NOT NULL UNIQUE,
-    isDefault bool NOT NULL,
-    FOREIGN KEY (applicationId) REFERENCES application(id)
+    is_default bool NOT NULL,
+    FOREIGN KEY (application_id) REFERENCES application(id)
 )
 `
 

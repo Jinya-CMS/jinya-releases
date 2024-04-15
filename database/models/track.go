@@ -6,11 +6,11 @@ import (
 )
 
 type Track struct {
-	Id            string `json:"id"`
-	ApplicationId string `json:"applicationId"`
-	Name          string `json:"name"`
-	Slug          string `json:"slug"`
-	IsDefault     bool   `json:"isDefault"`
+	Id            string `json:"id" db:"id"`
+	ApplicationId string `json:"applicationId" db:"application_id"`
+	Name          string `json:"name" db:"name"`
+	Slug          string `json:"slug" db:"slug"`
+	IsDefault     bool   `json:"isDefault" db:"is_default"`
 }
 
 var (
@@ -32,7 +32,7 @@ func CreateTrack(track Track) (*Track, error) {
 
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO track (applicationid, name, slug, isdefault) VALUES ($1, $2, $3, $4)", track.ApplicationId, track.Name, track.Slug, track.IsDefault)
+	_, err = db.Exec("INSERT INTO track (application_id, name, slug, is_default) VALUES ($1, $2, $3, $4)", track.ApplicationId, track.Name, track.Slug, track.IsDefault)
 
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func GetAllTracks(applicationId string) ([]Track, error) {
 	defer db.Close()
 	tracks := make([]Track, 0)
 
-	if err = db.Select(&tracks, "SELECT id, applicationid, name, slug, isdefault FROM track WHERE applicationid = $1 ORDER BY name", applicationId); err != nil {
+	if err = db.Select(&tracks, "SELECT id, application_id, name, slug, is_default FROM track WHERE application_id = $1 ORDER BY name", applicationId); err != nil {
 		return nil, err
 	}
 
@@ -66,7 +66,7 @@ func GetTrackById(id string, applicationId string) (*Track, error) {
 	defer db.Close()
 	track := new(Track)
 
-	if err = db.Get(track, "SELECT id, applicationid, name, slug, isdefault FROM track WHERE id = $1 AND applicationid = $2", id, applicationId); err != nil {
+	if err = db.Get(track, "SELECT id, application_id, name, slug, is_default FROM track WHERE id = $1 AND application_id = $2", id, applicationId); err != nil {
 		return nil, err
 	}
 
@@ -82,7 +82,7 @@ func GetTrackBySlug(slug string, applicationId string) (*Track, error) {
 	defer db.Close()
 	track := new(Track)
 
-	if err = db.Get(track, "SELECT id, applicationid, name, slug, isdefault FROM track WHERE slug = $1 AND applicationid = $2", slug, applicationId); err != nil {
+	if err = db.Get(track, "SELECT id, application_id, name, slug, is_default FROM track WHERE slug = $1 AND application_id = $2", slug, applicationId); err != nil {
 		return nil, err
 	}
 
@@ -97,7 +97,7 @@ func UpdateTrack(track Track) (*Track, error) {
 
 	defer db.Close()
 
-	result, err := db.Exec("UPDATE track SET name = $1, slug = $2, isdefault = $3 WHERE id = $4 AND applicationid = $5", track.Name, track.Slug, track.IsDefault, track.Id, track.ApplicationId)
+	result, err := db.Exec("UPDATE track SET name = $1, slug = $2, is_default = $3 WHERE id = $4 AND application_id = $5", track.Name, track.Slug, track.IsDefault, track.Id, track.ApplicationId)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func DeleteTrackById(id string, applicationId string) error {
 
 	defer db.Close()
 
-	result, err := db.Exec("DELETE FROM track WHERE id = $1 AND applicationid = $2", id, applicationId)
+	result, err := db.Exec("DELETE FROM track WHERE id = $1 AND application_id = $2", id, applicationId)
 	if err != nil {
 		return err
 	}

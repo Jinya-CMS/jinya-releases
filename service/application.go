@@ -150,6 +150,8 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 }
 
 func UpdateApplication(id string, reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
+	status = http.StatusNoContent
+
 	body := new(updateApplicationRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
@@ -215,12 +217,13 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 			log.Println(err.Error())
 		}
 	}
-	status = http.StatusNoContent
 	return
 }
 
 func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
 	err := models.DeleteApplicationById(id)
+	status = http.StatusNoContent
+
 	if err != nil {
 		errDetails = &ErrorDetails{
 			EntityType: "application",
@@ -241,6 +244,5 @@ func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
 			log.Println(err.Error())
 		}
 	}
-	status = http.StatusNoContent
 	return
 }
