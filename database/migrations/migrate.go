@@ -3,6 +3,7 @@ package migrations
 import (
 	"github.com/jmoiron/sqlx"
 	"jinya-releases/database"
+	dbMigrations "jinya-releases/migrations"
 )
 
 type Migration interface {
@@ -16,6 +17,10 @@ CREATE TABLE IF NOT EXISTS migrations (
     Version varchar(255) PRIMARY KEY
 )
 `
+
+var migrations = []Migration{
+	dbMigrations.CreateApplicationTable{},
+}
 
 func createMigrationsTable() error {
 	db, err := database.Connect()
@@ -66,7 +71,7 @@ func isMigrated(version string) (bool, error) {
 	return false, err
 }
 
-func Migrate(migrations []Migration) error {
+func Migrate() error {
 	db, err := database.Connect()
 	if err != nil {
 		return err
