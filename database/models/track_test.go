@@ -408,3 +408,195 @@ func TestGetTrackBySlug(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateTrack(t *testing.T) {
+	type args struct {
+		track            Track
+		testTrack        Track
+		additionalTracks []Track
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Track
+		wantErr bool
+	}{
+		{
+			name: "UpdateTrackFields",
+			args: args{
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+				testTrack: Track{
+					Name:      "test1",
+					Slug:      "test1",
+					IsDefault: true,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "UpdateTrackNameExists",
+			args: args{
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+				testTrack: Track{
+					Name:      "test2",
+					Slug:      "test1",
+					IsDefault: true,
+				},
+				additionalTracks: []Track{
+					{
+						Name:      "test2",
+						Slug:      "test2",
+						IsDefault: false,
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "UpdateTrackSlugExists",
+			args: args{
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+				testTrack: Track{
+					Name:      "test1",
+					Slug:      "test2",
+					IsDefault: true,
+				},
+				additionalTracks: []Track{
+					{
+						Name:      "test2",
+						Slug:      "test2",
+						IsDefault: false,
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app, err := CreateApplication(Application{
+				Name:              "track_test",
+				Slug:              "track_test",
+				HomepageTemplate:  "test",
+				TrackpageTemplate: "test",
+			})
+			if err != nil {
+				t.Errorf("Prepare UpdateTrack() error = %v", err)
+				test.CleanTables()
+				return
+			}
+			for _, track := range tt.args.additionalTracks {
+				track.ApplicationId = app.Id
+				if _, err := CreateTrack(track); err != nil {
+					t.Errorf("Prepare UpdateTrack() error = %v", err)
+					test.CleanTables()
+					return
+				}
+			}
+
+			tt.args.track.ApplicationId = app.Id
+			track, err := CreateTrack(tt.args.track)
+			if err != nil {
+				t.Errorf("Prepare UpdateTrack() error = %v", err)
+				test.CleanTables()
+				return
+			}
+			track.Name = tt.args.testTrack.Name
+			track.Slug = tt.args.testTrack.Slug
+			track.IsDefault = tt.args.testTrack.IsDefault
+
+			got, err := UpdateTrack(*track)
+			test.CleanTables()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UpdateTrack() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, track) != tt.wantErr {
+				t.Errorf("UpdateTrack() got = %v, want %v", got, track)
+			}
+		})
+	}
+}
+
+func TestDeleteTrackById(t *testing.T) {
+	type args struct {
+		track Track
+		id    string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "DeleteTrackByIdExists",
+			args: args{
+				id: "",
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "DeleteTrackByIdDoesNotExist",
+			args: args{
+				id: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app, err := CreateApplication(Application{
+				Name:              "track_test",
+				Slug:              "track_test",
+				HomepageTemplate:  "test",
+				TrackpageTemplate: "test",
+			})
+			if err != nil {
+				t.Errorf("Prepare DeleteTrackById() error = %v", err)
+				test.CleanTables()
+				return
+			}
+			tt.args.track.ApplicationId = app.Id
+			track, err := CreateTrack(tt.args.track)
+			if err != nil {
+				t.Errorf("Prepare DeleteTrackById() error = %v", err)
+				test.CleanTables()
+				return
+			}
+			if len(tt.args.id) > 0 {
+				if err := DeleteTrackById(tt.args.id, track.ApplicationId); (err != nil) != tt.wantErr {
+					t.Errorf("DeleteTrackById() error = %v, wantErr %v", err, tt.wantErr)
+					test.CleanTables()
+				}
+			} else {
+				if err := DeleteTrackById(track.Id, track.ApplicationId); (err != nil) != tt.wantErr {
+					t.Errorf("DeleteTrackById() error = %v, wantErr %v", err, tt.wantErr)
+					test.CleanTables()
+				}
+			}
+			test.CleanTables()
+		})
+	}
+}
