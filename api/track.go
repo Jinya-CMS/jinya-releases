@@ -37,8 +37,9 @@ func getTrackById(w http.ResponseWriter, r *http.Request) {
 }
 
 func createTrack(w http.ResponseWriter, r *http.Request) {
+	applicationId := mux.Vars(r)["applicationId"]
 	encoder := json.NewEncoder(w)
-	track, errDetails, errStatus := service.CreateTrack(r.Body)
+	track, errDetails, errStatus := service.CreateTrack(r.Body, applicationId)
 	if errDetails != nil {
 		w.WriteHeader(errStatus)
 		_ = encoder.Encode(errDetails)

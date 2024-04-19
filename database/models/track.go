@@ -90,6 +90,13 @@ func GetTrackBySlug(slug string, applicationId string) (*Track, error) {
 }
 
 func UpdateTrack(track Track) (*Track, error) {
+	if track.Name == "" {
+		return nil, ErrNameEmpty
+	}
+	if track.Slug == "" {
+		return nil, ErrSlugEmpty
+	}
+
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err

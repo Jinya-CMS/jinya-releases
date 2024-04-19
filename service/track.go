@@ -13,6 +13,7 @@ import (
 )
 
 type createTrackRequest struct {
+	Id        string `json:"id"`
 	Name      string `json:"name"`
 	Slug      string `json:"slug"`
 	IsDefault bool   `json:"isDefault"`
@@ -26,7 +27,6 @@ type updateTrackRequest struct {
 
 func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *ErrorDetails) {
 	tracks, err := models.GetAllTracks(applicationId)
-
 	if err != nil {
 		errDetails = &ErrorDetails{
 			EntityType: "track",
@@ -39,6 +39,7 @@ func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *Erro
 }
 
 func GetTrackById(trackId string, applicationId string) (track *models.Track, errDetails *ErrorDetails, status int) {
+	status = http.StatusOK
 	track, err := models.GetTrackById(trackId, applicationId)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -63,7 +64,8 @@ func GetTrackById(trackId string, applicationId string) (track *models.Track, er
 	return
 }
 
-func CreateTrack(reader io.Reader) (track *models.Track, errDetails *ErrorDetails, status int) {
+func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, errDetails *ErrorDetails, status int) {
+	status = http.StatusCreated
 	body := new(createTrackRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
@@ -90,9 +92,10 @@ func CreateTrack(reader io.Reader) (track *models.Track, errDetails *ErrorDetail
 	}
 
 	trk := models.Track{
-		Name:      body.Name,
-		Slug:      body.Slug,
-		IsDefault: body.IsDefault,
+		ApplicationId: applicationId,
+		Name:          body.Name,
+		Slug:          body.Slug,
+		IsDefault:     body.IsDefault,
 	}
 
 	track, err = models.CreateTrack(trk)
@@ -116,6 +119,9 @@ func CreateTrack(reader io.Reader) (track *models.Track, errDetails *ErrorDetail
 			if pgErr.Code == pgerrcode.UniqueViolation {
 				status = http.StatusConflict
 				errDetails.Message = "Track already exists"
+			} else if pgErr.Code == pgerrcode.ForeignKeyViolation {
+				status = http.StatusNotFound
+				errDetails.Message = "Application not found"
 			} else {
 				status = http.StatusInternalServerError
 				errDetails.Message = "Unknown database error"
@@ -175,7 +181,15 @@ func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track 
 		}
 
 		var pgErr *pgconn.PgError
-		if errors.Is(err, models.ErrTrackNotFound) {
+		if errors.Is(err, models.ErrSlugEmpty) {
+			status = http.StatusBadRequest
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Slug missing"
+		} else if errors.Is(err, models.ErrNameEmpty) {
+			status = http.StatusBadRequest
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Name missing"
+		} else if errors.Is(err, models.ErrTrackNotFound) {
 			status = http.StatusNotFound
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Track not found"
