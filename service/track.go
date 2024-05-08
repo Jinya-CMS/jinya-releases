@@ -25,13 +25,28 @@ type updateTrackRequest struct {
 	IsDefault bool   `json:"isDefault"`
 }
 
-func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *ErrorDetails) {
+func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *ErrorDetails, status int) {
 	tracks, err := models.GetAllTracks(applicationId)
 	if err != nil {
-		errDetails = &ErrorDetails{
-			EntityType: "track",
-			ErrorType:  "database",
-			Message:    "Could not get all tracks",
+		var pgErr *pgconn.PgError
+		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			_, err := models.GetApplicationById(applicationId)
+			if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+				errDetails = &ErrorDetails{
+					EntityType: "track",
+					ErrorType:  "database",
+					Message:    "Could not find application",
+				}
+				status = http.StatusNotFound
+			}
+		} else {
+			errDetails = &ErrorDetails{
+				EntityType: "track",
+				ErrorType:  "database",
+				Message:    "Could not get all tracks",
+			}
+			status = http.StatusInternalServerError
+			log.Println(err.Error())
 		}
 	}
 
@@ -48,6 +63,13 @@ func GetTrackById(trackId string, applicationId string) (track *models.Track, er
 				EntityType: "track",
 				ErrorType:  "database",
 				Message:    "Could not find track",
+			}
+			status = http.StatusNotFound
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
+			errDetails = &ErrorDetails{
+				EntityType: "track",
+				ErrorType:  "database",
+				Message:    "Could not find application",
 			}
 			status = http.StatusNotFound
 		} else {
@@ -228,6 +250,10 @@ func DeleteTrack(trackId string, applicationId string) (errDetails *ErrorDetails
 			status = http.StatusNotFound
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Track not found"
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
 		} else if errors.As(err, &pgErr) {
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown database error"

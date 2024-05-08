@@ -49,6 +49,15 @@ func GetAllTracks(applicationId string) ([]Track, error) {
 
 	defer db.Close()
 	tracks := make([]Track, 0)
+	applicationCount := 0
+
+	if err = db.Get(&applicationCount, "SELECT COUNT(*) FROM application WHERE id = $1", applicationId); err != nil {
+		return nil, err
+	}
+
+	if applicationCount == 0 {
+		return nil, ErrApplicationNotFound
+	}
 
 	if err = db.Select(&tracks, "SELECT id, application_id, name, slug, is_default FROM track WHERE application_id = $1 ORDER BY name", applicationId); err != nil {
 		return nil, err
@@ -65,6 +74,15 @@ func GetTrackById(id string, applicationId string) (*Track, error) {
 
 	defer db.Close()
 	track := new(Track)
+	applicationCount := 0
+
+	if err = db.Get(&applicationCount, "SELECT COUNT(*) FROM application WHERE id = $1", applicationId); err != nil {
+		return nil, err
+	}
+
+	if applicationCount == 0 {
+		return nil, ErrApplicationNotFound
+	}
 
 	if err = db.Get(track, "SELECT id, application_id, name, slug, is_default FROM track WHERE id = $1 AND application_id = $2", id, applicationId); err != nil {
 		return nil, err
@@ -81,6 +99,15 @@ func GetTrackBySlug(slug string, applicationId string) (*Track, error) {
 
 	defer db.Close()
 	track := new(Track)
+	applicationCount := 0
+
+	if err = db.Get(&applicationCount, "SELECT COUNT(*) FROM application WHERE id = $1", applicationId); err != nil {
+		return nil, err
+	}
+
+	if applicationCount == 0 {
+		return nil, ErrApplicationNotFound
+	}
 
 	if err = db.Get(track, "SELECT id, application_id, name, slug, is_default FROM track WHERE slug = $1 AND application_id = $2", slug, applicationId); err != nil {
 		return nil, err
@@ -125,6 +152,15 @@ func DeleteTrackById(id string, applicationId string) error {
 	db, err := database.Connect()
 	if err != nil {
 		return err
+	}
+	applicationCount := 0
+
+	if err = db.Get(&applicationCount, "SELECT COUNT(*) FROM application WHERE id = $1", applicationId); err != nil {
+		return err
+	}
+
+	if applicationCount == 0 {
+		return ErrApplicationNotFound
 	}
 
 	defer db.Close()

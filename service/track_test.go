@@ -15,6 +15,7 @@ func TestGetAllTracks(t *testing.T) {
 	type args struct {
 		applicationId string
 		tracks        []models.Track
+		appId         string
 	}
 	tests := []struct {
 		name       string
@@ -81,6 +82,27 @@ func TestGetAllTracks(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "GetAllTracksApplicationWrong",
+			args: args{
+				tracks: []models.Track{
+					{
+						Name:      "test",
+						Slug:      "test",
+						IsDefault: true,
+					},
+				},
+				appId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
+			},
+			wantTracks: []models.Track{
+				{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: true,
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -105,7 +127,14 @@ func TestGetAllTracks(t *testing.T) {
 				return
 			}
 
-			gotTracks, errDetails := GetAllTracks(app.Id)
+			var appId string
+			if len(tt.args.appId) > 0 {
+				appId = tt.args.appId
+			} else {
+				appId = app.Id
+			}
+
+			gotTracks, errDetails, _ := GetAllTracks(appId)
 			test.CleanTables()
 
 			if (errDetails != nil) != tt.wantErr {

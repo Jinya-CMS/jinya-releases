@@ -142,6 +142,7 @@ func TestCreateTrack(t *testing.T) {
 func TestGetAllTracks(t *testing.T) {
 	type args struct {
 		tracks []Track
+		appId  string
 	}
 	tests := []struct {
 		name    string
@@ -208,6 +209,28 @@ func TestGetAllTracks(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "GetAllTracksWrongApplication",
+			args: args{
+				tracks: []Track{
+					{
+						ApplicationId: "",
+						Name:          "test",
+						Slug:          "test",
+						IsDefault:     true,
+					},
+				},
+				appId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
+			},
+			want: []Track{
+				{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: true,
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -232,13 +255,19 @@ func TestGetAllTracks(t *testing.T) {
 				}
 			}
 
-			got, err := GetAllTracks(app.Id)
+			var appId string
+			if len(tt.args.appId) > 0 {
+				appId = tt.args.appId
+			} else {
+				appId = app.Id
+			}
+			got, err := GetAllTracks(appId)
 			test.CleanTables()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetAllTracks() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if len(got) != len(tt.want) {
+			if len(got) != len(tt.want) && !tt.wantErr {
 				t.Errorf("GetAllTracks() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -411,9 +440,11 @@ func TestGetTrackBySlug(t *testing.T) {
 
 func TestUpdateTrack(t *testing.T) {
 	type args struct {
-		track            Track
-		testTrack        Track
-		additionalTracks []Track
+		track              Track
+		testTrack          Track
+		additionalTracks   []Track
+		missingTrack       bool
+		missingApplication bool
 	}
 	tests := []struct {
 		name    string
@@ -434,6 +465,8 @@ func TestUpdateTrack(t *testing.T) {
 					Slug:      "test1",
 					IsDefault: true,
 				},
+				missingTrack:       false,
+				missingApplication: false,
 			},
 			wantErr: false,
 		},
@@ -457,6 +490,8 @@ func TestUpdateTrack(t *testing.T) {
 						IsDefault: false,
 					},
 				},
+				missingTrack:       false,
+				missingApplication: false,
 			},
 			wantErr: true,
 		},
@@ -480,6 +515,44 @@ func TestUpdateTrack(t *testing.T) {
 						IsDefault: false,
 					},
 				},
+				missingTrack:       false,
+				missingApplication: false,
+			},
+			wantErr: true,
+		},
+		{
+			name: "UpdateTrackTrackNotFound",
+			args: args{
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+				testTrack: Track{
+					Name:      "test1",
+					Slug:      "test2",
+					IsDefault: true,
+				},
+				missingTrack:       true,
+				missingApplication: false,
+			},
+			wantErr: true,
+		},
+		{
+			name: "UpdateTrackApplicationNotFound",
+			args: args{
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+				testTrack: Track{
+					Name:      "test1",
+					Slug:      "test2",
+					IsDefault: true,
+				},
+				missingTrack:       true,
+				missingApplication: true,
 			},
 			wantErr: true,
 		},
@@ -513,6 +586,12 @@ func TestUpdateTrack(t *testing.T) {
 				test.CleanTables()
 				return
 			}
+			if tt.args.missingTrack {
+				track.Id = "e2ebb12e-e77d-4618-ba79-3f26e8af239a"
+			}
+			if tt.args.missingApplication {
+				track.ApplicationId = "e2ebb12e-e77d-4618-ba79-3f26e8af239a"
+			}
 			track.Name = tt.args.testTrack.Name
 			track.Slug = tt.args.testTrack.Slug
 			track.IsDefault = tt.args.testTrack.IsDefault
@@ -534,6 +613,7 @@ func TestDeleteTrackById(t *testing.T) {
 	type args struct {
 		track Track
 		id    string
+		AppId string
 	}
 	tests := []struct {
 		name    string
@@ -564,6 +644,18 @@ func TestDeleteTrackById(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "DeleteTrackByIdApplicationDoesNotExist",
+			args: args{
+				AppId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
+				track: Track{
+					Name:      "test",
+					Slug:      "test",
+					IsDefault: false,
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -585,7 +677,12 @@ func TestDeleteTrackById(t *testing.T) {
 				test.CleanTables()
 				return
 			}
-			if len(tt.args.id) > 0 {
+			if len(tt.args.AppId) > 0 {
+				if err := DeleteTrackById(track.Id, tt.args.AppId); (err != nil) != tt.wantErr {
+					t.Errorf("DeleteTrackById() error = %v, wantErr %v", err, tt.wantErr)
+					test.CleanTables()
+				}
+			} else if len(tt.args.id) > 0 {
 				if err := DeleteTrackById(tt.args.id, track.ApplicationId); (err != nil) != tt.wantErr {
 					t.Errorf("DeleteTrackById() error = %v, wantErr %v", err, tt.wantErr)
 					test.CleanTables()

@@ -11,9 +11,9 @@ func getAllTracks(w http.ResponseWriter, r *http.Request) {
 	applicationId := mux.Vars(r)["applicationId"]
 
 	encoder := json.NewEncoder(w)
-	tracks, errDetails := service.GetAllTracks(applicationId)
+	tracks, errDetails, errStatus := service.GetAllTracks(applicationId)
 	if errDetails != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(errStatus)
 		_ = encoder.Encode(errDetails)
 		return
 	}
