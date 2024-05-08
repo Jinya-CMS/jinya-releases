@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 
 var migrations = []Migration{
 	dbMigrations.CreateApplicationTable{},
+	dbMigrations.CreateTrackTable{},
 }
 
 func createMigrationsTable() error {
@@ -77,7 +78,7 @@ func Migrate() error {
 		return err
 	}
 
-	_ = db.MustExec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
+	_, _ = db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	err = createMigrationsTable()
 	if err != nil {

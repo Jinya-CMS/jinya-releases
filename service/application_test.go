@@ -21,6 +21,7 @@ func cleanDatabase() error {
 		return err
 	}
 
+	_, _ = conn.Exec("DROP TABLE track CASCADE")
 	_, _ = conn.Exec("DROP TABLE application CASCADE")
 	_, _ = conn.Exec("DROP TABLE migrations CASCADE")
 
@@ -33,7 +34,8 @@ func TestMain(m *testing.M) {
 	}
 
 	if err := migrator.Migrate(); err != nil {
-		log.Fatalln("Failed to migrate database")
+		log.Println("Failed to migrate database")
+		log.Println("Running tests anyway, database might be migrated already")
 	}
 
 	code := m.Run()
@@ -507,7 +509,7 @@ func TestDeleteApplication(t *testing.T) {
 		{
 			name: "DeleteApplicationByIdDoesNotExist",
 			args: args{
-				id: "falseId",
+				id: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				application: models.Application{
 					Name:              "test",
 					Slug:              "test",

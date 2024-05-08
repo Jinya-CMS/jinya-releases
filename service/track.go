@@ -12,52 +12,69 @@ import (
 	"net/http"
 )
 
-type createApplicationRequest struct {
-	Name                 string `json:"name"`
-	Slug                 string `json:"slug"`
-	HomepageTemplate     string `json:"homepageTemplate"`
-	TrackpageTemplate    string `json:"trackpageTemplate"`
-	AdditionalCss        string `json:"additionalCss,omitempty"`
-	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
+type createTrackRequest struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	Slug      string `json:"slug"`
+	IsDefault bool   `json:"isDefault"`
 }
 
-type updateApplicationRequest struct {
-	Name                 string `json:"name"`
-	Slug                 string `json:"slug"`
-	HomepageTemplate     string `json:"homepageTemplate"`
-	TrackpageTemplate    string `json:"trackpageTemplate"`
-	AdditionalCss        string `json:"additionalCss,omitempty"`
-	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
+type updateTrackRequest struct {
+	Name      string `json:"name"`
+	Slug      string `json:"slug"`
+	IsDefault bool   `json:"isDefault"`
 }
 
-func GetAllApplications() (applications []models.Application, errDetails *ErrorDetails) {
-	applications, err := models.GetAllApplications()
-
+func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *ErrorDetails, status int) {
+	tracks, err := models.GetAllTracks(applicationId)
 	if err != nil {
-		errDetails = &ErrorDetails{
-			EntityType: "application",
-			ErrorType:  "database",
-			Message:    "Could not get all applications",
+		var pgErr *pgconn.PgError
+		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			_, err := models.GetApplicationById(applicationId)
+			if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+				errDetails = &ErrorDetails{
+					EntityType: "track",
+					ErrorType:  "database",
+					Message:    "Could not find application",
+				}
+				status = http.StatusNotFound
+			}
+		} else {
+			errDetails = &ErrorDetails{
+				EntityType: "track",
+				ErrorType:  "database",
+				Message:    "Could not get all tracks",
+			}
+			status = http.StatusInternalServerError
+			log.Println(err.Error())
 		}
 	}
 
 	return
 }
 
-func GetApplicationById(id string) (application *models.Application, errDetails *ErrorDetails, status int) {
-	application, err := models.GetApplicationById(id)
+func GetTrackById(trackId string, applicationId string) (track *models.Track, errDetails *ErrorDetails, status int) {
+	status = http.StatusOK
+	track, err := models.GetTrackById(trackId, applicationId)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
 			errDetails = &ErrorDetails{
-				EntityType: "application",
+				EntityType: "track",
+				ErrorType:  "database",
+				Message:    "Could not find track",
+			}
+			status = http.StatusNotFound
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
+			errDetails = &ErrorDetails{
+				EntityType: "track",
 				ErrorType:  "database",
 				Message:    "Could not find application",
 			}
 			status = http.StatusNotFound
 		} else {
 			errDetails = &ErrorDetails{
-				EntityType: "application",
+				EntityType: "track",
 				ErrorType:  "server",
 				Message:    "Unknown error",
 			}
@@ -69,22 +86,23 @@ func GetApplicationById(id string) (application *models.Application, errDetails 
 	return
 }
 
-func CreateApplication(reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
-	body := new(createApplicationRequest)
+func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, errDetails *ErrorDetails, status int) {
+	status = http.StatusCreated
+	body := new(createTrackRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
 			errDetails = &ErrorDetails{
-				EntityType: "application",
+				EntityType: "track",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
 			errDetails = &ErrorDetails{
-				EntityType: "application",
+				EntityType: "track",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
 			}
@@ -95,19 +113,17 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 		return
 	}
 
-	app := models.Application{
-		Name:                 body.Name,
-		Slug:                 body.Slug,
-		HomepageTemplate:     body.HomepageTemplate,
-		TrackpageTemplate:    body.TrackpageTemplate,
-		AdditionalCss:        &body.AdditionalCss,
-		AdditionalJavaScript: &body.AdditionalJavaScript,
+	trk := models.Track{
+		ApplicationId: applicationId,
+		Name:          body.Name,
+		Slug:          body.Slug,
+		IsDefault:     body.IsDefault,
 	}
 
-	application, err = models.CreateApplication(app)
+	track, err = models.CreateTrack(trk)
 	if err != nil {
 		errDetails = &ErrorDetails{
-			EntityType: "application",
+			EntityType: "track",
 		}
 
 		var pgErr *pgconn.PgError
@@ -119,20 +135,15 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 			status = http.StatusBadRequest
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Name missing"
-		} else if errors.Is(err, models.ErrHomepageTemplateEmpty) {
-			status = http.StatusBadRequest
-			errDetails.ErrorType = "request"
-			errDetails.Message = "Homepage template missing"
-		} else if errors.Is(err, models.ErrTrackpageTemplateEmpty) {
-			status = http.StatusBadRequest
-			errDetails.ErrorType = "request"
-			errDetails.Message = "Trackpage template missing"
 		} else if errors.As(err, &pgErr) {
 			errDetails.ErrorType = "database"
 
 			if pgErr.Code == pgerrcode.UniqueViolation {
 				status = http.StatusConflict
-				errDetails.Message = "Application already exists"
+				errDetails.Message = "Track already exists"
+			} else if pgErr.Code == pgerrcode.ForeignKeyViolation {
+				status = http.StatusNotFound
+				errDetails.Message = "Application not found"
 			} else {
 				status = http.StatusInternalServerError
 				errDetails.Message = "Unknown database error"
@@ -149,24 +160,24 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 	return
 }
 
-func UpdateApplication(id string, reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
+func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track *models.Track, errDetails *ErrorDetails, status int) {
 	status = http.StatusNoContent
 
-	body := new(updateApplicationRequest)
+	body := new(updateTrackRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
 			errDetails = &ErrorDetails{
-				EntityType: "application",
+				EntityType: "track",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
 			errDetails = &ErrorDetails{
-				EntityType: "application",
+				EntityType: "track",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
 			}
@@ -177,34 +188,40 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 		return
 	}
 
-	app := models.Application{
-		Id:                   id,
-		Name:                 body.Name,
-		Slug:                 body.Slug,
-		HomepageTemplate:     body.HomepageTemplate,
-		TrackpageTemplate:    body.TrackpageTemplate,
-		AdditionalCss:        &body.AdditionalCss,
-		AdditionalJavaScript: &body.AdditionalJavaScript,
+	trk := models.Track{
+		Id:            trackId,
+		ApplicationId: applicationId,
+		Name:          body.Name,
+		Slug:          body.Slug,
+		IsDefault:     body.IsDefault,
 	}
 
-	application, err = models.UpdateApplication(app)
+	track, err = models.UpdateTrack(trk)
 	if err != nil {
 		errDetails = &ErrorDetails{
-			EntityType: "application",
+			EntityType: "track",
 		}
 
 		var pgErr *pgconn.PgError
-		if errors.Is(err, models.ErrApplicationNotFound) {
+		if errors.Is(err, models.ErrSlugEmpty) {
+			status = http.StatusBadRequest
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Slug missing"
+		} else if errors.Is(err, models.ErrNameEmpty) {
+			status = http.StatusBadRequest
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Name missing"
+		} else if errors.Is(err, models.ErrTrackNotFound) {
 			status = http.StatusNotFound
 			errDetails.ErrorType = "request"
-			errDetails.Message = "Application not found"
+			errDetails.Message = "Track not found"
 			return
 		} else if errors.As(err, &pgErr) {
 			errDetails.ErrorType = "database"
 
 			if pgErr.Code == pgerrcode.UniqueViolation {
 				status = http.StatusConflict
-				errDetails.Message = "Application already exists"
+				errDetails.Message = "Track already exists"
 			} else {
 				status = http.StatusInternalServerError
 				errDetails.Message = "Unknown database error"
@@ -220,16 +237,20 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	return
 }
 
-func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
-	err := models.DeleteApplicationById(id)
+func DeleteTrack(trackId string, applicationId string) (errDetails *ErrorDetails, status int) {
+	err := models.DeleteTrackById(trackId, applicationId)
 	status = http.StatusNoContent
 
 	if err != nil {
 		errDetails = &ErrorDetails{
-			EntityType: "application",
+			EntityType: "track",
 		}
 		var pgErr *pgconn.PgError
-		if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+		if errors.Is(err, models.ErrTrackNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Track not found"
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
 			status = http.StatusNotFound
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Application not found"
