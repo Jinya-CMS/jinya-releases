@@ -8,7 +8,7 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jmoiron/sqlx v1.4.0
-	go-simpler.org/env v0.12.0
+	go-simpler.org/env v0.11.0
 )
 
 require (
