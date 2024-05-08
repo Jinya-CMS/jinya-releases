@@ -22,7 +22,7 @@ test:
   variables:
     DATABASE_URL: host=localhost port=5432 user=jinya password=jinya dbname=jinya
   script:
-    - go test ./...
+    - go test ./... -p 1
 
 build:
   image: library/golang:1.22-alpine
