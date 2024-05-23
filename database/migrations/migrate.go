@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 var migrations = []Migration{
 	dbMigrations.CreateApplicationTable{},
 	dbMigrations.CreateTrackTable{},
+	dbMigrations.CreateVersionTable{},
 }
 
 func createMigrationsTable() error {
