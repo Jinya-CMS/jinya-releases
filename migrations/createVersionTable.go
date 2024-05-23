@@ -11,7 +11,8 @@ const createVersionTable = `
     url text NOT NULL,
     upload_date date NOT NULL,
     FOREIGN KEY (application_id) REFERENCES application(id),
-    FOREIGN KEY (track_id) references track(id)
+    FOREIGN KEY (track_id) references track(id),
+	UNIQUE (track_id, version)	                       
 )
 `
 

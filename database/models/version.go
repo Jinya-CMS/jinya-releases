@@ -134,7 +134,7 @@ func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
 	return versions, nil
 }
 
-func DeleteVersionById(id string, applicationId string, trackId string) error {
+func DeleteVersionById(applicationId string, trackId string, id string) error {
 	db, err := database.Connect()
 	if err != nil {
 		return err
