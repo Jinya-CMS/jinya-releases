@@ -80,6 +80,14 @@ func CreateVersion(reader io.Reader, applicationId string, trackId string) (vers
 				errDetails.Message = "Unknown database error"
 				log.Println(err.Error())
 			}
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
+		} else if errors.Is(err, models.ErrTrackNotFound) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Track not found"
 		} else {
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown error"
@@ -131,7 +139,7 @@ func GetAllVersions(applicationId string, trackId string) (versions []models.Ver
 
 func GetVersionById(applicationId string, trackId string, id string) (version *models.Version, errDetails *ErrorDetails, status int) {
 	status = http.StatusOK
-	version, err := models.GetVersionById(trackId, applicationId, id)
+	version, err := models.GetVersionById(applicationId, trackId, id)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {

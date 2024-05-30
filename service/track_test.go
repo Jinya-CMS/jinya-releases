@@ -138,7 +138,7 @@ func TestGetAllTracks(t *testing.T) {
 			test.CleanTables()
 
 			if (errDetails != nil) != tt.wantErr {
-				t.Errorf("GetApplicationById() error = %v, wantErr %v", errDetails, tt.wantErr)
+				t.Errorf("GetAllTracks() error = %v, wantErr %v", errDetails, tt.wantErr)
 				return
 			}
 			if (len(gotTracks) != len(tt.wantTracks)) != tt.wantErr {
@@ -371,10 +371,10 @@ func TestCreateTrack(t *testing.T) {
 			test.CleanTables()
 
 			if (gotErrDetails != nil) != tt.wantErr {
-				t.Errorf("GetTrackById() gotErrDetails = %v, want %v", gotErrDetails, tt.wantErr)
+				t.Errorf("CreateTrack() gotErrDetails = %v, want %v", gotErrDetails, tt.wantErr)
 			}
 			if gotStatus != tt.wantStatus {
-				t.Errorf("GetTrackById() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
+				t.Errorf("CreateTrack() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
 			}
 		})
 	}

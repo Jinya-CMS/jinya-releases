@@ -31,8 +31,25 @@ func CreateVersion(version Version) (*Version, error) {
 	}
 
 	defer db.Close()
+	applicationCount := 0
+	trackCount := 0
+	if err = db.Get(&applicationCount, "SELECT COUNT(*) FROM application WHERE id = $1", version.ApplicationId); err != nil {
+		return nil, err
+	}
 
-	_, err = db.Exec("INSERT INTO version (id, application_id, track_id, version, url, upload_date) VALUES ($1, $2, $3, $4)", version.Id, version.Version, version.Url, version.UploadDate)
+	if applicationCount == 0 {
+		return nil, ErrApplicationNotFound
+	}
+
+	if err = db.Get(&trackCount, "SELECT COUNT(*) FROM track WHERE id = $1", version.TrackId); err != nil {
+		return nil, err
+	}
+
+	if applicationCount == 0 {
+		return nil, ErrTrackNotFound
+	}
+
+	_, err = db.Exec("INSERT INTO version (application_id, track_id, version, url, upload_date) VALUES ($1, $2, $3, $4, $5)", version.ApplicationId, version.TrackId, version.Version, version.Url, version.UploadDate)
 
 	if err != nil {
 		return nil, err
