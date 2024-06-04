@@ -10,14 +10,11 @@ import (
 	"jinya-releases/database/models"
 	"log"
 	"net/http"
-	"time"
 )
 
 type createVersionRequest struct {
-	Id         string    `json:"id"`
-	Version    string    `json:"version"`
-	Url        string    `json:"url"`
-	UploadDate time.Time `json:"uploadDate"`
+	Id      string `json:"id"`
+	Version string `json:"version"`
 }
 
 func CreateVersion(reader io.Reader, applicationId string, trackId string) (version *models.Version, errDetails *ErrorDetails, status int) {
@@ -51,8 +48,6 @@ func CreateVersion(reader io.Reader, applicationId string, trackId string) (vers
 		ApplicationId: applicationId,
 		TrackId:       trackId,
 		Version:       body.Version,
-		Url:           body.Url,
-		UploadDate:    body.UploadDate,
 	}
 
 	version, err = models.CreateVersion(vsn)
