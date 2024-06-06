@@ -4,7 +4,6 @@ import (
 	"jinya-releases/test"
 	"reflect"
 	"testing"
-	"time"
 )
 
 func TestCreateVersion(t *testing.T) {
@@ -19,22 +18,17 @@ func TestCreateVersion(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "CreateVersionSuccessfully",
+			name: "CreateVersionSuccess",
 			args: args{
 				version: Version{
-					Version:    "1.0",
-					Url:        "test_url",
-					UploadDate: time.Now(),
+					Version: "1.0 CreateVersionSuccess",
 				}},
 			wantErr: false,
 		},
 		{
 			name: "CreateVersionVersionMissing",
 			args: args{
-				version: Version{
-					Url:        "test_url",
-					UploadDate: time.Now(),
-				}},
+				version: Version{}},
 			wantErr: true,
 		},
 		{
@@ -42,9 +36,7 @@ func TestCreateVersion(t *testing.T) {
 			args: args{
 				version: Version{
 					ApplicationId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
-					Version:       "1.0",
-					Url:           "test_url",
-					UploadDate:    time.Now(),
+					Version:       "1.0 CreateVersionWrongApplicationId",
 				}},
 			wantErr: true,
 		},
@@ -52,10 +44,8 @@ func TestCreateVersion(t *testing.T) {
 			name: "CreateVersionWrongTrackId",
 			args: args{
 				version: Version{
-					TrackId:    "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
-					Version:    "1.0",
-					Url:        "test_url",
-					UploadDate: time.Now(),
+					TrackId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
+					Version: "1.0 CreateVersionWrongTrackId",
 				}},
 			wantErr: true,
 		},
@@ -63,15 +53,11 @@ func TestCreateVersion(t *testing.T) {
 			name: "CreateVersionVersionExists",
 			args: args{
 				version: Version{
-					Version:    "1.0",
-					Url:        "test_url",
-					UploadDate: time.Now(),
+					Version: "1.0 CreateVersionVersionExists",
 				},
 				versions: []Version{
 					{
-						Version:    "1.0",
-						Url:        "test_url",
-						UploadDate: time.Now(),
+						Version: "1.0 CreateVersionVersionExists",
 					},
 				},
 			},
@@ -81,8 +67,8 @@ func TestCreateVersion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := CreateApplication(Application{
-				Name:              "version_test",
-				Slug:              "version_test",
+				Name:              "testCreateVersionApplication",
+				Slug:              "testCreateVersionApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -94,8 +80,8 @@ func TestCreateVersion(t *testing.T) {
 
 			track, err := CreateTrack(Track{
 				ApplicationId: app.Id,
-				Name:          "version_test",
-				Slug:          "version_test",
+				Name:          "testCreateVersionTrack",
+				Slug:          "testCreateVersionTrack",
 				IsDefault:     true,
 			})
 
@@ -149,7 +135,7 @@ func TestDeleteVersionById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "DeleteVersionByIdExists",
+			name:    "DeleteVersionByIdSuccess",
 			args:    args{},
 			wantErr: false,
 		},
@@ -178,8 +164,8 @@ func TestDeleteVersionById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := CreateApplication(Application{
-				Name:              "version_test",
-				Slug:              "version_test",
+				Name:              "testDeleteVersionByIdApplication",
+				Slug:              "testDeleteVersionByIdApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -191,8 +177,8 @@ func TestDeleteVersionById(t *testing.T) {
 
 			track, err := CreateTrack(Track{
 				ApplicationId: app.Id,
-				Name:          "version_test",
-				Slug:          "version_test",
+				Name:          "testDeleteVersionByIdTrack",
+				Slug:          "testDeleteVersionByIdTrack",
 				IsDefault:     true,
 			})
 
@@ -205,9 +191,7 @@ func TestDeleteVersionById(t *testing.T) {
 			version, err := CreateVersion(Version{
 				ApplicationId: app.Id,
 				TrackId:       track.Id,
-				Version:       "1.0",
-				Url:           "test_url",
-				UploadDate:    time.Now(),
+				Version:       "1.0 DeleteVersionById",
 			})
 
 			if err != nil {
@@ -258,93 +242,73 @@ func TestGetAllVersions(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "GetAllTracksOne",
+			name: "GetAllVersionsOne",
 			args: args{
 				versions: []Version{
 					{
-						Version:    "1.0",
-						Url:        "testurl",
-						UploadDate: time.Now(),
+						Version: "1.0 GetAllVersionsOne",
 					},
 				},
 			},
 			want: []Version{
 				{
-					Version:    "1.0",
-					Url:        "testurl",
-					UploadDate: time.Now(),
+					Version: "1.0 GetAllVersionsOne",
 				},
 			},
 			wantErr: false,
 		},
 		{
-			name: "GetAllTracksMany",
+			name: "GetAllVersionsMany",
 			args: args{
 				versions: []Version{
 					{
-						Version:    "1.0",
-						Url:        "testurl",
-						UploadDate: time.Now(),
+						Version: "1.0 GetAllVersionsMany",
 					},
 					{
-						Version:    "1.1",
-						Url:        "testurl",
-						UploadDate: time.Now(),
+						Version: "1.1 GetAllVersionsMany",
 					},
 				},
 			},
 			want: []Version{
 				{
-					Version:    "1.0",
-					Url:        "testurl",
-					UploadDate: time.Now(),
+					Version: "1.0 GetAllVersionsMany",
 				},
 				{
-					Version:    "1.1",
-					Url:        "testurl",
-					UploadDate: time.Now(),
+					Version: "1.1 GetAllVersionsMany",
 				},
 			},
 			wantErr: false,
 		},
 		{
-			name: "GetAllTracksWrongApplication",
+			name: "GetAllVersionsWrongApplication",
 			args: args{
 				applicationId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				versions: []Version{
 					{
-						Version:    "1.0",
-						Url:        "testurl",
-						UploadDate: time.Now(),
+						Version: "1.0 GetAllVersionsWrongApplication",
 					},
 				},
 			},
 			want: []Version{
 				{
-					Version:    "1.0",
-					Url:        "testurl",
-					UploadDate: time.Now(),
+					Version: "1.0 GetAllVersionsWrongApplication",
 				},
 			},
 			wantErr: true,
 		},
 		{
-			name: "GetAllTracksWrongTrack",
+			name: "GetAllVersionsWrongTrack",
 			args: args{
 				trackId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				versions: []Version{
 					{
-						Version:    "1.0",
-						Url:        "testurl",
-						UploadDate: time.Now(),
+						Version: "1.0 GetAllVersionsWrongTrack",
 					},
 				},
 			},
 			want: []Version{
 				{
-					Version:    "1.0",
-					Url:        "testurl",
-					UploadDate: time.Now(),
+					Version: "1.0 GetAllVersionsWrongTrack",
 				},
 			},
 			wantErr: true,
@@ -353,8 +317,8 @@ func TestGetAllVersions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := CreateApplication(Application{
-				Name:              "version_test",
-				Slug:              "version_test",
+				Name:              "testGetAllVersionsApplication",
+				Slug:              "testGetAllVersionsApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -366,8 +330,8 @@ func TestGetAllVersions(t *testing.T) {
 
 			track, err := CreateTrack(Track{
 				ApplicationId: app.Id,
-				Name:          "version_test",
-				Slug:          "version_test",
+				Name:          "testGetAllVersionsTrack",
+				Slug:          "testGetAllVersionsTrack",
 				IsDefault:     true,
 			})
 			if err != nil {
@@ -423,7 +387,7 @@ func TestGetVersionById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "GetVersionByIdExists",
+			name:    "GetVersionByIdSuccess",
 			args:    args{},
 			wantErr: false,
 		},
@@ -452,8 +416,8 @@ func TestGetVersionById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := CreateApplication(Application{
-				Name:              "version_test",
-				Slug:              "version_test",
+				Name:              "testGetVersionByIdApplication",
+				Slug:              "testGetVersionByIdApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -465,8 +429,8 @@ func TestGetVersionById(t *testing.T) {
 
 			track, err := CreateTrack(Track{
 				ApplicationId: app.Id,
-				Name:          "version_test",
-				Slug:          "version_test",
+				Name:          "testGetVersionByIdTrack",
+				Slug:          "testGetVersionByIdTrack",
 				IsDefault:     true,
 			})
 			if err != nil {
@@ -478,9 +442,7 @@ func TestGetVersionById(t *testing.T) {
 			version, err := CreateVersion(Version{
 				ApplicationId: app.Id,
 				TrackId:       track.Id,
-				Version:       "1.0",
-				Url:           "test_url",
-				UploadDate:    time.Now(),
+				Version:       "1.0 testGetVersionByIdVersion",
 			})
 			if err != nil {
 				t.Errorf("Prepare GetVersionById() error = %v", err)
@@ -531,7 +493,7 @@ func TestGetVersionByTrackAndVersion(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "GetVersionByTrackAndVersionExists",
+			name:    "GetVersionByTrackAndVersionSuccess",
 			args:    args{},
 			wantErr: false,
 		},
@@ -553,8 +515,8 @@ func TestGetVersionByTrackAndVersion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := CreateApplication(Application{
-				Name:              "version_test",
-				Slug:              "version_test",
+				Name:              "testGetVersionByTrackAndVersionApplication",
+				Slug:              "testGetVersionByTrackAndVersionApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -566,8 +528,8 @@ func TestGetVersionByTrackAndVersion(t *testing.T) {
 
 			track, err := CreateTrack(Track{
 				ApplicationId: app.Id,
-				Name:          "version_test",
-				Slug:          "version_test",
+				Name:          "testGetVersionByTrackAndVersionTrack",
+				Slug:          "testGetVersionByTrackAndVersionTrack",
 				IsDefault:     true,
 			})
 			if err != nil {
@@ -580,8 +542,6 @@ func TestGetVersionByTrackAndVersion(t *testing.T) {
 				ApplicationId: app.Id,
 				TrackId:       track.Id,
 				Version:       "1.0",
-				Url:           "test_url",
-				UploadDate:    time.Now(),
 			})
 			if err != nil {
 				t.Errorf("Prepare GetVersionByTrackAndVersion() error = %v", err)

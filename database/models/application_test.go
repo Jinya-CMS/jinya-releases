@@ -17,6 +17,7 @@ func cleanDatabase() error {
 		return err
 	}
 
+	_, _ = conn.Exec("DROP TABLE version CASCADE")
 	_, _ = conn.Exec("DROP TABLE track CASCADE")
 	_, _ = conn.Exec("DROP TABLE application CASCADE")
 	_, _ = conn.Exec("DROP TABLE migrations CASCADE")
@@ -72,8 +73,8 @@ func TestCreateApplication(t *testing.T) {
 			name: "CreateNewApplicationSuccessfulRequiredFields",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testCreateApplicationSuccess",
+					Slug:              "testCreateApplicationSuccess",
 					TrackpageTemplate: "test",
 					HomepageTemplate:  "test",
 				},
@@ -84,8 +85,8 @@ func TestCreateApplication(t *testing.T) {
 			name: "CreateNewApplicationNameMissing",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testCreateNewApplicationNameMissing",
+					Slug:              "testCreateNewApplicationNameMissing",
 					TrackpageTemplate: "test",
 				},
 			},
@@ -95,8 +96,8 @@ func TestCreateApplication(t *testing.T) {
 			name: "CreateNewApplicationSlugMissing",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testCreateNewApplicationSlugMissing",
+					Slug:              "testCreateNewApplicationSlugMissing",
 					TrackpageTemplate: "test",
 				},
 			},
@@ -106,8 +107,8 @@ func TestCreateApplication(t *testing.T) {
 			name: "CreateNewApplicationHomepageTemplateMissing",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testCreateNewApplicationHomepageTemplateMissing",
+					Slug:              "testCreateNewApplicationHomepageTemplateMissing",
 					TrackpageTemplate: "test",
 				},
 			},
@@ -117,8 +118,8 @@ func TestCreateApplication(t *testing.T) {
 			name: "CreateNewApplicationTrackpageTemplateMissing",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testCreateNewApplicationTrackpageTemplateMissing",
+					Slug:              "testCreateNewApplicationTrackpageTemplateMissing",
 					TrackpageTemplate: "test",
 				},
 			},
@@ -129,15 +130,15 @@ func TestCreateApplication(t *testing.T) {
 			args: args{
 				additionalApplications: []Application{
 					{
-						Name:              "test",
-						Slug:              "test",
+						Name:              "testCreateNewApplicationNonUniqueName",
+						Slug:              "testCreateNewApplicationNonUniqueName",
 						HomepageTemplate:  "test",
 						TrackpageTemplate: "test",
 					},
 				},
 				application: Application{
-					Name:              "test",
-					Slug:              "test2",
+					Name:              "testCreateNewApplicationNonUniqueName",
+					Slug:              "testCreateNewApplicationNonUniqueName2",
 					HomepageTemplate:  "test2",
 					TrackpageTemplate: "test2",
 				},
@@ -149,15 +150,15 @@ func TestCreateApplication(t *testing.T) {
 			args: args{
 				additionalApplications: []Application{
 					{
-						Name:              "test",
-						Slug:              "test",
+						Name:              "testCreateNewApplicationNonUniqueSlug",
+						Slug:              "testCreateNewApplicationNonUniqueSlug",
 						HomepageTemplate:  "test",
 						TrackpageTemplate: "test",
 					},
 				},
 				application: Application{
-					Name:              "test2",
-					Slug:              "test",
+					Name:              "testCreateNewApplicationNonUniqueSlug2",
+					Slug:              "testCreateNewApplicationNonUniqueSlug",
 					HomepageTemplate:  "test2",
 					TrackpageTemplate: "test2",
 				},
@@ -205,16 +206,16 @@ func TestGetAllApplications(t *testing.T) {
 			name: "GetAllApplicationsOne",
 			args: []Application{
 				{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetAllApplicationsOne",
+					Slug:              "testGetAllApplicationsOne",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
 			},
 			want: []Application{
 				{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetAllApplicationsOne",
+					Slug:              "testGetAllApplicationsOne",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
@@ -225,28 +226,28 @@ func TestGetAllApplications(t *testing.T) {
 			name: "GetAllApplicationsMany",
 			args: []Application{
 				{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetAllApplicationsMany",
+					Slug:              "testGetAllApplicationsMany",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
 				{
-					Name:              "test1",
-					Slug:              "test1",
+					Name:              "testGetAllApplicationsMany1",
+					Slug:              "testGetAllApplicationsMany1",
 					HomepageTemplate:  "test1",
 					TrackpageTemplate: "test1",
 				},
 			},
 			want: []Application{
 				{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetAllApplicationsMany",
+					Slug:              "testGetAllApplicationsMany",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
 				{
-					Name:              "test1",
-					Slug:              "test1",
+					Name:              "testGetAllApplicationsMany1",
+					Slug:              "testGetAllApplicationsMany1",
 					HomepageTemplate:  "test1",
 					TrackpageTemplate: "test1",
 				},
@@ -284,12 +285,12 @@ func TestGetApplicationById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "GetApplicationByIdPositiv",
+			name: "GetApplicationByIdSuccess",
 			args: args{
 				id: "",
 				app: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetApplicationByIdSuccess",
+					Slug:              "testGetApplicationByIdSuccess",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
@@ -297,12 +298,12 @@ func TestGetApplicationById(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "GetApplicationByIdNegative",
+			name: "GetApplicationByIdFalseId",
 			args: args{
-				id: "falseId",
+				id: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				app: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetApplicationByIdFalseId",
+					Slug:              "testGetApplicationByIdFalseId",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
@@ -344,12 +345,12 @@ func TestGetApplicationBySlug(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "GetApplicationBySlugPositiv",
+			name: "GetApplicationBySlugSuccess",
 			args: args{
-				slug: "test",
+				slug: "testGetApplicationBySlugSuccess",
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetApplicationBySlugSuccess",
+					Slug:              "testGetApplicationBySlugSuccess",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
@@ -357,12 +358,12 @@ func TestGetApplicationBySlug(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "GetApplicationBySlugNegative",
+			name: "GetApplicationBySlugFalseSlug",
 			args: args{
 				slug: "falseSlug",
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testGetApplicationBySlugFalseSlug",
+					Slug:              "testGetApplicationBySlugFalseSlug",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
@@ -408,14 +409,14 @@ func TestUpdateApplication(t *testing.T) {
 			name: "UpdateApplicationFields",
 			args: args{
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testUpdateApplicationFields",
+					Slug:              "testUpdateApplicationFields",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
 				testApplication: Application{
-					Name:              "test1",
-					Slug:              "test1",
+					Name:              "testUpdateApplicationFields1",
+					Slug:              "testUpdateApplicationFields1",
 					HomepageTemplate:  "test1",
 					TrackpageTemplate: "test1",
 				},
@@ -427,21 +428,21 @@ func TestUpdateApplication(t *testing.T) {
 			args: args{
 				additionalApplications: []Application{
 					{
-						Name:              "test2",
-						Slug:              "test2",
+						Name:              "testUpdateApplicationNameExists2",
+						Slug:              "testUpdateApplicationNameExists2",
 						HomepageTemplate:  "test2",
 						TrackpageTemplate: "test2",
 					},
 				},
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testUpdateApplicationNameExists",
+					Slug:              "testUpdateApplicationNameExists",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
 				testApplication: Application{
-					Name:              "test2",
-					Slug:              "test1",
+					Name:              "testUpdateApplicationNameExists2",
+					Slug:              "testUpdateApplicationNameExists1",
 					HomepageTemplate:  "test1",
 					TrackpageTemplate: "test1",
 				},
@@ -453,21 +454,21 @@ func TestUpdateApplication(t *testing.T) {
 			args: args{
 				additionalApplications: []Application{
 					{
-						Name:              "test2",
-						Slug:              "test2",
+						Name:              "testUpdateApplicationSlugExists2",
+						Slug:              "testUpdateApplicationSlugExists2",
 						HomepageTemplate:  "test2",
 						TrackpageTemplate: "test2",
 					},
 				},
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testUpdateApplicationSlugExists",
+					Slug:              "testUpdateApplicationSlugExists",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
 				testApplication: Application{
-					Name:              "test1",
-					Slug:              "test2",
+					Name:              "testUpdateApplicationSlugExists1",
+					Slug:              "testUpdateApplicationSlugExists2",
 					HomepageTemplate:  "test1",
 					TrackpageTemplate: "test1",
 				},
@@ -520,8 +521,8 @@ func TestDeleteApplicationById(t *testing.T) {
 			args: args{
 				id: "",
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testDeleteApplicationByIdExists",
+					Slug:              "testDeleteApplicationByIdExists",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},
@@ -533,8 +534,8 @@ func TestDeleteApplicationById(t *testing.T) {
 			args: args{
 				id: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				application: Application{
-					Name:              "test",
-					Slug:              "test",
+					Name:              "testDeleteApplicationByIdDoesNotExist",
+					Slug:              "testDeleteApplicationByIdDoesNotExist",
 					HomepageTemplate:  "test",
 					TrackpageTemplate: "test",
 				},

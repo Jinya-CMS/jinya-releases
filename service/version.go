@@ -100,7 +100,7 @@ func GetAllVersions(applicationId string, trackId string) (versions []models.Ver
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
 			_, err := models.GetApplicationById(applicationId)
-			if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			if errors.Is(err, models.ErrApplicationNotFound) || errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
 				errDetails = &ErrorDetails{
 					EntityType: "version",
 					ErrorType:  "database",
@@ -109,7 +109,7 @@ func GetAllVersions(applicationId string, trackId string) (versions []models.Ver
 				status = http.StatusNotFound
 			} else {
 				_, err := models.GetTrackById(trackId, applicationId)
-				if errors.Is(err, models.ErrTrackNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+				if errors.Is(err, models.ErrTrackNotFound) || errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
 					errDetails = &ErrorDetails{
 						EntityType: "version",
 						ErrorType:  "database",

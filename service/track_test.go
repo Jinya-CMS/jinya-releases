@@ -37,16 +37,16 @@ func TestGetAllTracks(t *testing.T) {
 			args: args{
 				tracks: []models.Track{
 					{
-						Name:      "test",
-						Slug:      "test",
+						Name:      "testGetAllTracksOne",
+						Slug:      "testGetAllTracksOne",
 						IsDefault: true,
 					},
 				},
 			},
 			wantTracks: []models.Track{
 				{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testGetAllTracksOne",
+					Slug:      "testGetAllTracksOne",
 					IsDefault: true,
 				},
 			},
@@ -57,26 +57,26 @@ func TestGetAllTracks(t *testing.T) {
 			args: args{
 				tracks: []models.Track{
 					{
-						Name:      "test",
-						Slug:      "test",
+						Name:      "testGetAllTracksMany",
+						Slug:      "testGetAllTracksMany",
 						IsDefault: true,
 					},
 					{
-						Name:      "test1",
-						Slug:      "test1",
+						Name:      "testGetAllTracksMany1",
+						Slug:      "testGetAllTracksMany1",
 						IsDefault: false,
 					},
 				},
 			},
 			wantTracks: []models.Track{
 				{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testGetAllTracksMany",
+					Slug:      "testGetAllTracksMany",
 					IsDefault: true,
 				},
 				{
-					Name:      "test1",
-					Slug:      "test1",
+					Name:      "testGetAllTracksMany1",
+					Slug:      "testGetAllTracksMany1",
 					IsDefault: false,
 				},
 			},
@@ -87,8 +87,8 @@ func TestGetAllTracks(t *testing.T) {
 			args: args{
 				tracks: []models.Track{
 					{
-						Name:      "test",
-						Slug:      "test",
+						Name:      "testGetAllTracksApplicationWrong",
+						Slug:      "testGetAllTracksApplicationWrong",
 						IsDefault: true,
 					},
 				},
@@ -96,8 +96,8 @@ func TestGetAllTracks(t *testing.T) {
 			},
 			wantTracks: []models.Track{
 				{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testGetAllTracksApplicationWrong",
+					Slug:      "testGetAllTracksApplicationWrong",
 					IsDefault: true,
 				},
 			},
@@ -107,8 +107,8 @@ func TestGetAllTracks(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := models.CreateApplication(models.Application{
-				Name:              "track_test",
-				Slug:              "track_test",
+				Name:              "testGetAllTracksApplication",
+				Slug:              "testGetAllTracksApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -161,7 +161,7 @@ func TestGetTrackById(t *testing.T) {
 		wantStatus int
 	}{
 		{
-			name:       "GetTrackByIdPositive",
+			name:       "GetTrackByIdSuccess",
 			args:       args{},
 			wantErr:    false,
 			wantStatus: http.StatusOK,
@@ -186,8 +186,8 @@ func TestGetTrackById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := models.CreateApplication(models.Application{
-				Name:              "track_test",
-				Slug:              "track_test",
+				Name:              "testGetTrackByIdApplication",
+				Slug:              "testGetTrackByIdApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -198,8 +198,8 @@ func TestGetTrackById(t *testing.T) {
 			}
 			track, err := models.CreateTrack(models.Track{
 				ApplicationId: app.Id,
-				Name:          "test",
-				Slug:          "test",
+				Name:          "testtestGetTrackByIdTrack",
+				Slug:          "testtestGetTrackByIdTrack",
 				IsDefault:     false,
 			})
 			if err != nil {
@@ -253,11 +253,11 @@ func TestCreateTrack(t *testing.T) {
 		wantStatus int
 	}{
 		{
-			name: "CreateTrackPositive",
+			name: "CreateTrackSuccess",
 			args: args{
 				track: createTrackRequest{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testCreateTrackSuccess",
+					Slug:      "testCreateTrackSuccess",
 					IsDefault: false,
 				}},
 			wantErr:    false,
@@ -268,7 +268,7 @@ func TestCreateTrack(t *testing.T) {
 			args: args{
 				track: createTrackRequest{
 					Name:      "",
-					Slug:      "test",
+					Slug:      "testCreateTrackNameMissing",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -278,7 +278,7 @@ func TestCreateTrack(t *testing.T) {
 			name: "CreateTrackSlugMissing",
 			args: args{
 				track: createTrackRequest{
-					Name:      "test",
+					Name:      "testCreateTrackSlugMissing",
 					Slug:      "",
 					IsDefault: false,
 				}},
@@ -290,8 +290,8 @@ func TestCreateTrack(t *testing.T) {
 			args: args{
 				applicationId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				track: createTrackRequest{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testCreateTrackApplicationNotFound",
+					Slug:      "testCreateTrackApplicationNotFound",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -302,14 +302,14 @@ func TestCreateTrack(t *testing.T) {
 			args: args{
 				tracks: []models.Track{
 					{
-						Name:      "test",
-						Slug:      "test",
+						Name:      "testCreateTrackNameExists",
+						Slug:      "testCreateTrackNameExists",
 						IsDefault: true,
 					},
 				},
 				track: createTrackRequest{
-					Name:      "test",
-					Slug:      "test1",
+					Name:      "testCreateTrackNameExists",
+					Slug:      "testCreateTrackNameExists1",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -320,14 +320,14 @@ func TestCreateTrack(t *testing.T) {
 			args: args{
 				tracks: []models.Track{
 					{
-						Name:      "test",
-						Slug:      "test",
+						Name:      "testCreateTrackSlugExists",
+						Slug:      "testCreateTrackSlugExists",
 						IsDefault: true,
 					},
 				},
 				track: createTrackRequest{
-					Name:      "test1",
-					Slug:      "test",
+					Name:      "testCreateTrackSlugExists1",
+					Slug:      "testCreateTrackSlugExists",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -337,8 +337,8 @@ func TestCreateTrack(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := models.CreateApplication(models.Application{
-				Name:              "track_test",
-				Slug:              "track_test",
+				Name:              "testCreateTrackApplication",
+				Slug:              "testCreateTrackApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -398,13 +398,13 @@ func TestUpdateTrack(t *testing.T) {
 			name: "UpdateTrack",
 			args: args{
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrack",
+					Slug:      "testUpdateTrack",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
-					Name:      "test1",
-					Slug:      "test1",
+					Name:      "testUpdateTrack1",
+					Slug:      "testUpdateTrack1",
 					IsDefault: false,
 				}},
 			wantErr:    false,
@@ -414,13 +414,13 @@ func TestUpdateTrack(t *testing.T) {
 			name: "UpdateTrackNameMissing",
 			args: args{
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrackNameMissing",
+					Slug:      "testUpdateTrackNameMissing",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
 					Name:      "",
-					Slug:      "test1",
+					Slug:      "testUpdateTrackNameMissing1",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -430,12 +430,12 @@ func TestUpdateTrack(t *testing.T) {
 			name: "UpdateTrackSlugMissing",
 			args: args{
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrackSlugMissing",
+					Slug:      "testUpdateTrackSlugMissing",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
-					Name:      "test1",
+					Name:      "testUpdateTrackSlugMissing1",
 					Slug:      "",
 					IsDefault: false,
 				}},
@@ -447,13 +447,13 @@ func TestUpdateTrack(t *testing.T) {
 			args: args{
 				trackId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrackWrongTrackId",
+					Slug:      "testUpdateTrackWrongTrackId",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
-					Name:      "test1",
-					Slug:      "test1",
+					Name:      "testUpdateTrackWrongTrackId1",
+					Slug:      "testUpdateTrackWrongTrackId1",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -464,13 +464,13 @@ func TestUpdateTrack(t *testing.T) {
 			args: args{
 				applicationId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrackWrongApplicationId",
+					Slug:      "testUpdateTrackWrongApplicationId",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
-					Name:      "test1",
-					Slug:      "test1",
+					Name:      "testUpdateTrackWrongApplicationId1",
+					Slug:      "testUpdateTrackWrongApplicationId1",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -481,19 +481,19 @@ func TestUpdateTrack(t *testing.T) {
 			args: args{
 				additionalTracks: []models.Track{
 					{
-						Name:      "test1",
-						Slug:      "test2",
+						Name:      "testUpdateTrackNameExists1",
+						Slug:      "testUpdateTrackNameExists2",
 						IsDefault: true,
 					},
 				},
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrackNameExists",
+					Slug:      "testUpdateTrackNameExists",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
-					Name:      "test1",
-					Slug:      "test1",
+					Name:      "testUpdateTrackNameExists1",
+					Slug:      "testUpdateTrackNameExists1",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -504,19 +504,19 @@ func TestUpdateTrack(t *testing.T) {
 			args: args{
 				additionalTracks: []models.Track{
 					{
-						Name:      "test2",
-						Slug:      "test1",
+						Name:      "testUpdateTrackSlugExists2",
+						Slug:      "testUpdateTrackSlugExists1",
 						IsDefault: true,
 					},
 				},
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testUpdateTrackSlugExists",
+					Slug:      "testUpdateTrackSlugExists",
 					IsDefault: true,
 				},
 				updateTrack: updateTrackRequest{
-					Name:      "test1",
-					Slug:      "test1",
+					Name:      "testUpdateTrackSlugExists1",
+					Slug:      "testUpdateTrackSlugExists1",
 					IsDefault: false,
 				}},
 			wantErr:    true,
@@ -526,8 +526,8 @@ func TestUpdateTrack(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := models.CreateApplication(models.Application{
-				Name:              "track_test",
-				Slug:              "track_test",
+				Name:              "testUpdateTrackApplication",
+				Slug:              "testUpdateTrackApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})
@@ -600,8 +600,8 @@ func TestDeleteTrack(t *testing.T) {
 			name: "DeleteTrackSuccess",
 			args: args{
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testDeleteTrackSuccess",
+					Slug:      "testDeleteTrackSuccess",
 					IsDefault: false,
 				},
 			},
@@ -613,8 +613,8 @@ func TestDeleteTrack(t *testing.T) {
 			args: args{
 				trackId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testDeleteTrackWrongTrackId",
+					Slug:      "testDeleteTrackWrongTrackId",
 					IsDefault: false,
 				},
 			},
@@ -626,8 +626,8 @@ func TestDeleteTrack(t *testing.T) {
 			args: args{
 				applicationId: "e2ebb12e-e77d-4618-ba79-3f26e8af239a",
 				track: models.Track{
-					Name:      "test",
-					Slug:      "test",
+					Name:      "testDeleteTrackWrongApplicationId",
+					Slug:      "testDeleteTrackWrongApplicationId",
 					IsDefault: false,
 				},
 			},
@@ -638,8 +638,8 @@ func TestDeleteTrack(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			app, err := models.CreateApplication(models.Application{
-				Name:              "track_test",
-				Slug:              "track_test",
+				Name:              "testDeleteTrackApplication",
+				Slug:              "testDeleteTrackApplication",
 				HomepageTemplate:  "test",
 				TrackpageTemplate: "test",
 			})

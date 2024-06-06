@@ -112,7 +112,7 @@ func GetVersionById(applicationId string, trackId string, id string) (*Version, 
 		return nil, ErrTrackNotFound
 	}
 
-	if err = db.Get(version, "SELECT id, application_id, track_id, version.version, url, upload_date  FROM version WHERE id = $1", id); err != nil {
+	if err = db.Get(version, "SELECT id, application_id, track_id, version.version, upload_date  FROM version WHERE id = $1", id); err != nil {
 		return nil, err
 	}
 
@@ -131,7 +131,7 @@ func setUrl(version *Version) (*Version, error) {
 	}
 
 	version.Url = fmt.Sprintf("%s/%s/%s", config.LoadedConfiguration.ServerUrl, app.Slug, track.Slug)
-	return nil, nil
+	return version, nil
 }
 
 func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
@@ -153,7 +153,7 @@ func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
 		return nil, err
 	}
 
-	if err = db.Select(&versions, "SELECT id, application_id, track_id, version.version, url, upload_date FROM version WHERE application_id = $1 AND track_id = $2 ORDER BY upload_date", applicationId, trackId); err != nil {
+	if err = db.Select(&versions, "SELECT id, application_id, track_id, version.version,  upload_date FROM version WHERE application_id = $1 AND track_id = $2 ORDER BY upload_date", applicationId, trackId); err != nil {
 		return nil, err
 	}
 
