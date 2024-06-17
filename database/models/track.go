@@ -7,7 +7,7 @@ import (
 
 type Track struct {
 	Id            string `json:"id" db:"id"`
-	ApplicationId string `json:"applicationId" db:"application_id"`
+	ApplicationId string `json:"-" db:"application_id"`
 	Name          string `json:"name" db:"name"`
 	Slug          string `json:"slug" db:"slug"`
 	IsDefault     bool   `json:"isDefault" db:"is_default"`

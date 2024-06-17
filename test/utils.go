@@ -12,6 +12,9 @@ func CleanTables() {
 		return
 	}
 
+	if _, err = conn.Exec("DELETE FROM version"); err != nil {
+		log.Printf("Failed to clean table version %v", err)
+	}
 	if _, err = conn.Exec("DELETE FROM track"); err != nil {
 		log.Printf("Failed to clean table track %v", err)
 	}
