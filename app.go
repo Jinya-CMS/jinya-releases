@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"github.com/gorilla/mux"
+	"golang.org/x/text/language"
 	"jinya-releases/api"
 	"jinya-releases/config"
 	migrator "jinya-releases/database/migrations"
@@ -19,12 +20,19 @@ var (
 	openapi embed.FS
 	//go:embed static
 	static embed.FS
+	//go:embed angular/dist/admin/browser
+	angularAdmin embed.FS
 )
 
 type SpaHandler struct {
 	embedFS      embed.FS
 	indexPath    string
 	fsPrefixPath string
+}
+
+type LanguageHandler struct {
+	defaultLang     language.Tag
+	langPathMapping map[language.Tag]string
 }
 
 func (handler SpaHandler) servePlain(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +53,31 @@ func (handler SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.ServeFileFS(w, r, handler.embedFS, fullPath)
+}
+
+func (handler LanguageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	oldPath := "/" + r.URL.Path + "?" + r.URL.RawQuery
+	acceptLanguage, _, err := language.ParseAcceptLanguage(r.Header.Get("Accept-Language"))
+	if err != nil {
+		http.Redirect(w, r, handler.langPathMapping[handler.defaultLang]+oldPath, http.StatusFound)
+		return
+	}
+
+	localMap := map[string]string{}
+	for tag, p := range handler.langPathMapping {
+		b, _ := tag.Base()
+		localMap[b.ISO3()] = p
+	}
+
+	for _, lang := range acceptLanguage {
+		b, _ := lang.Base()
+		if p, exists := localMap[b.ISO3()]; exists {
+			http.Redirect(w, r, p+oldPath, http.StatusFound)
+			return
+		}
+	}
+
+	http.Redirect(w, r, handler.langPathMapping[handler.defaultLang]+oldPath, http.StatusFound)
 }
 
 func main() {
@@ -70,6 +103,23 @@ func main() {
 		indexPath:    "openapi/index.html",
 		fsPrefixPath: "",
 	})
+	router.PathPrefix("/admin/de").Handler(http.StripPrefix("/admin/de", SpaHandler{
+		embedFS:      angularAdmin,
+		indexPath:    "angular/dist/admin/browser/de/index.html",
+		fsPrefixPath: "angular/dist/admin/browser/de",
+	}))
+	router.PathPrefix("/admin/en").Handler(http.StripPrefix("/admin/en", SpaHandler{
+		embedFS:      angularAdmin,
+		indexPath:    "angular/dist/admin/browser/en/index.html",
+		fsPrefixPath: "angular/dist/admin/browser/en",
+	}))
+	router.PathPrefix("/admin").Handler(http.StripPrefix("/admin", LanguageHandler{
+		defaultLang: language.English,
+		langPathMapping: map[language.Tag]string{
+			language.English: "/admin/en",
+			language.German:  "/admin/de",
+		},
+	}))
 
 	router.PathPrefix("/static/").Handler(http.FileServerFS(static))
 
