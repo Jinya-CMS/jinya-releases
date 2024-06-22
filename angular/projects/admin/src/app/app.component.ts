@@ -1,13 +1,17 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterLinkActive } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'admin';
+  protected readonly RouterLinkActive = RouterLinkActive;
+
+  constructor(
+    protected router: Router,
+    protected location: Location
+  ) {}
 }

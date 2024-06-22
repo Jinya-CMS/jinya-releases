@@ -1,4 +1,10 @@
 {
   "locale": "de",
-  "translations": {}
+  "translations": {
+    "logout": "Abmelden",
+    "back": "Zurück",
+    "applications": "Anwendungen",
+    "overview": "Überblick",
+    "versions": "Versionen"
+  }
 }
