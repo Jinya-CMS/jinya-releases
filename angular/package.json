@@ -8,8 +8,13 @@
     "build": "npm run build:api && npm run build:admin",
     "build:api": "ng build api",
     "build:admin": "ng build admin",
+    "build:dev": "npm run build:api:dev && npm run build:admin:dev",
+    "build:api:dev": "ng build --configuration development api",
+    "build:admin:dev": "ng build --configuration development admin",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "prettier --check projects && ng lint",
+    "format": "prettier --write projects"
   },
   "private": true,
   "dependencies": {

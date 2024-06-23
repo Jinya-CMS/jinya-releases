@@ -19,7 +19,7 @@
         <package-json value="$PROJECT_DIR$/angular/package.json" />
         <command value="run" />
         <scripts>
-          <script value="build" />
+          <script value="build:dev" />
         </scripts>
         <node-interpreter value="project" />
         <envs />

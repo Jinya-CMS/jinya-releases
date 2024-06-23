@@ -3,9 +3,10 @@ import { AppComponent } from './app.component';
 import { NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
-import { ApiModule } from '../../../api/src/lib/api.module';
+import { ApiModule } from 'api';
 import { provideHttpClient } from '@angular/common/http';
 import { ApplicationsModule } from './applications/applications.module';
+import { UiModule } from '../ui/ui.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -14,6 +15,7 @@ import { ApplicationsModule } from './applications/applications.module';
     BrowserModule,
     NgIf,
     ApplicationsModule,
+    UiModule,
     RouterLink,
     RouterLinkActive,
     RouterModule.forRoot(
