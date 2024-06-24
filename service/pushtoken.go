@@ -51,7 +51,6 @@ func CreatePushtoken(reader io.Reader) (pushtoken *models.PushToken, errDetails 
 	}
 
 	token := models.PushToken{
-		Token:       body.Token,
 		AllowedApps: body.AllowedApps,
 	}
 

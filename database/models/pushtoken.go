@@ -12,10 +12,14 @@ type PushToken struct {
 }
 
 var (
-	ErrPushtokenNotFound = errors.New("token not found")
+	ErrPushtokenNotFound    = errors.New("token not found")
+	ErrApplicationlistEmpty = errors.New("applicationlist empty")
 )
 
 func CreatePushtoken(applications []string) (*PushToken, error) {
+	if len(applications) == 0 {
+		return nil, ErrApplicationlistEmpty
+	}
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -97,6 +101,10 @@ func GetPushTokenById(id string) (*PushToken, error) {
 }
 
 func UpdatePushtoken(id string, applications []string) error {
+	if len(applications) == 0 {
+		return ErrApplicationlistEmpty
+	}
+
 	db, err := database.Connect()
 	if err != nil {
 		return err
