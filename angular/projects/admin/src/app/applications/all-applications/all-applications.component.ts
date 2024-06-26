@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Application, ApplicationService, Track } from 'api';
+import { Application, ApplicationService, Track, TrackService, VersionService } from 'api';
 import { Router } from '@angular/router';
 import { ConfirmComponent } from '../../../ui/confirm/confirm.component';
+import { EditTrackDialogComponent } from '../edit-track-dialog/edit-track-dialog.component';
 
 enum ActiveTab {
   Details,
@@ -17,12 +18,16 @@ export class AllApplicationsComponent implements OnInit {
 
   applications: Application[] = [];
   selectedApplication: Application | null = null;
+  selectedTrack: Track | null = null;
   activeTab = ActiveTab.Details;
   tracks: Track[] = [];
   loading = true;
+  trackHasVersions: { [key: string]: boolean } = {};
 
   constructor(
     protected applicationService: ApplicationService,
+    protected trackService: TrackService,
+    protected versionService: VersionService,
     protected router: Router
   ) {}
 
@@ -33,7 +38,7 @@ export class AllApplicationsComponent implements OnInit {
         if (!this.id) {
           this.router.navigateByUrl(`/application/${value[0].id}`);
         } else {
-          this.selectedApplication = this.applications.find((app) => app.id === this.id) ?? this.applications[0];
+          this.selectApp(this.applications.find((app) => app.id === this.id) ?? this.applications[0]);
           this.loading = false;
         }
       } else {
@@ -56,6 +61,21 @@ export class AllApplicationsComponent implements OnInit {
 
   selectApp(app: Application) {
     this.selectedApplication = app;
+    this.trackService
+      .getAllTracks({
+        applicationId: app.id
+      })
+      .subscribe((tracks) => {
+        this.tracks = tracks;
+        for (const track of tracks) {
+          this.versionService
+            .getAllVersions({
+              applicationId: this.selectedApplication!.id,
+              trackId: track.id
+            })
+            .subscribe((versions) => (this.trackHasVersions[track.id] = versions.length > 0));
+        }
+      });
   }
 
   deleteApp(deleteApplication: ConfirmComponent) {
@@ -70,6 +90,43 @@ export class AllApplicationsComponent implements OnInit {
     });
   }
 
+  trackAdded(track: Track) {
+    this.tracks.push(track);
+  }
+
+  updateTrack(track: Track) {
+    if (track.isDefault) {
+      this.tracks = this.tracks.map((t) => ({ ...t, isDefault: false }));
+    }
+
+    const idx = this.tracks.findIndex((t) => track.id === t.id);
+    this.tracks[idx].name = track.name;
+    this.tracks[idx].slug = track.slug;
+    this.tracks[idx].isDefault = track.isDefault;
+  }
+
   protected readonly ActiveTab = ActiveTab;
   protected readonly location = location;
+
+  editTrack(track: Track, editTrackDialog: EditTrackDialogComponent) {
+    editTrackDialog.open(this.selectedApplication!, track);
+  }
+
+  deleteTrack(deleteTrackConfirm: ConfirmComponent) {
+    this.trackService
+      .deleteTrack({
+        applicationId: this.selectedApplication!.id,
+        id: this.selectedTrack!.id
+      })
+      .subscribe(() => {
+        deleteTrackConfirm.open = false;
+        this.tracks = this.tracks.filter((t) => t.id !== this.selectedTrack!.id);
+        this.selectedTrack = null;
+      });
+  }
+
+  openDeleteTrack(track: Track, deleteTrackConfirm: ConfirmComponent) {
+    this.selectedTrack = track;
+    deleteTrackConfirm.open = true;
+  }
 }

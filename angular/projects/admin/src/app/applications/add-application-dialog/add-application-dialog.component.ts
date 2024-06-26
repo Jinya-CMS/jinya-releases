@@ -45,11 +45,14 @@ export class AddApplicationDialogComponent {
       homepageTemplate: '<html></html>',
       trackpageTemplate: '<html></html>'
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.applicationService.createApplication({ body }).subscribe({
       next(value) {
         self.saved.emit(value);
         self.open = false;
+        self.createApplicationForm.reset();
       },
       error(error) {
         self.hasErrors = true;

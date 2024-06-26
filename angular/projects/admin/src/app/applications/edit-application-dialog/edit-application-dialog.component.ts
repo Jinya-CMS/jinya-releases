@@ -38,8 +38,11 @@ export class EditApplicationDialogComponent {
 
   open() {
     this.isOpen = true;
-    this.editApplicationForm.get('name')?.setValue(this.selectedApplication.name);
-    this.editApplicationForm.get('slug')?.setValue(this.selectedApplication.slug);
+    this.editApplicationForm.reset({
+      name: this.selectedApplication.name,
+      slug: this.selectedApplication.slug
+    });
+    this.hasErrors = false;
   }
 
   editApplication() {
@@ -52,6 +55,8 @@ export class EditApplicationDialogComponent {
       name: this.editApplicationForm.value.name!,
       slug: this.editApplicationForm.value.slug!
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.applicationService.updateApplication({ id: this.selectedApplication.id, body }).subscribe({
       next() {
@@ -62,7 +67,7 @@ export class EditApplicationDialogComponent {
         });
         self.isOpen = false;
       },
-      error(error) {
+      error() {
         self.hasErrors = true;
       }
     });

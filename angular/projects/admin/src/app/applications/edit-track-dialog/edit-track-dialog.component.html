@@ -1,0 +1,28 @@
+<div class="cosmo-modal__container" [class.is--closed]="!isOpen">
+  <form class="cosmo-modal" [formGroup]="editTrackForm" (ngSubmit)="updateTrack()">
+    <h1 class="cosmo-modal__title" i18n="@@edit-track-title">Edit track</h1>
+    <div class="cosmo-modal__content">
+      @if (hasErrors) {
+        <div class="cosmo-message is--negative">
+          <span class="cosmo-message__header" i18n="@@update-track-exists-title">The track exists</span>
+          <p class="cosmo-message__message" i18n="@@update-track-exists-message">A track with these parameters exists
+            already</p>
+        </div>
+      }
+      <div class="cosmo-input__group">
+        <label for="edit-track-name" class="cosmo-label" i18n="@@track-name-label">Name</label>
+        <input formControlName="name" type="text" class="cosmo-input" required id="edit-track-name">
+        <label for="edit-track-slug" class="cosmo-label" i18n="@@track-slug-label">Slug</label>
+        <input formControlName="slug" type="text" class="cosmo-input" required id="edit-track-slug">
+        <div class="cosmo-input__group is--switch">
+          <input type="checkbox" class="cosmo-switch" formControlName="isDefault" id="edit-track-isDefault">
+          <label class="cosmo-label" i18n="@@track-default-label" for="edit-track-isDefault">Is default</label>
+        </div>
+      </div>
+    </div>
+    <div class="cosmo-modal__button-bar">
+      <button class="cosmo-button" (click)="isOpen = false" i18n="@@cancel">Cancel</button>
+      <button class="cosmo-button" type="submit" i18n="@@update-track">Update track</button>
+    </div>
+  </form>
+</div>

@@ -8,9 +8,17 @@ import { CircleCheck, CircleX, LucideAngularModule } from 'lucide-angular';
 import { EditApplicationDialogComponent } from './edit-application-dialog/edit-application-dialog.component';
 import { UiModule } from '../../ui/ui.module';
 import { ConfirmComponent } from '../../ui/confirm/confirm.component';
+import { AddTrackDialogComponent } from './add-track-dialog/add-track-dialog.component';
+import { EditTrackDialogComponent } from './edit-track-dialog/edit-track-dialog.component';
 
 @NgModule({
-  declarations: [AddApplicationDialogComponent, AllApplicationsComponent, EditApplicationDialogComponent],
+  declarations: [
+    AddApplicationDialogComponent,
+    AllApplicationsComponent,
+    EditApplicationDialogComponent,
+    AddTrackDialogComponent,
+    EditTrackDialogComponent
+  ],
   imports: [
     RouterLink,
     CommonModule,
