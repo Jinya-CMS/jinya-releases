@@ -5,17 +5,18 @@
       @if (hasErrors) {
         <div class="cosmo-message is--negative">
           <span class="cosmo-message__header" i18n="@@create-track-exists-title">The track exists</span>
-          <p class="cosmo-message__message" i18n="@@create-track-exists-message">A track with these parameters exists
-            already</p>
+          <p class="cosmo-message__message" i18n="@@create-track-exists-message">
+            A track with these parameters exists already
+          </p>
         </div>
       }
       <div class="cosmo-input__group">
         <label for="add-track-name" class="cosmo-label" i18n="@@track-name-label">Name</label>
-        <input formControlName="name" type="text" class="cosmo-input" required id="add-track-name">
+        <input formControlName="name" type="text" class="cosmo-input" required id="add-track-name" />
         <label for="add-track-slug" class="cosmo-label" i18n="@@track-slug-label">Slug</label>
-        <input formControlName="slug" type="text" class="cosmo-input" required id="add-track-slug">
+        <input formControlName="slug" type="text" class="cosmo-input" required id="add-track-slug" />
         <div class="cosmo-input__group is--switch">
-          <input type="checkbox" class="cosmo-switch" formControlName="isDefault" id="add-track-isDefault">
+          <input type="checkbox" class="cosmo-switch" formControlName="isDefault" id="add-track-isDefault" />
           <label class="cosmo-label" i18n="@@track-default-label" for="add-track-isDefault">Is default</label>
         </div>
       </div>

@@ -27,7 +27,7 @@ export class AddTrackDialogComponent {
     isDefault: new FormControl<boolean>(false)
   });
 
-  hasErrors: boolean = false;
+  hasErrors = false;
 
   @Input() open = false;
   @Input() selectedApplication!: Application;
@@ -41,7 +41,6 @@ export class AddTrackDialogComponent {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.trackService
       .createNewTrack({

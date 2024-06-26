@@ -1,15 +1,15 @@
 @if (loading) {
-  <app-loading-spinner/>
+  <app-loading-spinner />
 } @else {
   @if (applications.length === 0) {
     <div class="cosmo-message is--information">
       <span class="cosmo-message__header" i18n="@@no-applications-exist-title">No apps exist</span>
-      <p class="cosmo-message__message" i18n="@@no-applications-exist-message">You currently have no apps, please
-        create one below</p>
+      <p class="cosmo-message__message" i18n="@@no-applications-exist-message">
+        You currently have no apps, please create one below
+      </p>
       <div class="cosmo-button__container">
-        <button class="cosmo-button is--information" i18n="@@new-application"
-                (click)="createApplication.open = true">New
-          app
+        <button class="cosmo-button is--information" i18n="@@new-application" (click)="createApplication.open = true">
+          New app
         </button>
       </div>
     </div>
@@ -17,11 +17,16 @@
     <div class="cosmo-side-list">
       <nav class="cosmo-side-list__items">
         @for (app of applications; track app) {
-          <a [routerLink]="'/application/' + app.id" class="cosmo-side-list__item" (click)="selectApp(app)"
-             [class.is--active]="selectedApplication?.id === app.id">{{ app.name }}</a>
+          <a
+            [routerLink]="'/application/' + app.id"
+            class="cosmo-side-list__item"
+            (click)="selectApp(app)"
+            [class.is--active]="selectedApplication?.id === app.id"
+            >{{ app.name }}</a
+          >
         }
-        <button class="cosmo-button is--full-width" i18n="@@new-application"
-                (click)="createApplication.open = true">New app
+        <button class="cosmo-button is--full-width" i18n="@@new-application" (click)="createApplication.open = true">
+          New app
         </button>
       </nav>
       @if (selectedApplication) {
@@ -29,11 +34,13 @@
           <span class="cosmo-title">{{ selectedApplication.name }}</span>
           <div class="cosmo-toolbar">
             <div class="cosmo-toolbar__group">
-              <button class="cosmo-button" (click)="editApplication.open()" i18n="@@edit-application">
-                Edit app
-              </button>
-              <button class="cosmo-button" (click)="deleteApplication.open = true"
-                      i18n="@@delete-application" [disabled]="tracks.length > 0">
+              <button class="cosmo-button" (click)="editApplication.open()" i18n="@@edit-application">Edit app</button>
+              <button
+                class="cosmo-button"
+                (click)="deleteApplication.open = true"
+                i18n="@@delete-application"
+                [disabled]="tracks.length > 0"
+              >
                 Delete app
               </button>
             </div>
@@ -43,10 +50,20 @@
           </div>
           <div class="cosmo-tab">
             <nav class="cosmo-tab__links">
-              <a class="cosmo-tab__link" [class.is--active]="activeTab === ActiveTab.Details"
-                 (click)="activeTab = ActiveTab.Details" i18n="@@application-details">Details</a>
-              <a class="cosmo-tab__link" [class.is--active]="activeTab === ActiveTab.Tracks"
-                 (click)="activeTab = ActiveTab.Tracks" i18n="@@application-tracks">Tracks</a>
+              <a
+                class="cosmo-tab__link"
+                [class.is--active]="activeTab === ActiveTab.Details"
+                (click)="activeTab = ActiveTab.Details"
+                i18n="@@application-details"
+                >Details</a
+              >
+              <a
+                class="cosmo-tab__link"
+                [class.is--active]="activeTab === ActiveTab.Tracks"
+                (click)="activeTab = ActiveTab.Tracks"
+                i18n="@@application-tracks"
+                >Tracks</a
+              >
             </nav>
             <div class="cosmo-tab__content">
               @if (activeTab === ActiveTab.Details) {
@@ -67,15 +84,12 @@
               } @else {
                 @if (tracks.length === 0) {
                   <div class="cosmo-message is--information">
-                                        <span class="cosmo-message__header" i18n="@@no-tracks-exist-title">
-                                            No tracks exist
-                                        </span>
+                    <span class="cosmo-message__header" i18n="@@no-tracks-exist-title"> No tracks exist </span>
                     <p class="cosmo-message__message" i18n="@@no-tracks-exist-message">
                       You currently have no tracks, please create one below
                     </p>
                     <div class="cosmo-button__container">
-                      <button class="cosmo-button is--information" i18n="@@new-track"
-                              (click)="createTrack.open = true">
+                      <button class="cosmo-button is--information" i18n="@@new-track" (click)="createTrack.open = true">
                         New track
                       </button>
                     </div>
@@ -83,14 +97,14 @@
                 } @else {
                   <table class="cosmo-table">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th i18n="@@application-track-name">Name</th>
-                      <th i18n="@@application-track-slug">Slug</th>
-                      <th i18n="@@application-track-default">Default</th>
-                      <th i18n="@@application-track-link">Link</th>
-                      <th i18n="@@application-track-actions">Actions</th>
-                    </tr>
+                      <tr>
+                        <th>#</th>
+                        <th i18n="@@application-track-name">Name</th>
+                        <th i18n="@@application-track-slug">Slug</th>
+                        <th i18n="@@application-track-default">Default</th>
+                        <th i18n="@@application-track-link">Link</th>
+                        <th i18n="@@application-track-actions">Actions</th>
+                      </tr>
                     </thead>
                     <tbody>
                       @for (track of tracks; track track) {
@@ -100,9 +114,9 @@
                           <td>{{ track.slug }}</td>
                           <td style="text-align: center">
                             @if (track.isDefault) {
-                              <lucide-icon name="circle-check" color="var(--positive-color)"/>
+                              <lucide-icon name="circle-check" color="var(--positive-color)" />
                             } @else {
-                              <lucide-icon name="circle-x" color="var(--negative-color)"/>
+                              <lucide-icon name="circle-x" color="var(--negative-color)" />
                             }
                           </td>
                           <td>
@@ -112,13 +126,19 @@
                           </td>
                           <td>
                             <div class="cosmo-toolbar__group">
-                              <button class="cosmo-button is--small" i18n="@@application-track-edit"
-                                      (click)="editTrack(track, editTrackDialog)">
+                              <button
+                                class="cosmo-button is--small"
+                                i18n="@@application-track-edit"
+                                (click)="editTrack(track, editTrackDialog)"
+                              >
                                 Edit
                               </button>
-                              <button class="cosmo-button is--small" i18n="@@application-track-delete"
-                                      [disabled]="trackHasVersions[track.id]"
-                                      (click)="openDeleteTrack(track, deleteTrackConfirm)">
+                              <button
+                                class="cosmo-button is--small"
+                                i18n="@@application-track-delete"
+                                [disabled]="trackHasVersions[track.id]"
+                                (click)="openDeleteTrack(track, deleteTrackConfirm)"
+                              >
                                 Delete
                               </button>
                             </div>
@@ -132,24 +152,46 @@
             </div>
           </div>
         </div>
-        <app-edit-application-dialog (saved)="appUpdated($event)" [selectedApplication]="selectedApplication"
-                                     #editApplication/>
-        <app-confirm negative title="Delete app" confirmLabel="Delete app" declineLabel="Don't delete"
-                     i18n-title="@@delete-app-title" i18n-declineLabel="@@delete-app-decline"
-                     i18n-confirmLabel="@@delete-app-confirm" #deleteApplication
-                     (decline)="deleteApplication.open = false" (confirm)="deleteApp(deleteApplication)">
+        <app-edit-application-dialog
+          (saved)="appUpdated($event)"
+          [selectedApplication]="selectedApplication"
+          #editApplication
+        />
+        <app-confirm
+          negative
+          title="Delete app"
+          confirmLabel="Delete app"
+          declineLabel="Don't delete"
+          i18n-title="@@delete-app-title"
+          i18n-declineLabel="@@delete-app-decline"
+          i18n-confirmLabel="@@delete-app-confirm"
+          #deleteApplication
+          (decline)="deleteApplication.open = false"
+          (confirm)="deleteApp(deleteApplication)"
+        >
           <ng-container i18n="@@delete-app-message">
             Do you really want to delete the app {{ selectedApplication.name }}?
           </ng-container>
         </app-confirm>
 
-        <app-add-track-dialog (saved)="trackAdded($event)" [selectedApplication]="selectedApplication" #createTrack/>
-        <app-edit-track-dialog (saved)="updateTrack($event)" [selectedApplication]="selectedApplication"
-                               #editTrackDialog/>
-        <app-confirm negative title="Delete track" confirmLabel="Delete track" declineLabel="Don't delete"
-                     i18n-title="@@delete-track-title" i18n-declineLabel="@@delete-track-decline"
-                     i18n-confirmLabel="@@delete-track-confirm" #deleteTrackConfirm
-                     (decline)="deleteTrackConfirm.open = false" (confirm)="deleteTrack(deleteTrackConfirm)">
+        <app-add-track-dialog (saved)="trackAdded($event)" [selectedApplication]="selectedApplication" #createTrack />
+        <app-edit-track-dialog
+          (saved)="updateTrack($event)"
+          [selectedApplication]="selectedApplication"
+          #editTrackDialog
+        />
+        <app-confirm
+          negative
+          title="Delete track"
+          confirmLabel="Delete track"
+          declineLabel="Don't delete"
+          i18n-title="@@delete-track-title"
+          i18n-declineLabel="@@delete-track-decline"
+          i18n-confirmLabel="@@delete-track-confirm"
+          #deleteTrackConfirm
+          (decline)="deleteTrackConfirm.open = false"
+          (confirm)="deleteTrack(deleteTrackConfirm)"
+        >
           <ng-container i18n="@@delete-track-message">
             Do you really want to delete the track {{ selectedTrack?.name }} in app {{ selectedApplication.name }}?
           </ng-container>
@@ -158,5 +200,5 @@
     </div>
   }
 
-  <app-add-application-dialog (saved)="appCreated($event)" #createApplication/>
+  <app-add-application-dialog (saved)="appCreated($event)" #createApplication />
 }

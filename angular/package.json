@@ -13,8 +13,8 @@
     "build:admin:dev": "ng build --configuration development admin",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "prettier --check projects && ng lint",
-    "format": "prettier --write projects"
+    "lint": "prettier --check projects/admin && ng lint",
+    "format": "prettier --write projects/admin"
   },
   "private": true,
   "dependencies": {
@@ -31,25 +31,21 @@
     "@fontsource/albert-sans": "5.0.13",
     "@fontsource/oxygen-mono": "5.0.20",
     "@fontsource/urbanist": "5.0.20",
-    "lucide-angular": "0.396.0",
+    "lucide-angular": "0.397.0",
     "rxjs": "7.8.1",
     "tslib": "2.6.3",
     "zone.js": "0.14.7"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "18.0.5",
+    "@angular-devkit/build-angular": "18.0.6",
     "@angular-eslint/builder": "18.0.1",
-    "@angular-eslint/eslint-plugin": "18.0.1",
-    "@angular-eslint/eslint-plugin-template": "18.0.1",
-    "@angular-eslint/schematics": "18.0.1",
-    "@angular-eslint/template-parser": "18.0.1",
-    "@angular/cli": "18.0.5",
+    "@angular/cli": "18.0.6",
     "@angular/compiler-cli": "18.0.4",
-    "@typescript-eslint/eslint-plugin": "7.13.1",
-    "@typescript-eslint/parser": "7.13.1",
-    "eslint": "8.57.0",
-    "ng-packagr": "18.0.0",
+    "@eslint/js": "9.5.0",
+    "angular-eslint": "18.0.1",
+    "eslint": "9.5.0",
     "prettier": "3.3.2",
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "typescript-eslint": "8.0.0-alpha.34"
   }
 }

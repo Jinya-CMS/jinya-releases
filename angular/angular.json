@@ -113,7 +113,8 @@
             "lintFilePatterns": [
               "projects/admin/**/*.ts",
               "projects/admin/**/*.html"
-            ]
+            ],
+            "eslintConfig": "projects/admin/eslint.config.js"
           }
         }
       }

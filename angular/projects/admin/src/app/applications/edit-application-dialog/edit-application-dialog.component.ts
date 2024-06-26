@@ -26,7 +26,7 @@ export class EditApplicationDialogComponent {
     })
   });
 
-  hasErrors: boolean = false;
+  hasErrors = false;
 
   isOpen = false;
 
@@ -56,7 +56,6 @@ export class EditApplicationDialogComponent {
       slug: this.editApplicationForm.value.slug!
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.applicationService.updateApplication({ id: this.selectedApplication.id, body }).subscribe({
       next() {

@@ -27,7 +27,7 @@ export class EditTrackDialogComponent {
     isDefault: new FormControl<boolean>(false)
   });
 
-  hasErrors: boolean = false;
+  hasErrors = false;
 
   @Input() isOpen = false;
   @Input() selectedApplication!: Application;
@@ -42,9 +42,7 @@ export class EditTrackDialogComponent {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-
     this.trackService
       .updateTrack({
         id: this.track.id,

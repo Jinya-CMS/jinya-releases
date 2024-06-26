@@ -1,9 +1,20 @@
 stages:
+  - lint-angular
   - build-angular
-  - lint
+  - lint-golang
   - test
   - build-golang
   - deploy
+
+lint-angular:
+  image: library/node:latest
+  stage: lint-angular
+  variables:
+    ANGULAR_DIR: $CI_PROJECT_DIR/angular
+  script:
+    - cd $ANGULAR_DIR
+    - npm install
+    - npm run lint
 
 build-angular:
   image: library/node:latest
@@ -20,7 +31,7 @@ build-angular:
 
 lint:
   image: library/golang:1.22-alpine
-  stage: lint
+  stage: lint-golang
   script:
     - go vet .
 

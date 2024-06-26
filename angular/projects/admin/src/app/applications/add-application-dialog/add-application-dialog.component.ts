@@ -26,7 +26,7 @@ export class AddApplicationDialogComponent {
     })
   });
 
-  hasErrors: boolean = false;
+  hasErrors = false;
 
   @Input() open = false;
 
@@ -46,7 +46,6 @@ export class AddApplicationDialogComponent {
       trackpageTemplate: '<html></html>'
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.applicationService.createApplication({ body }).subscribe({
       next(value) {
@@ -54,7 +53,7 @@ export class AddApplicationDialogComponent {
         self.open = false;
         self.createApplicationForm.reset();
       },
-      error(error) {
+      error() {
         self.hasErrors = true;
       }
     });

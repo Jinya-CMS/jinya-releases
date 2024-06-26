@@ -22,7 +22,7 @@ export class AllApplicationsComponent implements OnInit {
   activeTab = ActiveTab.Details;
   tracks: Track[] = [];
   loading = true;
-  trackHasVersions: { [key: string]: boolean } = {};
+  trackHasVersions: Record<string, boolean> = {};
 
   constructor(
     protected applicationService: ApplicationService,
@@ -105,9 +105,6 @@ export class AllApplicationsComponent implements OnInit {
     this.tracks[idx].isDefault = track.isDefault;
   }
 
-  protected readonly ActiveTab = ActiveTab;
-  protected readonly location = location;
-
   editTrack(track: Track, editTrackDialog: EditTrackDialogComponent) {
     editTrackDialog.open(this.selectedApplication!, track);
   }
@@ -129,4 +126,7 @@ export class AllApplicationsComponent implements OnInit {
     this.selectedTrack = track;
     deleteTrackConfirm.open = true;
   }
+
+  protected readonly ActiveTab = ActiveTab;
+  protected readonly location = location;
 }
