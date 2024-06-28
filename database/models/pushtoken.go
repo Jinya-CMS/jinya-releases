@@ -26,9 +26,21 @@ func CreatePushtoken(applications []string) (*PushToken, error) {
 	}
 
 	defer db.Close()
+
+	for _, a := range applications {
+		count := 0
+		err = db.Get(&count, "SELECT COUNT(*) FROM application WHERE id = $1", a)
+		if err != nil {
+			return nil, err
+		}
+		if count == 0 {
+			return nil, ErrApplicationNotFound
+		}
+	}
+
 	var tokenId string
 
-	if err = db.Select(&tokenId, "INSERT INTO pushtoken (id, token) DEFAULT VALUES RETURNING id"); err != nil {
+	if err = db.Get(&tokenId, "INSERT INTO pushtoken DEFAULT VALUES RETURNING id"); err != nil {
 		return nil, err
 	}
 
@@ -85,11 +97,19 @@ func GetPushTokenById(id string) (*PushToken, error) {
 	}
 
 	defer db.Close()
-	pushToken := new(PushToken)
+	type tempToken struct {
+		Id    string `db:"id"`
+		Token string `db:"token"`
+	}
+	tToken := new(tempToken)
 
-	if err = db.Select(&pushToken, "SELECT id, token FROM pushtoken where id = $1", id); err != nil {
+	if err = db.Get(tToken, "SELECT id, token FROM pushtoken where id = $1", id); err != nil {
 		return nil, err
 	}
+
+	pushToken := new(PushToken)
+	pushToken.Id = tToken.Id
+	pushToken.Token = tToken.Token
 
 	applicationIds := make([]string, 0)
 	if err = db.Select(&applicationIds, "SELECT application FROM pushtokenapplication WHERE token = $1", pushToken.Token); err != nil {
@@ -100,46 +120,67 @@ func GetPushTokenById(id string) (*PushToken, error) {
 	return pushToken, nil
 }
 
-func UpdatePushtoken(id string, applications []string) error {
+func UpdatePushtoken(id string, applications []string) (*PushToken, error) {
 	if len(applications) == 0 {
-		return ErrApplicationlistEmpty
+		return nil, ErrApplicationlistEmpty
 	}
 
 	db, err := database.Connect()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer db.Close()
-	var token string
 
-	if err = db.Select(&token, "SELECT  token FROM pushtoken where id = $1", id); err != nil {
-		return err
+	for _, a := range applications {
+		count := 0
+		err = db.Get(&count, "SELECT COUNT(*) FROM application WHERE id = $1", a)
+		if err != nil {
+			return nil, err
+		}
+		if count == 0 {
+			return nil, ErrApplicationNotFound
+		}
 	}
 
-	result, err := db.Exec("DELETE FROM pushtokenapplication WHERE token = $1", token)
+	type tempToken struct {
+		Id    string `db:"id"`
+		Token string `db:"token"`
+	}
+	tToken := new(tempToken)
+
+	if err = db.Get(tToken, "SELECT id, token FROM pushtoken where id = $1", id); err != nil {
+		return nil, ErrPushtokenNotFound
+	}
+
+	result, err := db.Exec("DELETE FROM pushtokenapplication WHERE token = $1", tToken.Token)
 	if err != nil {
-		return err
+		return nil, ErrPushtokenNotFound
 	}
 
 	affected, err := result.RowsAffected()
 	if err != nil {
-		return err
+		return nil, ErrPushtokenNotFound
 	}
 
 	if affected == 0 {
-		return ErrPushtokenNotFound
+		return nil, ErrPushtokenNotFound
 	}
 
 	for _, a := range applications {
-		_, err = db.Exec("INSERT INTO pushtokenapplication (token, application) VALUES ($1, $2)", token, a)
+		_, err = db.Exec("INSERT INTO pushtokenapplication (token, application) VALUES ($1, $2)", tToken.Token, a)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	pushToken := new(PushToken)
+	pushToken.Id = tToken.Id
+	pushToken.Token = tToken.Token
+	pushToken.AllowedApps = applications
+
+	return pushToken, nil
 }
 
 func DeletePushtoken(id string) error {
@@ -151,8 +192,8 @@ func DeletePushtoken(id string) error {
 	defer db.Close()
 	var token string
 
-	if err = db.Select(&token, "SELECT  token FROM pushtoken where id = $1", id); err != nil {
-		return err
+	if err = db.Get(&token, "SELECT  token FROM pushtoken where id = $1", id); err != nil {
+		return ErrPushtokenNotFound
 	}
 
 	result, err := db.Exec("DELETE FROM pushtokenapplication WHERE token = $1", token)
@@ -170,6 +211,11 @@ func DeletePushtoken(id string) error {
 	}
 
 	result, err = db.Exec("DELETE FROM pushtoken WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+
+	affected, err = result.RowsAffected()
 	if err != nil {
 		return err
 	}

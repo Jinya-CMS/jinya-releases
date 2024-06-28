@@ -12,6 +12,12 @@ func CleanTables() {
 		return
 	}
 
+	if _, err = conn.Exec("DELETE FROM pushtokenapplication"); err != nil {
+		log.Printf("Failed to clean table pushtokenapplication %v", err)
+	}
+	if _, err = conn.Exec("DELETE FROM pushtoken"); err != nil {
+		log.Printf("Failed to clean table pushtoken %v", err)
+	}
 	if _, err = conn.Exec("DELETE FROM version"); err != nil {
 		log.Printf("Failed to clean table version %v", err)
 	}

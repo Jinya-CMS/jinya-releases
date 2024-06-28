@@ -55,13 +55,22 @@ func CreatePushtoken(reader io.Reader) (pushtoken *models.PushToken, errDetails 
 	}
 
 	pushtoken, err = models.CreatePushtoken(token.AllowedApps)
+	status = http.StatusCreated
 	if err != nil {
 		errDetails = &ErrorDetails{
 			EntityType: "pushtoken",
 		}
 
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
+		if errors.Is(err, models.ErrApplicationlistEmpty) {
+			status = http.StatusBadRequest
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Applicationlist empty"
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
+		} else if errors.As(err, &pgErr) {
 			errDetails.ErrorType = "database"
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown database error"
@@ -93,6 +102,7 @@ func GetAllPushtokens() (pushtokens []models.PushToken, errDetails *ErrorDetails
 
 func GetPushtokenById(id string) (pushtoken *models.PushToken, errDetails *ErrorDetails, status int) {
 	pushtoken, err := models.GetPushTokenById(id)
+	status = http.StatusOK
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
@@ -150,7 +160,7 @@ func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, 
 		AllowedApps: body.AllowedApps,
 	}
 
-	err = models.UpdatePushtoken(token.Id, token.AllowedApps)
+	pushtoken, err = models.UpdatePushtoken(token.Id, token.AllowedApps)
 	if err != nil {
 		errDetails = &ErrorDetails{
 			EntityType: "pushtoken",
@@ -162,17 +172,27 @@ func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, 
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Pushtoken not found"
 			return
+		} else if errors.Is(err, models.ErrApplicationlistEmpty) {
+			status = http.StatusBadRequest
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Applicationlist empty"
+			return
+		} else if errors.Is(err, models.ErrApplicationNotFound) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
+			return
 		} else if errors.As(err, &pgErr) {
 			errDetails.ErrorType = "database"
 			status = http.StatusInternalServerError
 			errDetails.Message = "Unknown database error"
 			log.Println(err.Error())
+		} else {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown error"
+			errDetails.ErrorType = "server"
+			log.Println(err.Error())
 		}
-	} else {
-		status = http.StatusInternalServerError
-		errDetails.Message = "Unknown error"
-		errDetails.ErrorType = "server"
-		log.Println(err.Error())
 	}
 
 	return
