@@ -22,6 +22,8 @@ var migrations = []Migration{
 	dbMigrations.CreateApplicationTable{},
 	dbMigrations.CreateTrackTable{},
 	dbMigrations.CreateVersionTable{},
+	dbMigrations.CreatePushtokenTable{},
+	dbMigrations.CreatePushtokenApplicationTable{},
 }
 
 func createMigrationsTable() error {

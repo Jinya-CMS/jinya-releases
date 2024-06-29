@@ -21,6 +21,8 @@ func cleanDatabase() error {
 		return err
 	}
 
+	_, _ = conn.Exec("DROP TABLE pushtokenapplication CASCADE")
+	_, _ = conn.Exec("DROP TABLE pushtoken CASCADE")
 	_, _ = conn.Exec("DROP TABLE version CASCADE")
 	_, _ = conn.Exec("DROP TABLE track CASCADE")
 	_, _ = conn.Exec("DROP TABLE application CASCADE")
