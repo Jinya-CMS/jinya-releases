@@ -45,7 +45,7 @@ func CreateApplication(application Application) (*Application, error) {
 
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO application (name, logo, slug, homepage_template, trackpage_template, additional_css, additional_javascript) VALUES ($1, $2, $3, $4, $5, $6, $7)", application.Name, application.Logo, application.Slug, application.HomepageTemplate, application.TrackpageTemplate, application.AdditionalCss, application.AdditionalJavaScript)
+	_, err = db.Exec("INSERT INTO application (name, slug, homepage_template, trackpage_template, additional_css, additional_javascript) VALUES ($1, $2, $3, $4, $5, $6)", application.Name, application.Slug, application.HomepageTemplate, application.TrackpageTemplate, application.AdditionalCss, application.AdditionalJavaScript)
 
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func GetAllApplications() ([]Application, error) {
 	defer db.Close()
 	applications := make([]Application, 0)
 
-	if err = db.Select(&applications, "SELECT id, name, logo, slug, homepage_template, trackpage_template, additional_css, additional_javascript FROM application ORDER BY name"); err != nil {
+	if err = db.Select(&applications, "SELECT id, name, slug, homepage_template, trackpage_template, additional_css, additional_javascript, '/content/logo/' || slug as logo FROM application ORDER BY name"); err != nil {
 		return nil, err
 	}
 
@@ -79,7 +79,7 @@ func GetApplicationById(id string) (*Application, error) {
 	defer db.Close()
 	application := new(Application)
 
-	if err = db.Get(application, "SELECT id, name, logo, slug, homepage_template, trackpage_template, additional_css, additional_javascript FROM application WHERE id = $1", id); err != nil {
+	if err = db.Get(application, "SELECT id, name, slug, homepage_template, trackpage_template, additional_css, additional_javascript, '/content/logo/' || slug as logo FROM application WHERE id = $1", id); err != nil {
 		return nil, err
 	}
 
@@ -95,7 +95,7 @@ func GetApplicationBySlug(slug string) (*Application, error) {
 	defer db.Close()
 	application := new(Application)
 
-	if err = db.Get(application, "SELECT id, name, logo, slug, homepage_template, trackpage_template, additional_css, additional_javascript FROM application WHERE slug = $1", slug); err != nil {
+	if err = db.Get(application, "SELECT id, name, slug, homepage_template, trackpage_template, additional_css, additional_javascript, '/content/logo/' || slug as logo FROM application WHERE slug = $1", slug); err != nil {
 		return nil, err
 	}
 
@@ -110,7 +110,7 @@ func UpdateApplication(application Application) (*Application, error) {
 
 	defer db.Close()
 
-	result, err := db.Exec("UPDATE application SET name = $1, logo = $2, slug = $3, homepage_template = $4, trackpage_template = $5, additional_css = $6, additional_javascript = $7 WHERE id = $8", application.Name, application.Logo, application.Slug, application.HomepageTemplate, application.TrackpageTemplate, application.AdditionalCss, application.AdditionalJavaScript, application.Id)
+	result, err := db.Exec("UPDATE application SET name = $1, slug = $2, homepage_template = $3, trackpage_template = $4, additional_css = $5, additional_javascript = $6 WHERE id = $7", application.Name, application.Slug, application.HomepageTemplate, application.TrackpageTemplate, application.AdditionalCss, application.AdditionalJavaScript, application.Id)
 	if err != nil {
 		return nil, err
 	}

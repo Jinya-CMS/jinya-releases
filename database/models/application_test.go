@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"jinya-releases/config"
 	"jinya-releases/database"
 	migrator "jinya-releases/database/migrations"
@@ -21,7 +22,7 @@ func cleanDatabase() error {
 	_, _ = conn.Exec("DROP TABLE track CASCADE")
 	_, _ = conn.Exec("DROP TABLE application CASCADE")
 	_, _ = conn.Exec("DROP TABLE pushtoken CASCADE")
-	_, _ = conn.Exec("DROP TABLE pushtokenapplication CASCADE")
+	_, _ = conn.Exec("DROP TABLE pushtoken_application CASCADE")
 	_, _ = conn.Exec("DROP TABLE migrations CASCADE")
 
 	return nil
@@ -66,7 +67,6 @@ func TestCreateApplication(t *testing.T) {
 					TrackpageTemplate:    "test",
 					AdditionalCss:        &testPtr,
 					AdditionalJavaScript: &testPtr,
-					Logo:                 &testPtr,
 				},
 			},
 			wantErr: false,
@@ -495,6 +495,9 @@ func TestUpdateApplication(t *testing.T) {
 			application.HomepageTemplate = tt.args.testApplication.HomepageTemplate
 			application.TrackpageTemplate = tt.args.testApplication.TrackpageTemplate
 
+			logo := fmt.Sprintf("/content/logo/%s", application.Slug)
+			application.Logo = &logo
+
 			got, err := UpdateApplication(*application)
 			test.CleanTables()
 			if (err != nil) != tt.wantErr {
@@ -502,7 +505,7 @@ func TestUpdateApplication(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, application) && !tt.wantErr {
-				t.Errorf("UpdateApplication() got = %v, want %v", got, tt.want)
+				t.Errorf("UpdateApplication() got = %v, want %v", got, application)
 			}
 		})
 	}

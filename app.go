@@ -6,6 +6,7 @@ import (
 	"golang.org/x/text/language"
 	"jinya-releases/api"
 	"jinya-releases/config"
+	"jinya-releases/content"
 	migrator "jinya-releases/database/migrations"
 	"log"
 	"net/http"
@@ -124,6 +125,7 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.FileServerFS(static))
 
 	api.SetupApiRouter(router)
+	content.SetupContentRouter(router)
 
 	log.Println("Serving at localhost:8090...")
 	err = http.ListenAndServe(":8090", router)

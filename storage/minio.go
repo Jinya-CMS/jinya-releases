@@ -1,0 +1,47 @@
+package storage
+
+import (
+	"context"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"io"
+	"jinya-releases/config"
+	"strings"
+)
+
+func getMinioClient() (*minio.Client, error) {
+	endpoint := config.LoadedConfiguration.StorageUrl
+	accessKeyID := config.LoadedConfiguration.StorageAccessKey
+	secretAccessKey := config.LoadedConfiguration.StorageSecretKey
+	useSSL := strings.HasPrefix(endpoint, "https://")
+
+	return minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure: useSSL,
+	})
+}
+
+func SaveFile(path string, reader io.Reader, size int64, contentType string) error {
+	client, err := getMinioClient()
+	if err != nil {
+		return err
+	}
+
+	_, err = client.PutObject(context.Background(), config.LoadedConfiguration.StorageBucket, path, reader, size, minio.PutObjectOptions{ContentType: contentType})
+
+	return err
+}
+
+func GetFile(path string) (io.ReadCloser, error) {
+	client, err := getMinioClient()
+	if err != nil {
+		return nil, err
+	}
+
+	object, err := client.GetObject(context.Background(), config.LoadedConfiguration.StorageBucket, path, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return object, nil
+}
