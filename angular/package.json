@@ -1,0 +1,51 @@
+{
+  "name": "jinya-releases",
+  "version": "3.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "extract-i18n": "ng extract-i18n --format json --output-path projects/admin/src/locale",
+    "build": "npm run build:api && npm run build:admin",
+    "build:api": "ng build api",
+    "build:admin": "ng build admin",
+    "build:dev": "npm run build:api:dev && npm run build:admin:dev",
+    "build:api:dev": "ng build --configuration development api",
+    "build:admin:dev": "ng build --configuration development admin",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "lint": "prettier --check projects/admin && ng lint",
+    "format": "prettier --write projects/admin"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "18.0.4",
+    "@angular/common": "18.0.4",
+    "@angular/compiler": "18.0.4",
+    "@angular/core": "18.0.4",
+    "@angular/forms": "18.0.4",
+    "@angular/localize": "18.0.4",
+    "@angular/platform-browser": "18.0.4",
+    "@angular/platform-browser-dynamic": "18.0.4",
+    "@angular/router": "18.0.4",
+    "@jinyacms/cosmo": "1.0.2",
+    "@fontsource/albert-sans": "5.0.13",
+    "@fontsource/oxygen-mono": "5.0.20",
+    "@fontsource/urbanist": "5.0.20",
+    "lucide-angular": "0.397.0",
+    "rxjs": "7.8.1",
+    "tslib": "2.6.3",
+    "zone.js": "0.14.7"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "18.0.6",
+    "@angular-eslint/builder": "18.0.1",
+    "@angular/cli": "18.0.6",
+    "@angular/compiler-cli": "18.0.4",
+    "@eslint/js": "9.5.0",
+    "angular-eslint": "18.0.1",
+    "eslint": "9.5.0",
+    "prettier": "3.3.2",
+    "typescript": "5.4.5",
+    "typescript-eslint": "8.0.0-alpha.34"
+  }
+}

@@ -1,0 +1,45 @@
+<main class="cosmo-page">
+  <div class="cosmo-menu is--top">
+    <div class="cosmo-menu__row"></div>
+    <div class="cosmo-profile-picture"></div>
+    <a href="#" class="cosmo-menu__item is--right" i18n="@@logout">Logout</a>
+  </div>
+  <div class="cosmo-menu">
+    <button
+      aria-label="Back"
+      class="cosmo-back-button"
+      (click)="location.back()"
+      type="button"
+      i18n-aria-label="@@back"
+    ></button>
+    <nav class="cosmo-menu__collection">
+      <div class="cosmo-menu__row is--main">
+        <a
+          class="cosmo-menu__item"
+          routerLink="/application"
+          routerLinkActive="is--active"
+          [routerLinkActiveOptions]="{ exact: false }"
+          i18n="@@applications"
+        >
+          Apps
+        </a>
+      </div>
+      <div class="cosmo-menu__row is--sub">
+        <a
+          class="cosmo-menu__item"
+          routerLink="/application"
+          [class.is--active]="router.url.includes('application')"
+          i18n="@@overview"
+        >
+          Overview
+        </a>
+        <span class="cosmo-menu__item" [class.is--active]="router.url.includes('track')" i18n="@@track-details">
+          Trackdetails
+        </span>
+      </div>
+    </nav>
+  </div>
+  <div class="cosmo-page__body">
+    <router-outlet />
+  </div>
+</main>

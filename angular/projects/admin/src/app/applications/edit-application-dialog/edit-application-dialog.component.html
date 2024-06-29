@@ -1,0 +1,25 @@
+<div class="cosmo-modal__container" [class.is--closed]="!isOpen">
+  <form class="cosmo-modal" [formGroup]="editApplicationForm" (ngSubmit)="editApplication()">
+    <h1 class="cosmo-modal__title" i18n="@@edit-application-title">Edit app</h1>
+    <div class="cosmo-modal__content">
+      @if (hasErrors) {
+        <div class="cosmo-message is--negative">
+          <span class="cosmo-message__header" i18n="@@edit-application-exists-title">The app exists</span>
+          <p class="cosmo-message__message" i18n="@@edit-application-exists-message">
+            An app with these parameters exists already
+          </p>
+        </div>
+      }
+      <div class="cosmo-input__group">
+        <label for="edit-app-name" class="cosmo-label" i18n="@@application-name-label">Name</label>
+        <input formControlName="name" type="text" class="cosmo-input" required id="edit-app-name" />
+        <label for="edit-app-slug" class="cosmo-label" i18n="@@application-slug-label">Slug</label>
+        <input formControlName="slug" type="text" class="cosmo-input" required id="edit-app-slug" />
+      </div>
+    </div>
+    <div class="cosmo-modal__button-bar">
+      <button class="cosmo-button" (click)="isOpen = false" i18n="@@cancel">Cancel</button>
+      <button class="cosmo-button" type="submit" i18n="@@save-application">Update app</button>
+    </div>
+  </form>
+</div>
