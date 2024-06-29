@@ -49,8 +49,8 @@ func CreatePushtoken(applications []string) (*PushToken, error) {
 		return nil, err
 	}
 
-	for _, a := range applications {
-		_, err = db.Exec("INSERT INTO pushtokenapplication (token, application) VALUES ($1, $2)", pushToken.Token, a)
+	for _, app := range applications {
+		_, err = db.Exec("INSERT INTO pushtoken_application (token_id, application_id) VALUES ($1, $2)", pushToken.Token, app)
 
 		if err != nil {
 			return nil, err
@@ -80,7 +80,7 @@ func GetAllPushTokens() ([]PushToken, error) {
 
 	for i, pushtoken := range pushTokens {
 		applicationIds := make([]string, 0)
-		if err = db.Select(&applicationIds, "SELECT application FROM pushtokenapplication WHERE token = $1", pushtoken.Token); err != nil {
+		if err = db.Select(&applicationIds, "SELECT application_id FROM pushtoken_application WHERE token_id = $1", pushtoken.Token); err != nil {
 			return nil, err
 		}
 		pushTokens[i].AllowedApps = applicationIds
@@ -112,7 +112,7 @@ func GetPushTokenById(id string) (*PushToken, error) {
 	pushToken.Token = tToken.Token
 
 	applicationIds := make([]string, 0)
-	if err = db.Select(&applicationIds, "SELECT application FROM pushtokenapplication WHERE token = $1", pushToken.Token); err != nil {
+	if err = db.Select(&applicationIds, "SELECT application_id FROM pushtoken_application WHERE token_id = $1", pushToken.Token); err != nil {
 		return nil, err
 	}
 	pushToken.AllowedApps = applicationIds
@@ -153,7 +153,7 @@ func UpdatePushtoken(id string, applications []string) (*PushToken, error) {
 		return nil, ErrPushtokenNotFound
 	}
 
-	result, err := db.Exec("DELETE FROM pushtokenapplication WHERE token = $1", tToken.Token)
+	result, err := db.Exec("DELETE FROM pushtoken_application WHERE token_id = $1", tToken.Token)
 	if err != nil {
 		return nil, ErrPushtokenNotFound
 	}
@@ -168,7 +168,7 @@ func UpdatePushtoken(id string, applications []string) (*PushToken, error) {
 	}
 
 	for _, a := range applications {
-		_, err = db.Exec("INSERT INTO pushtokenapplication (token, application) VALUES ($1, $2)", tToken.Token, a)
+		_, err = db.Exec("INSERT INTO pushtoken_application (token_id, application_id) VALUES ($1, $2)", tToken.Token, a)
 
 		if err != nil {
 			return nil, err
@@ -196,7 +196,7 @@ func DeletePushtoken(id string) error {
 		return ErrPushtokenNotFound
 	}
 
-	result, err := db.Exec("DELETE FROM pushtokenapplication WHERE token = $1", token)
+	result, err := db.Exec("DELETE FROM pushtoken_application WHERE token_id = $1", token)
 	if err != nil {
 		return err
 	}

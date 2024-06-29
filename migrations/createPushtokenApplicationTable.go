@@ -5,10 +5,10 @@ import (
 )
 
 const createPushtokenApplicationTable = `
-CREATE TABLE "pushtokenapplication" (
-	token uuid,
-	application uuid,
-	PRIMARY KEY (token, application)
+CREATE TABLE "pushtoken_application" (
+	token_id uuid,
+	application_id uuid,
+	PRIMARY KEY (token_id, application_id)
 )`
 
 type CreatePushtokenApplicationTable struct{}
