@@ -130,7 +130,7 @@ func setUrl(version *Version) (*Version, error) {
 		return nil, err
 	}
 
-	version.Url = fmt.Sprintf("%s/%s/%s", config.LoadedConfiguration.ServerUrl, app.Slug, track.Slug)
+	version.Url = fmt.Sprintf("%s/%s/%s/%s", config.LoadedConfiguration.ServerUrl, app.Slug, track.Slug, version.UploadDate.Format("2006-01-02"))
 	return version, nil
 }
 
@@ -157,8 +157,8 @@ func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
 		return nil, err
 	}
 
-	for i, _ := range versions {
-		versions[i].Url = fmt.Sprintf("%s/%s/%s", config.LoadedConfiguration.ServerUrl, application.Slug, track.Slug)
+	for i, v := range versions {
+		versions[i].Url = fmt.Sprintf("%s/%s/%s/%s", config.LoadedConfiguration.ServerUrl, application.Slug, track.Slug, v.UploadDate.Format("2006-01-02"))
 	}
 
 	return versions, nil
