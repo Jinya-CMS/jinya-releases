@@ -17,7 +17,7 @@ func GetLogo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logo, err := storage.DownloadLogo(app.Id)
+	logo, contentType, err := storage.DownloadLogo(app.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -25,5 +25,6 @@ func GetLogo(w http.ResponseWriter, r *http.Request) {
 
 	defer logo.Close()
 
+	w.Header().Set("Content-Type", contentType)
 	_, _ = io.Copy(w, logo)
 }

@@ -23,7 +23,8 @@ export class EditApplicationDialogComponent {
           };
         }
       ]
-    })
+    }),
+    logo: new FormControl<File | null>(null, { nonNullable: true })
   });
 
   hasErrors = false;
@@ -59,16 +60,81 @@ export class EditApplicationDialogComponent {
     const self = this;
     this.applicationService.updateApplication({ id: this.selectedApplication.id, body }).subscribe({
       next() {
-        self.saved.emit({
-          ...self.selectedApplication,
-          name: self.editApplicationForm.value.name!,
-          slug: self.editApplicationForm.value.slug!
-        });
-        self.isOpen = false;
+        if (self.editApplicationForm.value.logo) {
+          const logoFile = self.editApplicationForm.value.logo;
+          let response = null;
+          switch (logoFile.type.replace('image/', '')) {
+            case 'apng':
+              response = self.applicationService.uploadApplicationLogo$Apng({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+            case 'avif':
+              response = self.applicationService.uploadApplicationLogo$Avif({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+            case 'gif':
+              response = self.applicationService.uploadApplicationLogo$Gif({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+            case 'jpeg':
+              response = self.applicationService.uploadApplicationLogo$Jpeg({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+            case 'png':
+              response = self.applicationService.uploadApplicationLogo$Png({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+            case 'svg+xml':
+              response = self.applicationService.uploadApplicationLogo$Xml({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+            case 'webp':
+              response = self.applicationService.uploadApplicationLogo$Webp({
+                body: logoFile,
+                id: self.selectedApplication.id
+              });
+              break;
+          }
+          if (response) {
+            response.subscribe(() => {
+              self.saved.emit({
+                ...self.selectedApplication,
+                name: self.editApplicationForm.value.name!,
+                slug: self.editApplicationForm.value.slug!
+              });
+              self.isOpen = false;
+            });
+          }
+        } else {
+          self.saved.emit({
+            ...self.selectedApplication,
+            name: self.editApplicationForm.value.name!,
+            slug: self.editApplicationForm.value.slug!
+          });
+          self.isOpen = false;
+        }
       },
       error() {
         self.hasErrors = true;
       }
     });
+  }
+
+  updateFile($event: Event) {
+    // @ts-expect-error The event cannot be null
+    const file = ($event.target as HTMLInputElement).files[0];
+    this.editApplicationForm.get('logo')?.patchValue(file);
   }
 }

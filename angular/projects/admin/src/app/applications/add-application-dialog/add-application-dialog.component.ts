@@ -23,7 +23,8 @@ export class AddApplicationDialogComponent {
           };
         }
       ]
-    })
+    }),
+    logo: new FormControl<File | null>(null, { nonNullable: true })
   });
 
   hasErrors = false;
@@ -49,13 +50,54 @@ export class AddApplicationDialogComponent {
     const self = this;
     this.applicationService.createApplication({ body }).subscribe({
       next(value) {
-        self.saved.emit(value);
-        self.open = false;
-        self.createApplicationForm.reset();
+        if (self.createApplicationForm.value.logo) {
+          const logoFile = self.createApplicationForm.value.logo;
+          let response = null;
+          switch (logoFile.type.replace('image/', '')) {
+            case 'apng':
+              response = self.applicationService.uploadApplicationLogo$Apng({ body: logoFile, id: value.id });
+              break;
+            case 'avif':
+              response = self.applicationService.uploadApplicationLogo$Avif({ body: logoFile, id: value.id });
+              break;
+            case 'gif':
+              response = self.applicationService.uploadApplicationLogo$Gif({ body: logoFile, id: value.id });
+              break;
+            case 'jpeg':
+              response = self.applicationService.uploadApplicationLogo$Jpeg({ body: logoFile, id: value.id });
+              break;
+            case 'png':
+              response = self.applicationService.uploadApplicationLogo$Png({ body: logoFile, id: value.id });
+              break;
+            case 'svg+xml':
+              response = self.applicationService.uploadApplicationLogo$Xml({ body: logoFile, id: value.id });
+              break;
+            case 'webp':
+              response = self.applicationService.uploadApplicationLogo$Webp({ body: logoFile, id: value.id });
+              break;
+          }
+          if (response) {
+            response.subscribe(() => {
+              self.saved.emit(value);
+              self.open = false;
+              self.createApplicationForm.reset();
+            });
+          }
+        } else {
+          self.saved.emit(value);
+          self.open = false;
+          self.createApplicationForm.reset();
+        }
       },
       error() {
         self.hasErrors = true;
       }
     });
+  }
+
+  updateFile($event: Event) {
+    // @ts-expect-error The event cannot be null
+    const file = ($event.target as HTMLInputElement).files[0];
+    this.createApplicationForm.get('logo')?.patchValue(file);
   }
 }

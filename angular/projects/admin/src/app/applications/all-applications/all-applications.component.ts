@@ -11,7 +11,8 @@ enum ActiveTab {
 
 @Component({
   selector: 'app-all-applications',
-  templateUrl: './all-applications.component.html'
+  templateUrl: './all-applications.component.html',
+  styleUrl: 'all-applications.component.scss'
 })
 export class AllApplicationsComponent implements OnInit {
   @Input() id?: string;
@@ -23,6 +24,8 @@ export class AllApplicationsComponent implements OnInit {
   tracks: Track[] = [];
   loading = true;
   trackHasVersions: Record<string, boolean> = {};
+  logoError = false;
+  timestamp = new Date().getTime();
 
   constructor(
     protected applicationService: ApplicationService,
@@ -49,7 +52,7 @@ export class AllApplicationsComponent implements OnInit {
 
   appCreated(app: Application) {
     this.applications.push(app);
-    this.selectedApplication = app;
+    this.selectApp(app);
   }
 
   appUpdated(app: Application) {
@@ -57,9 +60,12 @@ export class AllApplicationsComponent implements OnInit {
     this.applications[idx].name = app.name;
     this.applications[idx].slug = app.slug;
     this.selectedApplication = app;
+    this.timestamp = new Date().getTime();
   }
 
   selectApp(app: Application) {
+    this.logoError = false;
+    this.timestamp = new Date().getTime();
     this.selectedApplication = app;
     this.trackService
       .getAllTracks({

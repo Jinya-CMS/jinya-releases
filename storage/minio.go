@@ -10,10 +10,10 @@ import (
 )
 
 func getMinioClient() (*minio.Client, error) {
-	endpoint := config.LoadedConfiguration.StorageUrl
+	endpoint := strings.TrimPrefix(strings.TrimPrefix(config.LoadedConfiguration.StorageUrl, "http://"), "https://")
 	accessKeyID := config.LoadedConfiguration.StorageAccessKey
 	secretAccessKey := config.LoadedConfiguration.StorageSecretKey
-	useSSL := strings.HasPrefix(endpoint, "https://")
+	useSSL := strings.HasPrefix(config.LoadedConfiguration.StorageUrl, "https://")
 
 	return minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
@@ -32,16 +32,21 @@ func SaveFile(path string, reader io.Reader, size int64, contentType string) err
 	return err
 }
 
-func GetFile(path string) (io.ReadCloser, error) {
+func GetFile(path string) (io.ReadCloser, string, error) {
 	client, err := getMinioClient()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	object, err := client.GetObject(context.Background(), config.LoadedConfiguration.StorageBucket, path, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return object, nil
+	objectStat, err := object.Stat()
+	if err != nil {
+		return nil, "", err
+	}
+
+	return object, objectStat.ContentType, nil
 }

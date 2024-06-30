@@ -12,14 +12,14 @@ import (
 const appLogoFormat = "application/%s/logo"
 
 func UploadLogo(r *http.Request) (errDetails *service.ErrorDetails, status int) {
-	status = http.StatusNoContent
-	errDetails = new(service.ErrorDetails)
 	id := mux.Vars(r)["id"]
 
 	_, errDetails, status = service.GetApplicationById(id)
 	if errDetails != nil {
 		return
 	}
+
+	status = http.StatusNoContent
 
 	contentType := r.Header.Get("Content-Type")
 	if !slices.Contains([]string{
@@ -31,24 +31,28 @@ func UploadLogo(r *http.Request) (errDetails *service.ErrorDetails, status int) 
 		"image/svg+xml",
 		"image/webp",
 	}, contentType) {
-		errDetails.Message = "file format not supported"
-		errDetails.ErrorType = "storage"
-		errDetails.EntityType = "application"
+		errDetails = &service.ErrorDetails{
+			EntityType: "application",
+			Message:    "file format not supported",
+			ErrorType:  "storage",
+		}
 		status = http.StatusUnsupportedMediaType
 		return
 	}
 
 	err := SaveFile(fmt.Sprintf(appLogoFormat, id), r.Body, r.ContentLength, contentType)
 	if err != nil {
-		errDetails.Message = "upload failed"
-		errDetails.ErrorType = "storage"
-		errDetails.EntityType = "application"
+		errDetails = &service.ErrorDetails{
+			EntityType: "application",
+			Message:    "upload failed",
+			ErrorType:  "storage",
+		}
 		status = http.StatusConflict
 	}
 
 	return
 }
 
-func DownloadLogo(id string) (io.ReadCloser, error) {
+func DownloadLogo(id string) (io.ReadCloser, string, error) {
 	return GetFile(fmt.Sprintf(appLogoFormat, id))
 }
