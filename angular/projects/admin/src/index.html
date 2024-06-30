@@ -12,6 +12,15 @@
     <meta name="msapplication-TileColor" content="#19324c" />
     <meta name="theme-color" content="#19324c" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script>
+      const jinyaConfig = {
+        openIdClientId: '{{.OpenIDClientId}}',
+        openIdUrl: 'https://{{.OpenIDDomain}}',
+        openIdCallbackUrl: '{{.GetRedirectUrl}}',
+        openIdLogoutRedirectUrl: '{{.ServerUrl}}'
+      };
+    </script>
   </head>
   <body>
     <app-root></app-root>

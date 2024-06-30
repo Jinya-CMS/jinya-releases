@@ -31,6 +31,7 @@
     "@fontsource/albert-sans": "5.0.13",
     "@fontsource/oxygen-mono": "5.0.20",
     "@fontsource/urbanist": "5.0.20",
+    "angular-oauth2-oidc": "17.0.2",
     "lucide-angular": "0.397.0",
     "rxjs": "7.8.1",
     "tslib": "2.6.3",
