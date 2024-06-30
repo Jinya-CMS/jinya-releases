@@ -20,7 +20,7 @@ func SetupApiRouter(router *mux.Router) {
 	router.Methods("GET").Path("/api/admin/application/{id}").Handler(contentTypeJson()(http.HandlerFunc(getApplicationById)))
 	router.Methods("PUT").Path("/api/admin/application/{id}").Handler(contentTypeJson()(http.HandlerFunc(updateApplication)))
 	router.Methods("DELETE").Path("/api/admin/application/{id}").Handler(contentTypeJson()(http.HandlerFunc(deleteApplication)))
-	router.Methods("POST").Path("/api/admin/application/{id}/logo").Handler(contentTypeJson()(http.HandlerFunc(deleteApplication)))
+	router.Methods("POST").Path("/api/admin/application/{id}/logo").Handler(contentTypeJson()(http.HandlerFunc(uploadLogo)))
 
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track").Handler(contentTypeJson()(http.HandlerFunc(getAllTracks)))
 	router.Methods("POST").Path("/api/admin/application/{applicationId}/track").Handler(contentTypeJson()(http.HandlerFunc(createTrack)))

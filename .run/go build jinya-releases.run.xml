@@ -5,10 +5,10 @@
     <envs>
       <env name="DATABASE_URL" value="host=localhost port=5432 user=jinya password=jinya dbname=jinya" />
       <env name="SERVER_URL" value="http://localhost:8090" />
-      <env name="STORAGE_SECRET_KEY" value="jinya-releases" />
-      <env name="STORAGE_ACCESS_KEY" value="jinya-releases" />
-      <env name="STORAGE_BUCKET" value="jinya-releases" />
-      <env name="STORAGE_URL" value="http://localhost:9200" />
+      <env name="STORAGE_ACCESS_KEY" value="DZcz7VZQIkyisBk5JYpG" />
+      <env name="STORAGE_BUCKET" value="jinya-releases-development" />
+      <env name="STORAGE_SECRET_KEY" value="9jGclxUV8cK9tHD2Q9aCgwraZcCl63KABVWOeLtm" />
+      <env name="STORAGE_URL" value="https://storage.ulbricht.casa" />
     </envs>
     <kind value="PACKAGE" />
     <package value="jinya-releases" />

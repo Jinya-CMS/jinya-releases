@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterModule } from '@angular/router';
 import { AllApplicationsComponent } from './all-applications/all-applications.component';
 import { AddApplicationDialogComponent } from './add-application-dialog/add-application-dialog.component';
@@ -35,7 +35,8 @@ import { EditTrackDialogComponent } from './edit-track-dialog/edit-track-dialog.
     ReactiveFormsModule,
     LucideAngularModule.pick({ CircleX, CircleCheck }),
     UiModule,
-    ConfirmComponent
+    ConfirmComponent,
+    NgOptimizedImage
   ]
 })
 export class ApplicationsModule {}

@@ -151,6 +151,16 @@
               }
             </div>
           </div>
+          <img
+            class="app-logo"
+            [ngSrc]="selectedApplication.logo! + '?timestamp=' + timestamp"
+            [alt]="selectedApplication.name"
+            aria-hidden="true"
+            height="384"
+            width="384"
+            (error)="logoError = true"
+            [hidden]="logoError"
+          />
         </div>
         <app-edit-application-dialog
           (saved)="appUpdated($event)"

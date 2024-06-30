@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"jinya-releases/service"
-	"log"
+	"jinya-releases/storage"
 	"net/http"
 )
 
@@ -76,8 +76,13 @@ func deleteApplication(w http.ResponseWriter, r *http.Request) {
 }
 
 func uploadLogo(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-	log.Printf("Id: %s", id)
+	encoder := json.NewEncoder(w)
+	errDetails, status := storage.UploadLogo(r)
+	if errDetails != nil {
+		w.WriteHeader(status)
+		_ = encoder.Encode(errDetails)
+		return
+	}
 
-	w.WriteHeader(http.StatusNotImplemented)
+	w.WriteHeader(status)
 }

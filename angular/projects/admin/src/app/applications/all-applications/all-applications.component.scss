@@ -1,0 +1,24 @@
+.app-logo {
+  opacity: 0.5;
+  grid-area: tab;
+  place-self: end end;
+}
+
+.cosmo-side-list__content {
+  display: grid;
+  grid-template-rows: [title] auto [toolbar] auto [tab] 1fr;
+  grid-template-columns: [content] 1fr;
+  grid-template-areas: 'title' 'toolbar' 'tab';
+
+  .cosmo-title {
+    grid-area: title;
+  }
+
+  .cosmo-toolbar {
+    grid-area: toolbar;
+  }
+
+  .cosmo-tab {
+    grid-area: tab;
+  }
+}
