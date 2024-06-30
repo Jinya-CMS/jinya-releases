@@ -7,6 +7,8 @@ import { ApiModule } from 'api';
 import { provideHttpClient } from '@angular/common/http';
 import { ApplicationsModule } from './applications/applications.module';
 import { UiModule } from '../ui/ui.module';
+import { OAuthModule } from 'angular-oauth2-oidc';
+import { AuthenticationModule } from '../authentication/authentication.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -16,6 +18,8 @@ import { UiModule } from '../ui/ui.module';
     NgIf,
     ApplicationsModule,
     UiModule,
+    OAuthModule.forRoot(),
+    AuthenticationModule.forRoot(),
     RouterLink,
     RouterLinkActive,
     RouterModule.forRoot(

@@ -5,3 +5,7 @@ updates:
   schedule:
     interval: daily
     time: "04:00"
+- package-ecosystem: npm
+  directory: "/angular"
+  schedule:
+    interval: daily

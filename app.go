@@ -4,6 +4,7 @@ import (
 	"embed"
 	"github.com/gorilla/mux"
 	"golang.org/x/text/language"
+	"html/template"
 	"jinya-releases/api"
 	"jinya-releases/config"
 	"jinya-releases/content"
@@ -29,11 +30,27 @@ type SpaHandler struct {
 	embedFS      embed.FS
 	indexPath    string
 	fsPrefixPath string
+	templated    bool
+	templateData any
 }
 
 type LanguageHandler struct {
 	defaultLang     language.Tag
 	langPathMapping map[language.Tag]string
+}
+
+func (handler SpaHandler) serveTemplated(w http.ResponseWriter, _ *http.Request) {
+	tmpl, err := template.ParseFS(handler.embedFS, handler.indexPath)
+	if err != nil {
+		http.Error(w, "Failed to get admin page", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, handler.templateData)
+	if err != nil {
+		http.Error(w, "Failed to get admin page", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (handler SpaHandler) servePlain(w http.ResponseWriter, r *http.Request) {
@@ -44,12 +61,20 @@ func (handler SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fullPath := strings.TrimPrefix(path.Join(handler.fsPrefixPath, r.URL.Path), "/")
 	file, err := handler.embedFS.Open(fullPath)
 	if err != nil {
-		handler.servePlain(w, r)
+		if handler.templated {
+			handler.serveTemplated(w, r)
+		} else {
+			handler.servePlain(w, r)
+		}
 		return
 	}
 
 	if fi, err := file.Stat(); err != nil || fi.IsDir() {
-		handler.servePlain(w, r)
+		if handler.templated {
+			handler.serveTemplated(w, r)
+		} else {
+			handler.servePlain(w, r)
+		}
 		return
 	}
 
@@ -98,21 +123,27 @@ func main() {
 		embedFS:      adminOpenapi,
 		indexPath:    "openapi/admin/index.html",
 		fsPrefixPath: "",
+		templated:    false,
 	})
 	router.PathPrefix("/openapi").Handler(SpaHandler{
 		embedFS:      openapi,
 		indexPath:    "openapi/index.html",
 		fsPrefixPath: "",
+		templated:    false,
 	})
 	router.PathPrefix("/admin/de").Handler(http.StripPrefix("/admin/de", SpaHandler{
 		embedFS:      angularAdmin,
 		indexPath:    "angular/dist/admin/browser/de/index.html",
 		fsPrefixPath: "angular/dist/admin/browser/de",
+		templated:    true,
+		templateData: config.LoadedConfiguration,
 	}))
 	router.PathPrefix("/admin/en").Handler(http.StripPrefix("/admin/en", SpaHandler{
 		embedFS:      angularAdmin,
 		indexPath:    "angular/dist/admin/browser/en/index.html",
 		fsPrefixPath: "angular/dist/admin/browser/en",
+		templated:    true,
+		templateData: config.LoadedConfiguration,
 	}))
 	router.PathPrefix("/admin").Handler(http.StripPrefix("/admin", LanguageHandler{
 		defaultLang: language.English,

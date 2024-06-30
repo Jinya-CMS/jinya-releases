@@ -54,6 +54,8 @@
     "edit-track-title": "Edit track",
     "update-track-exists-title": "The track exists",
     "update-track-exists-message": " A track with these parameters exists already ",
-    "update-track": "Update track"
+    "update-track": "Update track",
+    "login-title": "Login",
+    "login-with-openid": "Login with OpenID"
   }
 }
