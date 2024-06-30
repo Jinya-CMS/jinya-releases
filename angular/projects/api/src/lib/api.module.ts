@@ -7,7 +7,6 @@ import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 import { ApplicationService } from './services/application.service';
 import { TrackService } from './services/track.service';
 import { VersionService } from './services/version.service';
-import { PushTokenService } from './services/push-token.service';
 
 /**
  * Module that provides all services and configuration.
@@ -20,7 +19,6 @@ import { PushTokenService } from './services/push-token.service';
     ApplicationService,
     TrackService,
     VersionService,
-    PushTokenService,
     ApiConfiguration
   ],
 })

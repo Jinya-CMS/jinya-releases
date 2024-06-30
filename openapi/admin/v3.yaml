@@ -144,6 +144,49 @@ paths:
         in: path
         schema:
           type: string
+  /api/admin/application/{id}/token:
+    post:
+      operationId: create_token
+      security:
+        - accessToken: [ ]
+      summary: Create token
+      tags:
+        - application
+      responses:
+        '201':
+          description: Created new token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/push-token'
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-details'
+    delete:
+      operationId: reset_tokens
+      security:
+        - accessToken: [ ]
+      summary: Resets all allowed push tokens for the given application
+      tags:
+        - application
+      responses:
+        '204':
+          description: Tokens reset successfully
+        '404':
+          description: The application was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-details'
+    parameters:
+      - name: id
+        required: true
+        in: path
+        schema:
+          type: string
   /api/admin/application/{id}/logo:
     post:
       operationId: upload_application_logo
@@ -490,112 +533,6 @@ paths:
         in: path
         schema:
           type: string
-  /api/admin/push-token:
-    post:
-      operationId: create_push_token
-      security:
-        - accessToken: [ ]
-      summary: Create push token
-      tags:
-        - push-token
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/create-token'
-      responses:
-        '201':
-          description: Created new push token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/push-token'
-        '404':
-          description: App or Track not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-    get:
-      operationId: get_all_push_tokens
-      security:
-        - accessToken: [ ]
-      summary: Get all push tokens
-      tags:
-        - push-token
-      responses:
-        '200':
-          description: A list of all push tokens
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/push-token'
-  /api/admin/push-token/{id}:
-    get:
-      operationId: get_push_token_by_id
-      security:
-        - accessToken: [ ]
-      summary: Get push token by id
-      tags:
-        - push-token
-      responses:
-        '404':
-          description: Push token not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '200':
-          description: The push token with the given id
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/push-token'
-    put:
-      operationId: update_push_token
-      security:
-        - accessToken: [ ]
-      summary: Update push token
-      tags:
-        - push-token
-      responses:
-        '404':
-          description: Push token, app or track not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '204':
-          description: The push token was updated
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/update-token'
-    delete:
-      operationId: delete_push_token
-      security:
-        - accessToken: [ ]
-      summary: Delete push token
-      tags:
-        - push-token
-      responses:
-        '404':
-          description: The push token was not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '204':
-          description: push token successfully deleted
-    parameters:
-      - name: id
-        required: true
-        in: path
-        schema:
-          type: string
   /api/push/{applicationSlug}/{trackSlug}/{versionNumber}:
     post:
       operationId: push_new_version
@@ -784,24 +721,6 @@ components:
       properties:
         version:
           type: string
-    create-token:
-      title: Create push token request
-      type: object
-      properties:
-        allowedApps:
-          type: array
-          items:
-            type: string
-            format: uuid
-    update-token:
-      title: Update push token request
-      type: object
-      properties:
-        allowedApps:
-          type: array
-          items:
-            type: string
-            format: uuid
     push-token:
       title: push token
       type: object
@@ -813,12 +732,6 @@ components:
           format: uuid
         token:
           type: string
-          format: uuid
-        allowedApps:
-          type: array
-          items:
-            type: string
-            format: uuid
     error-details:
       title: Root Type for ErrorDetails
       type: object

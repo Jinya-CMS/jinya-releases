@@ -6,7 +6,8 @@ import { EditTrackDialogComponent } from '../edit-track-dialog/edit-track-dialog
 
 enum ActiveTab {
   Details,
-  Tracks
+  Tracks,
+  PushTokens
 }
 
 @Component({
@@ -26,6 +27,8 @@ export class AllApplicationsComponent implements OnInit {
   trackHasVersions: Record<string, boolean> = {};
   logoError = false;
   timestamp = new Date().getTime();
+  newToken: string | null = null;
+  tokenCopied = false;
 
   constructor(
     protected applicationService: ApplicationService,
@@ -135,4 +138,23 @@ export class AllApplicationsComponent implements OnInit {
 
   protected readonly ActiveTab = ActiveTab;
   protected readonly location = location;
+
+  createPushToken(createPushTokenDialog: ConfirmComponent) {
+    this.tokenCopied = false;
+    this.applicationService.createToken({ id: this.selectedApplication!.id }).subscribe((value) => {
+      this.newToken = value.token;
+      createPushTokenDialog.open = false;
+    });
+  }
+
+  resetTokens(resetPushTokenDialog: ConfirmComponent) {
+    this.applicationService.resetTokens({ id: this.selectedApplication!.id }).subscribe(() => {
+      resetPushTokenDialog.open = false;
+    });
+  }
+
+  async copyToken() {
+    await navigator.clipboard.writeText(this.newToken ?? '');
+    this.tokenCopied = true;
+  }
 }

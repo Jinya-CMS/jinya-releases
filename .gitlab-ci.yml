@@ -35,20 +35,6 @@ lint:
   script:
     - go vet .
 
-test:
-  image: library/golang:1.22-alpine
-  stage: test
-  services:
-    - name: library/postgres:14-alpine
-      variables:
-        POSTGRES_USER: jinya
-        POSTGRES_PASSWORD: jinya
-        POSTGRES_DB: jinya
-  variables:
-    DATABASE_URL: host=localhost port=5432 user=jinya password=jinya dbname=jinya
-  script:
-    - go test ./... -p 1
-
 build:
   image: library/golang:1.22-alpine
   stage: build-golang

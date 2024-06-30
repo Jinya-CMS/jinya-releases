@@ -75,6 +75,35 @@ func deleteApplication(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(status)
 }
 
+func resetToken(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	encoder := json.NewEncoder(w)
+	errDetails, status := service.ResetToken(id)
+	if errDetails != nil {
+		w.WriteHeader(status)
+		_ = encoder.Encode(errDetails)
+		return
+	}
+
+	w.WriteHeader(status)
+}
+
+func createToken(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	encoder := json.NewEncoder(w)
+	errDetails, token, status := service.CreatePushToken(id)
+	if errDetails != nil {
+		w.WriteHeader(status)
+		_ = encoder.Encode(errDetails)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = encoder.Encode(token)
+}
+
 func uploadLogo(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	errDetails, status := storage.UploadLogo(r)

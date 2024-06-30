@@ -73,6 +73,8 @@ func SetupApiRouter(router *mux.Router) {
 	router.Methods("PUT").Path("/api/admin/application/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(updateApplication))))
 	router.Methods("DELETE").Path("/api/admin/application/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deleteApplication))))
 	router.Methods("POST").Path("/api/admin/application/{id}/logo").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(uploadLogo))))
+	router.Methods("DELETE").Path("/api/admin/application/{id}/token").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(resetToken))))
+	router.Methods("POST").Path("/api/admin/application/{id}/token").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(createToken))))
 
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getAllTracks))))
 	router.Methods("POST").Path("/api/admin/application/{applicationId}/track").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(createTrack))))
@@ -84,12 +86,6 @@ func SetupApiRouter(router *mux.Router) {
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getVersionById))))
 	router.Methods("DELETE").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deleteVersion))))
 	router.Methods("POST").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{versionNumber}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(uploadVersion))))
-
-	router.Methods("GET").Path("/api/admin/push-token").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getAllPushTokens))))
-	router.Methods("POST").Path("/api/admin/push-token").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(createPushToken))))
-	router.Methods("GET").Path("/api/admin/push-token/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getPushTokenById))))
-	router.Methods("PUT").Path("/api/admin/push-token/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(updatePushToken))))
-	router.Methods("DELETE").Path("/api/admin/push-token/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deletePushToken))))
 
 	router.Methods("POST").Path("/api/push/{applicationSlug}/{trackSlug}/{versionNumber}").Handler(pushTokenMiddleware()(http.HandlerFunc(pushVersion)))
 }
