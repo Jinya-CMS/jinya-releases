@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"io"
 	"jinya-releases/database/models"
+	"jinya-releases/utils"
 	"log"
 	"net/http"
 )
@@ -24,21 +25,21 @@ type updatePushtokenRequest struct {
 	AllowedApps []string `json:"allowedApps,omitempty"`
 }
 
-func CreatePushtoken(reader io.Reader) (pushtoken *models.PushToken, errDetails *ErrorDetails, status int) {
+func CreatePushtoken(reader io.Reader) (pushtoken *models.PushToken, errDetails *utils.ErrorDetails, status int) {
 	body := new(createPushtokenRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "pushtoken",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "pushtoken",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -57,7 +58,7 @@ func CreatePushtoken(reader io.Reader) (pushtoken *models.PushToken, errDetails 
 	pushtoken, err = models.CreatePushtoken(token.AllowedApps)
 	status = http.StatusCreated
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "pushtoken",
 		}
 
@@ -86,11 +87,11 @@ func CreatePushtoken(reader io.Reader) (pushtoken *models.PushToken, errDetails 
 	return
 }
 
-func GetAllPushtokens() (pushtokens []models.PushToken, errDetails *ErrorDetails) {
+func GetAllPushtokens() (pushtokens []models.PushToken, errDetails *utils.ErrorDetails) {
 	pushtokens, err := models.GetAllPushTokens()
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "pushtoken",
 			ErrorType:  "database",
 			Message:    "Could not get all pushtokens",
@@ -100,20 +101,20 @@ func GetAllPushtokens() (pushtokens []models.PushToken, errDetails *ErrorDetails
 	return
 }
 
-func GetPushtokenById(id string) (pushtoken *models.PushToken, errDetails *ErrorDetails, status int) {
+func GetPushtokenById(id string) (pushtoken *models.PushToken, errDetails *utils.ErrorDetails, status int) {
 	pushtoken, err := models.GetPushTokenById(id)
 	status = http.StatusOK
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "pushtoken",
 				ErrorType:  "database",
 				Message:    "Could not find pushtoken",
 			}
 			status = http.StatusNotFound
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "pushtoken",
 				ErrorType:  "server",
 				Message:    "Unknown error",
@@ -126,7 +127,7 @@ func GetPushtokenById(id string) (pushtoken *models.PushToken, errDetails *Error
 	return
 }
 
-func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, errDetails *ErrorDetails, status int) {
+func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusNoContent
 
 	body := new(updatePushtokenRequest)
@@ -135,14 +136,14 @@ func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, 
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "pushtoken",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "pushtoken",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -162,7 +163,7 @@ func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, 
 
 	pushtoken, err = models.UpdatePushtoken(token.Id, token.AllowedApps)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "pushtoken",
 		}
 
@@ -198,12 +199,12 @@ func UpdatePushtoken(id string, reader io.Reader) (pushtoken *models.PushToken, 
 	return
 }
 
-func DeletePushtoken(id string) (errDetails *ErrorDetails, status int) {
+func DeletePushtoken(id string) (errDetails *utils.ErrorDetails, status int) {
 	err := models.DeletePushtoken(id)
 	status = http.StatusNoContent
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "pushtoken",
 		}
 		var pgErr *pgconn.PgError

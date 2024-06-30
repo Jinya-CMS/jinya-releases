@@ -4,18 +4,26 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
-	"jinya-releases/service"
+	"jinya-releases/database/models"
+	"jinya-releases/utils"
 	"net/http"
 	"slices"
 )
 
 const appLogoFormat = "application/%s/logo"
 
-func UploadLogo(r *http.Request) (errDetails *service.ErrorDetails, status int) {
+func UploadLogo(r *http.Request) (errDetails *utils.ErrorDetails, status int) {
 	id := mux.Vars(r)["id"]
 
-	_, errDetails, status = service.GetApplicationById(id)
-	if errDetails != nil {
+	_, err := models.GetApplicationById(id)
+	if err != nil {
+		status = http.StatusNotFound
+		errDetails = &utils.ErrorDetails{
+			EntityType: "application",
+			Message:    "Application not found",
+			ErrorType:  "request",
+		}
+
 		return
 	}
 
@@ -31,7 +39,7 @@ func UploadLogo(r *http.Request) (errDetails *service.ErrorDetails, status int) 
 		"image/svg+xml",
 		"image/webp",
 	}, contentType) {
-		errDetails = &service.ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 			Message:    "file format not supported",
 			ErrorType:  "storage",
@@ -40,9 +48,9 @@ func UploadLogo(r *http.Request) (errDetails *service.ErrorDetails, status int) 
 		return
 	}
 
-	err := SaveFile(fmt.Sprintf(appLogoFormat, id), r.Body, r.ContentLength, contentType)
+	err = SaveFile(fmt.Sprintf(appLogoFormat, id), r.Body, r.ContentLength, contentType)
 	if err != nil {
-		errDetails = &service.ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 			Message:    "upload failed",
 			ErrorType:  "storage",

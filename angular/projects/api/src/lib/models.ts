@@ -4,7 +4,6 @@ export { Application } from './models/application';
 export { CreateApplication } from './models/create-application';
 export { CreateToken } from './models/create-token';
 export { CreateTrack } from './models/create-track';
-export { CreateVersion } from './models/create-version';
 export { ErrorDetails } from './models/error-details';
 export { PushToken } from './models/push-token';
 export { Track } from './models/track';

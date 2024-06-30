@@ -358,43 +358,6 @@ paths:
         schema:
           type: string
   /api/admin/application/{applicationId}/track/{trackId}/version:
-    post:
-      operationId: create_version
-      security:
-        - accessToken: [ ]
-      summary: Create version
-      tags:
-        - version
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/create-version'
-      responses:
-        '400':
-          description: Version missing
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '404':
-          description: Application, track or version not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '409':
-          description: Version already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '201':
-          description: Created new version
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/version'
     get:
       operationId: get_all_versions
       security:
@@ -424,6 +387,46 @@ paths:
         schema:
           type: string
       - name: trackId
+        required: true
+        in: path
+        schema:
+          type: string
+  /api/admin/application/{applicationId}/track/{trackId}/version/{versionNumber}:
+    post:
+      operationId: create_new_version
+      security:
+        - accessToken: [ ]
+      summary: Upload new version to the given application and track, if the version exists the binary is replaced
+      tags:
+        - version
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Upload successful
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-details'
+    parameters:
+      - name: versionNumber
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: applicationSlug
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: trackSlug
         required: true
         in: path
         schema:
@@ -471,52 +474,6 @@ paths:
                 $ref: '#/components/schemas/error-details'
         '204':
           description: Version successfully deleted
-    parameters:
-      - name: id
-        required: true
-        in: path
-        schema:
-          type: string
-      - name: applicationId
-        required: true
-        in: path
-        schema:
-          type: string
-      - name: trackId
-        required: true
-        in: path
-        schema:
-          type: string
-  /api/admin/application/{applicationId}/track/{trackId}/version/{id}/file:
-    post:
-      operationId: upload_version_artifact
-      security:
-        - accessToken: [ ]
-      summary: Upload version artifact binary
-      tags:
-        - version
-      requestBody:
-        required: true
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      responses:
-        '201':
-          description: Upload successful
-        '404':
-          description: Application, track or version not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
-        '409':
-          description: File already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error-details'
     parameters:
       - name: id
         required: true
@@ -639,9 +596,52 @@ paths:
         in: path
         schema:
           type: string
+  /api/push/{applicationSlug}/{trackSlug}/{versionNumber}:
+    post:
+      operationId: push_new_version
+      security:
+        - pushToken: [ ]
+      summary: Push new version to the given application and track, if the version exists the binary is replaced
+      tags:
+        - version
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Upload successful
+        '404':
+          description: Application, track or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-details'
+    parameters:
+      - name: versionNumber
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: applicationSlug
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: trackSlug
+        required: true
+        in: path
+        schema:
+          type: string
 components:
   securitySchemes:
     accessToken:
+      type: http
+      scheme: Bearer
+    pushToken:
       type: http
       scheme: Bearer
   schemas:
@@ -793,21 +793,11 @@ components:
           items:
             type: string
             format: uuid
-        allowedTracks:
-          type: array
-          items:
-            type: string
-            format: uuid
     update-token:
       title: Update push token request
       type: object
       properties:
         allowedApps:
-          type: array
-          items:
-            type: string
-            format: uuid
-        allowedTracks:
           type: array
           items:
             type: string
@@ -825,11 +815,6 @@ components:
           type: string
           format: uuid
         allowedApps:
-          type: array
-          items:
-            type: string
-            format: uuid
-        allowedTracks:
           type: array
           items:
             type: string

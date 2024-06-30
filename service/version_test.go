@@ -6,6 +6,7 @@ import (
 	"io"
 	"jinya-releases/database/models"
 	"jinya-releases/test"
+	"jinya-releases/utils"
 	"net/http"
 	"reflect"
 	"testing"
@@ -23,7 +24,7 @@ func TestCreateVersion(t *testing.T) {
 		name           string
 		args           args
 		wantVersion    *models.Version
-		wantErrDetails *ErrorDetails
+		wantErrDetails *utils.ErrorDetails
 		wantStatus     int
 		wantErr        bool
 	}{
@@ -154,7 +155,7 @@ func TestDeleteVersion(t *testing.T) {
 	tests := []struct {
 		name           string
 		args           args
-		wantErrDetails *ErrorDetails
+		wantErrDetails *utils.ErrorDetails
 		wantStatus     int
 		wantErr        bool
 	}{
@@ -268,7 +269,7 @@ func TestGetAllVersions(t *testing.T) {
 		name           string
 		args           args
 		wantVersions   []models.Version
-		wantErrDetails *ErrorDetails
+		wantErrDetails *utils.ErrorDetails
 		wantStatus     int
 		wantErr        bool
 	}{
@@ -427,7 +428,7 @@ func TestGetVersionById(t *testing.T) {
 		name           string
 		args           args
 		wantVersion    *models.Version
-		wantErrDetails *ErrorDetails
+		wantErrDetails *utils.ErrorDetails
 		wantStatus     int
 		wantErr        bool
 	}{

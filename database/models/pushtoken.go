@@ -13,7 +13,7 @@ type PushToken struct {
 
 var (
 	ErrPushtokenNotFound    = errors.New("token not found")
-	ErrApplicationlistEmpty = errors.New("applicationlist empty")
+	ErrApplicationlistEmpty = errors.New("application list empty")
 )
 
 func CreatePushtoken(applications []string) (*PushToken, error) {
@@ -221,4 +221,28 @@ func DeletePushtoken(id string) error {
 	}
 
 	return nil
+}
+
+func CheckPushToken(token, app string) bool {
+	db, err := database.Connect()
+	if err != nil {
+		return false
+	}
+
+	defer db.Close()
+	type tokenCount struct {
+		Count int `db:"count"`
+	}
+	count := new(tokenCount)
+
+	if err = db.Get(count, `select count(*)
+from pushtoken pt
+         join pushtoken_application pa on pt.id = pa.token_id
+         join public.application a on a.id = pa.application_id
+where
+    pt.token = $1 and a.slug = $2`, token, app); err != nil {
+		return false
+	}
+
+	return count.Count > 0
 }

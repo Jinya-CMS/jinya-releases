@@ -77,3 +77,33 @@ func uploadVersionBinary(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNotImplemented)
 }
+
+func pushVersion(w http.ResponseWriter, r *http.Request) {
+	applicationSlug := mux.Vars(r)["applicationSlug"]
+	trackSlug := mux.Vars(r)["trackSlug"]
+	versionNumber := mux.Vars(r)["version"]
+	encoder := json.NewEncoder(w)
+	errDetails, status := service.PushVersion(r, applicationSlug, trackSlug, versionNumber)
+	if errDetails != nil {
+		w.WriteHeader(status)
+		_ = encoder.Encode(errDetails)
+		return
+	}
+
+	w.WriteHeader(status)
+}
+
+func uploadVersion(w http.ResponseWriter, r *http.Request) {
+	applicationId := mux.Vars(r)["applicationId"]
+	trackId := mux.Vars(r)["trackId"]
+	versionNumber := mux.Vars(r)["version"]
+	encoder := json.NewEncoder(w)
+	errDetails, status := service.UploadVersion(r, applicationId, trackId, versionNumber)
+	if errDetails != nil {
+		w.WriteHeader(status)
+		_ = encoder.Encode(errDetails)
+		return
+	}
+
+	w.WriteHeader(status)
+}

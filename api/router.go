@@ -11,7 +11,9 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/http/middleware"
 	"github.com/zitadel/zitadel-go/v3/pkg/zitadel"
 	"jinya-releases/config"
+	"jinya-releases/database/models"
 	"net/http"
+	"strings"
 )
 
 func contentTypeJson() func(next http.Handler) http.Handler {
@@ -19,6 +21,25 @@ func contentTypeJson() func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			next.ServeHTTP(w, req)
+		})
+	}
+}
+
+func pushTokenMiddleware() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			auth := req.Header.Get("Authorization")
+			if strings.HasPrefix(auth, "Bearer ") {
+				token := strings.TrimPrefix(auth, "Bearer ")
+				vars := mux.Vars(req)
+				appSlug, exists := vars["applicationSlug"]
+				if exists && models.CheckPushToken(token, appSlug) {
+					next.ServeHTTP(w, req)
+					return
+				}
+			}
+
+			w.WriteHeader(http.StatusUnauthorized)
 		})
 	}
 }
@@ -60,14 +81,15 @@ func SetupApiRouter(router *mux.Router) {
 	router.Methods("DELETE").Path("/api/admin/application/{applicationId}/track/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deleteTrack))))
 
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track/{trackId}/version").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getAllVersions))))
-	router.Methods("POST").Path("/api/admin/application/{applicationId}/track/{trackId}/version").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(createVersion))))
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getVersionById))))
 	router.Methods("DELETE").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deleteVersion))))
-	router.Methods("POST").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}/file").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(uploadVersionBinary))))
+	router.Methods("POST").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{versionNumber}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(uploadVersion))))
 
 	router.Methods("GET").Path("/api/admin/push-token").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getAllPushTokens))))
 	router.Methods("POST").Path("/api/admin/push-token").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(createPushToken))))
 	router.Methods("GET").Path("/api/admin/push-token/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getPushTokenById))))
 	router.Methods("PUT").Path("/api/admin/push-token/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(updatePushToken))))
 	router.Methods("DELETE").Path("/api/admin/push-token/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deletePushToken))))
+
+	router.Methods("POST").Path("/api/push/{applicationSlug}/{trackSlug}/{versionNumber}").Handler(pushTokenMiddleware()(http.HandlerFunc(pushVersion)))
 }

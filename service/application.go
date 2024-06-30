@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"io"
 	"jinya-releases/database/models"
+	"jinya-releases/utils"
 	"log"
 	"net/http"
 )
@@ -30,11 +31,11 @@ type updateApplicationRequest struct {
 	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
 }
 
-func GetAllApplications() (applications []models.Application, errDetails *ErrorDetails) {
+func GetAllApplications() (applications []models.Application, errDetails *utils.ErrorDetails) {
 	applications, err := models.GetAllApplications()
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 			ErrorType:  "database",
 			Message:    "Could not get all applications",
@@ -44,19 +45,19 @@ func GetAllApplications() (applications []models.Application, errDetails *ErrorD
 	return
 }
 
-func GetApplicationById(id string) (application *models.Application, errDetails *ErrorDetails, status int) {
+func GetApplicationById(id string) (application *models.Application, errDetails *utils.ErrorDetails, status int) {
 	application, err := models.GetApplicationById(id)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "database",
 				Message:    "Could not find application",
 			}
 			status = http.StatusNotFound
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "server",
 				Message:    "Unknown error",
@@ -69,21 +70,21 @@ func GetApplicationById(id string) (application *models.Application, errDetails 
 	return
 }
 
-func CreateApplication(reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
+func CreateApplication(reader io.Reader) (application *models.Application, errDetails *utils.ErrorDetails, status int) {
 	body := new(createApplicationRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -106,7 +107,7 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 
 	application, err = models.CreateApplication(app)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 		}
 
@@ -149,7 +150,7 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 	return
 }
 
-func UpdateApplication(id string, reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
+func UpdateApplication(id string, reader io.Reader) (application *models.Application, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusNoContent
 
 	body := new(updateApplicationRequest)
@@ -158,14 +159,14 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -189,7 +190,7 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 
 	application, err = models.UpdateApplication(app)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 		}
 
@@ -220,12 +221,12 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	return
 }
 
-func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
+func DeleteApplication(id string) (errDetails *utils.ErrorDetails, status int) {
 	err := models.DeleteApplicationById(id)
 	status = http.StatusNoContent
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 		}
 		var pgErr *pgconn.PgError

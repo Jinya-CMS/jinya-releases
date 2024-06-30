@@ -8,8 +8,11 @@ import (
 	"github.com/jackc/pgerrcode"
 	"io"
 	"jinya-releases/database/models"
+	"jinya-releases/storage"
+	"jinya-releases/utils"
 	"log"
 	"net/http"
+	"time"
 )
 
 type createVersionRequest struct {
@@ -17,7 +20,7 @@ type createVersionRequest struct {
 	Version string `json:"version"`
 }
 
-func CreateVersion(reader io.Reader, applicationId string, trackId string) (version *models.Version, errDetails *ErrorDetails, status int) {
+func CreateVersion(reader io.Reader, applicationId string, trackId string) (version *models.Version, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusCreated
 	body := new(createVersionRequest)
 	decoder := json.NewDecoder(reader)
@@ -25,14 +28,14 @@ func CreateVersion(reader io.Reader, applicationId string, trackId string) (vers
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -52,7 +55,7 @@ func CreateVersion(reader io.Reader, applicationId string, trackId string) (vers
 
 	version, err = models.CreateVersion(vsn)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "version",
 		}
 
@@ -94,14 +97,14 @@ func CreateVersion(reader io.Reader, applicationId string, trackId string) (vers
 	return
 }
 
-func GetAllVersions(applicationId string, trackId string) (versions []models.Version, errDetails *ErrorDetails, status int) {
+func GetAllVersions(applicationId string, trackId string) (versions []models.Version, errDetails *utils.ErrorDetails, status int) {
 	versions, err := models.GetAllVersions(applicationId, trackId)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
 			_, err := models.GetApplicationById(applicationId)
 			if errors.Is(err, models.ErrApplicationNotFound) || errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-				errDetails = &ErrorDetails{
+				errDetails = &utils.ErrorDetails{
 					EntityType: "version",
 					ErrorType:  "database",
 					Message:    "Could not find application",
@@ -110,7 +113,7 @@ func GetAllVersions(applicationId string, trackId string) (versions []models.Ver
 			} else {
 				_, err := models.GetTrackById(trackId, applicationId)
 				if errors.Is(err, models.ErrTrackNotFound) || errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-					errDetails = &ErrorDetails{
+					errDetails = &utils.ErrorDetails{
 						EntityType: "version",
 						ErrorType:  "database",
 						Message:    "Could not find track",
@@ -119,7 +122,7 @@ func GetAllVersions(applicationId string, trackId string) (versions []models.Ver
 				}
 			}
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "database",
 				Message:    "Could not get all versions",
@@ -132,34 +135,34 @@ func GetAllVersions(applicationId string, trackId string) (versions []models.Ver
 	return
 }
 
-func GetVersionById(applicationId string, trackId string, id string) (version *models.Version, errDetails *ErrorDetails, status int) {
+func GetVersionById(applicationId string, trackId string, id string) (version *models.Version, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusOK
 	version, err := models.GetVersionById(applicationId, trackId, id)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "database",
 				Message:    "Could not find version",
 			}
 			status = http.StatusNotFound
 		} else if errors.Is(err, models.ErrApplicationNotFound) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "database",
 				Message:    "Could not find application",
 			}
 			status = http.StatusNotFound
 		} else if errors.Is(err, models.ErrTrackNotFound) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "database",
 				Message:    "Could not find track",
 			}
 			status = http.StatusNotFound
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "version",
 				ErrorType:  "server",
 				Message:    "Unknown error",
@@ -172,12 +175,12 @@ func GetVersionById(applicationId string, trackId string, id string) (version *m
 	return
 }
 
-func DeleteVersion(applicationId string, trackId string, id string) (errDetails *ErrorDetails, status int) {
+func DeleteVersion(applicationId string, trackId string, id string) (errDetails *utils.ErrorDetails, status int) {
 	err := models.DeleteVersionById(applicationId, trackId, id)
 	status = http.StatusNoContent
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "version",
 		}
 		var pgErr *pgconn.PgError
@@ -204,5 +207,96 @@ func DeleteVersion(applicationId string, trackId string, id string) (errDetails 
 			log.Println(err.Error())
 		}
 	}
+	return
+}
+
+func UploadVersion(r *http.Request, applicationId string, trackId string, versionNumber string) (errDetails *utils.ErrorDetails, status int) {
+	app, err := models.GetApplicationById(applicationId)
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
+			EntityType: "version",
+			Message:    "Application not found",
+			ErrorType:  "request",
+		}
+		status = http.StatusNotFound
+
+		return
+	}
+
+	track, err := models.GetTrackById(trackId, app.Id)
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
+			EntityType: "version",
+			Message:    "Track not found",
+			ErrorType:  "request",
+		}
+		status = http.StatusNotFound
+
+		return
+	}
+
+	return performUpload(r, app, track, versionNumber)
+}
+
+func PushVersion(r *http.Request, applicationSlug string, trackSlug string, versionNumber string) (errDetails *utils.ErrorDetails, status int) {
+	app, err := models.GetApplicationBySlug(applicationSlug)
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
+			EntityType: "version",
+			Message:    "Application not found",
+			ErrorType:  "request",
+		}
+		status = http.StatusNotFound
+
+		return
+	}
+
+	track, err := models.GetTrackBySlug(trackSlug, app.Id)
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
+			EntityType: "version",
+			Message:    "Track not found",
+			ErrorType:  "request",
+		}
+		status = http.StatusNotFound
+
+		return
+	}
+
+	return performUpload(r, app, track, versionNumber)
+}
+
+func performUpload(r *http.Request, app *models.Application, track *models.Track, versionNumber string) (errDetails *utils.ErrorDetails, status int) {
+	versionToUploadBinaryFor, err := models.GetVersionByTrackAndVersion(track.Id, versionNumber)
+	if versionToUploadBinaryFor == nil {
+		versionToUploadBinaryFor, err = models.CreateVersion(models.Version{
+			ApplicationId: app.Id,
+			TrackId:       track.Id,
+			Version:       versionNumber,
+			UploadDate:    time.Now(),
+		})
+
+		if err != nil {
+			status = http.StatusNotFound
+			errDetails = &utils.ErrorDetails{
+				EntityType: "version",
+				Message:    "Version not found and cannot be created",
+				ErrorType:  "request",
+			}
+
+			return
+		}
+	}
+
+	err = storage.UploadVersion(r, versionToUploadBinaryFor)
+	if err != nil {
+		status = http.StatusInternalServerError
+		errDetails = &utils.ErrorDetails{
+			EntityType: "version",
+			Message:    "Version not found and cannot be created",
+			ErrorType:  "request",
+		}
+	}
+
 	return
 }

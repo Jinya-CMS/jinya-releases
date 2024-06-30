@@ -8,6 +8,7 @@ import (
 	migrator "jinya-releases/database/migrations"
 	"jinya-releases/database/models"
 	"jinya-releases/test"
+	"jinya-releases/utils"
 	"log"
 	"net/http"
 	"os"
@@ -179,7 +180,7 @@ func TestGetApplicationById(t *testing.T) {
 			var (
 				got        *models.Application
 				status     int
-				errDetails *ErrorDetails
+				errDetails *utils.ErrorDetails
 			)
 			if len(tt.args.id) > 0 {
 				got, errDetails, status = GetApplicationById(tt.args.id)
