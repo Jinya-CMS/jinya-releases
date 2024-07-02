@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"io"
 	"jinya-releases/database/models"
+	"jinya-releases/utils"
 	"log"
 	"net/http"
 )
@@ -25,14 +26,14 @@ type updateTrackRequest struct {
 	IsDefault bool   `json:"isDefault"`
 }
 
-func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *ErrorDetails, status int) {
+func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *utils.ErrorDetails, status int) {
 	tracks, err := models.GetAllTracks(applicationId)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
 			_, err := models.GetApplicationById(applicationId)
 			if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-				errDetails = &ErrorDetails{
+				errDetails = &utils.ErrorDetails{
 					EntityType: "track",
 					ErrorType:  "database",
 					Message:    "Could not find application",
@@ -40,7 +41,7 @@ func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *Erro
 				status = http.StatusNotFound
 			}
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "database",
 				Message:    "Could not get all tracks",
@@ -53,27 +54,27 @@ func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *Erro
 	return
 }
 
-func GetTrackById(trackId string, applicationId string) (track *models.Track, errDetails *ErrorDetails, status int) {
+func GetTrackById(trackId string, applicationId string) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusOK
 	track, err := models.GetTrackById(trackId, applicationId)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "database",
 				Message:    "Could not find track",
 			}
 			status = http.StatusNotFound
 		} else if errors.Is(err, models.ErrApplicationNotFound) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "database",
 				Message:    "Could not find application",
 			}
 			status = http.StatusNotFound
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "server",
 				Message:    "Unknown error",
@@ -86,7 +87,7 @@ func GetTrackById(trackId string, applicationId string) (track *models.Track, er
 	return
 }
 
-func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, errDetails *ErrorDetails, status int) {
+func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusCreated
 	body := new(createTrackRequest)
 	decoder := json.NewDecoder(reader)
@@ -94,14 +95,14 @@ func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, e
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -122,7 +123,7 @@ func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, e
 
 	track, err = models.CreateTrack(trk)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "track",
 		}
 
@@ -160,7 +161,7 @@ func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, e
 	return
 }
 
-func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track *models.Track, errDetails *ErrorDetails, status int) {
+func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusNoContent
 
 	body := new(updateTrackRequest)
@@ -169,14 +170,14 @@ func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track 
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "track",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -198,7 +199,7 @@ func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track 
 
 	track, err = models.UpdateTrack(trk)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "track",
 		}
 
@@ -237,12 +238,12 @@ func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track 
 	return
 }
 
-func DeleteTrack(trackId string, applicationId string) (errDetails *ErrorDetails, status int) {
+func DeleteTrack(trackId string, applicationId string) (errDetails *utils.ErrorDetails, status int) {
 	err := models.DeleteTrackById(trackId, applicationId)
 	status = http.StatusNoContent
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "track",
 		}
 		var pgErr *pgconn.PgError

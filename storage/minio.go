@@ -50,3 +50,12 @@ func GetFile(path string) (io.ReadCloser, string, error) {
 
 	return object, objectStat.ContentType, nil
 }
+
+func DeleteFile(path string) error {
+	client, err := getMinioClient()
+	if err != nil {
+		return err
+	}
+
+	return client.RemoveObject(context.Background(), config.LoadedConfiguration.StorageBucket, path, minio.RemoveObjectOptions{})
+}

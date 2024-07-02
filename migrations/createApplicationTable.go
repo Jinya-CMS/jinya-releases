@@ -5,15 +5,11 @@ import (
 )
 
 const createApplicationTable = `
-CREATE TABLE "application" (
-	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name text NOT NULL UNIQUE,
-    slug text NOT NULL UNIQUE,
-    logo text NULL,
-    homepage_template text NOT NULL,
-    trackpage_template text NOT NULL,
-    additional_css text NULL,
-    additional_javascript text NULL
+create table "application" (
+	id uuid primary key default uuid_generate_v4(),
+    name text not null unique,
+    slug text not null unique,
+    logo text null
 )`
 
 type CreateApplicationTable struct{}

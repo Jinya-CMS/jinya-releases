@@ -3,13 +3,13 @@ package migrations
 import "github.com/jmoiron/sqlx"
 
 const createTrackTable = `
-	CREATE TABLE "track" (
-	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-	application_id uuid NOT NULL,
-    name text NOT NULL UNIQUE,
-    slug text NOT NULL UNIQUE,
-    is_default bool NOT NULL,
-    FOREIGN KEY (application_id) REFERENCES application(id)
+create table "track" (
+	id uuid primary key default uuid_generate_v4(),
+	application_id uuid not null,
+    name text not null unique,
+    slug text not null unique,
+    is_default bool not null,
+    foreign key (application_id) references application(id)
 )
 `
 

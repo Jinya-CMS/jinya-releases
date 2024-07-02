@@ -8,33 +8,26 @@ import (
 	"github.com/jackc/pgerrcode"
 	"io"
 	"jinya-releases/database/models"
+	"jinya-releases/utils"
 	"log"
 	"net/http"
 )
 
 type createApplicationRequest struct {
-	Name                 string `json:"name"`
-	Slug                 string `json:"slug"`
-	HomepageTemplate     string `json:"homepageTemplate"`
-	TrackpageTemplate    string `json:"trackpageTemplate"`
-	AdditionalCss        string `json:"additionalCss,omitempty"`
-	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 type updateApplicationRequest struct {
-	Name                 string `json:"name"`
-	Slug                 string `json:"slug"`
-	HomepageTemplate     string `json:"homepageTemplate"`
-	TrackpageTemplate    string `json:"trackpageTemplate"`
-	AdditionalCss        string `json:"additionalCss,omitempty"`
-	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
-func GetAllApplications() (applications []models.Application, errDetails *ErrorDetails) {
+func GetAllApplications() (applications []models.Application, errDetails *utils.ErrorDetails) {
 	applications, err := models.GetAllApplications()
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 			ErrorType:  "database",
 			Message:    "Could not get all applications",
@@ -44,19 +37,19 @@ func GetAllApplications() (applications []models.Application, errDetails *ErrorD
 	return
 }
 
-func GetApplicationById(id string) (application *models.Application, errDetails *ErrorDetails, status int) {
+func GetApplicationById(id string) (application *models.Application, errDetails *utils.ErrorDetails, status int) {
 	application, err := models.GetApplicationById(id)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, sql.ErrNoRows) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "database",
 				Message:    "Could not find application",
 			}
 			status = http.StatusNotFound
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "server",
 				Message:    "Unknown error",
@@ -69,21 +62,21 @@ func GetApplicationById(id string) (application *models.Application, errDetails 
 	return
 }
 
-func CreateApplication(reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
+func CreateApplication(reader io.Reader) (application *models.Application, errDetails *utils.ErrorDetails, status int) {
 	body := new(createApplicationRequest)
 	decoder := json.NewDecoder(reader)
 	err := decoder.Decode(body)
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -96,17 +89,13 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 	}
 
 	app := models.Application{
-		Name:                 body.Name,
-		Slug:                 body.Slug,
-		HomepageTemplate:     body.HomepageTemplate,
-		TrackpageTemplate:    body.TrackpageTemplate,
-		AdditionalCss:        &body.AdditionalCss,
-		AdditionalJavaScript: &body.AdditionalJavaScript,
+		Name: body.Name,
+		Slug: body.Slug,
 	}
 
 	application, err = models.CreateApplication(app)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 		}
 
@@ -119,14 +108,6 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 			status = http.StatusBadRequest
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Name missing"
-		} else if errors.Is(err, models.ErrHomepageTemplateEmpty) {
-			status = http.StatusBadRequest
-			errDetails.ErrorType = "request"
-			errDetails.Message = "Homepage template missing"
-		} else if errors.Is(err, models.ErrTrackpageTemplateEmpty) {
-			status = http.StatusBadRequest
-			errDetails.ErrorType = "request"
-			errDetails.Message = "Trackpage template missing"
 		} else if errors.As(err, &pgErr) {
 			errDetails.ErrorType = "database"
 
@@ -149,7 +130,7 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 	return
 }
 
-func UpdateApplication(id string, reader io.Reader) (application *models.Application, errDetails *ErrorDetails, status int) {
+func UpdateApplication(id string, reader io.Reader) (application *models.Application, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusNoContent
 
 	body := new(updateApplicationRequest)
@@ -158,14 +139,14 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	if err != nil {
 		var jsonErr *json.SyntaxError
 		if errors.As(err, &jsonErr) {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "request",
 				Message:    "Json syntax error",
 			}
 			status = http.StatusBadRequest
 		} else {
-			errDetails = &ErrorDetails{
+			errDetails = &utils.ErrorDetails{
 				EntityType: "application",
 				ErrorType:  "serialization",
 				Message:    "Unknown serialization error",
@@ -178,18 +159,14 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	}
 
 	app := models.Application{
-		Id:                   id,
-		Name:                 body.Name,
-		Slug:                 body.Slug,
-		HomepageTemplate:     body.HomepageTemplate,
-		TrackpageTemplate:    body.TrackpageTemplate,
-		AdditionalCss:        &body.AdditionalCss,
-		AdditionalJavaScript: &body.AdditionalJavaScript,
+		Id:   id,
+		Name: body.Name,
+		Slug: body.Slug,
 	}
 
 	application, err = models.UpdateApplication(app)
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 		}
 
@@ -220,12 +197,66 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	return
 }
 
-func DeleteApplication(id string) (errDetails *ErrorDetails, status int) {
+func DeleteApplication(id string) (errDetails *utils.ErrorDetails, status int) {
 	err := models.DeleteApplicationById(id)
 	status = http.StatusNoContent
 
 	if err != nil {
-		errDetails = &ErrorDetails{
+		errDetails = &utils.ErrorDetails{
+			EntityType: "application",
+		}
+		var pgErr *pgconn.PgError
+		if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
+		} else if errors.As(err, &pgErr) {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown database error"
+			log.Println(err.Error())
+		} else {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown error"
+			errDetails.ErrorType = "server"
+			log.Println(err.Error())
+		}
+	}
+	return
+}
+
+func ResetToken(id string) (errDetails *utils.ErrorDetails, status int) {
+	err := models.ResetToken(id)
+	status = http.StatusNoContent
+
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
+			EntityType: "application",
+		}
+		var pgErr *pgconn.PgError
+		if errors.Is(err, models.ErrApplicationNotFound) || (errors.As(err, &pgErr) && pgErr.Code == pgerrcode.InvalidTextRepresentation) {
+			status = http.StatusNotFound
+			errDetails.ErrorType = "request"
+			errDetails.Message = "Application not found"
+		} else if errors.As(err, &pgErr) {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown database error"
+			log.Println(err.Error())
+		} else {
+			status = http.StatusInternalServerError
+			errDetails.Message = "Unknown error"
+			errDetails.ErrorType = "server"
+			log.Println(err.Error())
+		}
+	}
+	return
+}
+
+func CreatePushToken(id string) (errDetails *utils.ErrorDetails, token *models.PushToken, status int) {
+	token, err := models.CreateToken(id)
+	status = http.StatusNoContent
+
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
 			EntityType: "application",
 		}
 		var pgErr *pgconn.PgError

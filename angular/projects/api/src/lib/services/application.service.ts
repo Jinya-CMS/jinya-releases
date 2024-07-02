@@ -12,12 +12,17 @@ import { StrictHttpResponse } from '../strict-http-response';
 import { Application } from '../models/application';
 import { createApplication } from '../fn/application/create-application';
 import { CreateApplication$Params } from '../fn/application/create-application';
+import { createToken } from '../fn/application/create-token';
+import { CreateToken$Params } from '../fn/application/create-token';
 import { deleteApplication } from '../fn/application/delete-application';
 import { DeleteApplication$Params } from '../fn/application/delete-application';
 import { getAllApplications } from '../fn/application/get-all-applications';
 import { GetAllApplications$Params } from '../fn/application/get-all-applications';
 import { getApplicationById } from '../fn/application/get-application-by-id';
 import { GetApplicationById$Params } from '../fn/application/get-application-by-id';
+import { PushToken } from '../models/push-token';
+import { resetTokens } from '../fn/application/reset-tokens';
+import { ResetTokens$Params } from '../fn/application/reset-tokens';
 import { updateApplication } from '../fn/application/update-application';
 import { UpdateApplication$Params } from '../fn/application/update-application';
 import { uploadApplicationLogo$Apng } from '../fn/application/upload-application-logo-apng';
@@ -202,6 +207,72 @@ export class ApplicationService extends BaseService {
    */
   deleteApplication(params: DeleteApplication$Params, context?: HttpContext): Observable<void> {
     return this.deleteApplication$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `createToken()` */
+  static readonly CreateTokenPath = '/api/admin/application/{id}/token';
+
+  /**
+   * Create token.
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `createToken()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  createToken$Response(params: CreateToken$Params, context?: HttpContext): Observable<StrictHttpResponse<PushToken>> {
+    return createToken(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * Create token.
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `createToken$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  createToken(params: CreateToken$Params, context?: HttpContext): Observable<PushToken> {
+    return this.createToken$Response(params, context).pipe(
+      map((r: StrictHttpResponse<PushToken>): PushToken => r.body)
+    );
+  }
+
+  /** Path part for operation `resetTokens()` */
+  static readonly ResetTokensPath = '/api/admin/application/{id}/token';
+
+  /**
+   * Resets all allowed push tokens for the given application.
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `resetTokens()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  resetTokens$Response(params: ResetTokens$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return resetTokens(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * Resets all allowed push tokens for the given application.
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `resetTokens$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  resetTokens(params: ResetTokens$Params, context?: HttpContext): Observable<void> {
+    return this.resetTokens$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
