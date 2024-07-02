@@ -29,7 +29,7 @@
           <a
             class="cosmo-menu__item"
             routerLink="/application"
-            [class.is--active]="router.url.includes('application')"
+            [class.is--active]="!router.url.includes('track')"
             i18n="@@overview"
           >
             Overview

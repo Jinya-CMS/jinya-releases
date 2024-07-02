@@ -3,15 +3,20 @@ package migrations
 import "github.com/jmoiron/sqlx"
 
 const createVersionTable = `
-	CREATE TABLE "version" (
-	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-	application_id uuid NOT NULL,
-	track_id uuid NOT NULL, 
-    version text NOT NULL UNIQUE,
-    upload_date date NOT NULL,
-    FOREIGN KEY (application_id) REFERENCES application(id),
-    FOREIGN KEY (track_id) references track(id),
-	UNIQUE (track_id, version)	                       
+create collation en_natural (
+	locale = 'en-us-u-kn-true',
+	provider = 'icu'
+);
+
+create table "version" (
+	id uuid primary key default uuid_generate_v4(),
+	application_id uuid not null,
+	track_id uuid not null, 
+    version text collate en_natural not null unique,
+    upload_date date not null,
+    foreign key (application_id) references application(id),
+    foreign key (track_id) references track(id),
+	unique (track_id, version)
 )
 `
 

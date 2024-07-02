@@ -5,11 +5,11 @@ import (
 )
 
 const createPushTokenTable = `
-CREATE TABLE "push_token" (
-	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-	token text NOT NULL,
-	application_id uuid NOT NULL,
-    FOREIGN KEY (application_id) REFERENCES application(id)
+create table "push_token" (
+	id uuid primary key default uuid_generate_v4(),
+	token text not null,
+	application_id uuid not null,
+    foreign key (application_id) references application(id)
 )`
 
 type CreatePushTokenTable struct{}

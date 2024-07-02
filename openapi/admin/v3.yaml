@@ -464,12 +464,12 @@ paths:
         in: path
         schema:
           type: string
-      - name: applicationSlug
+      - name: applicationId
         required: true
         in: path
         schema:
           type: string
-      - name: trackSlug
+      - name: trackId
         required: true
         in: path
         schema:
@@ -588,20 +588,10 @@ components:
       required:
         - name
         - slug
-        - homepageTemplate
-        - trackpageTemplate
       properties:
         name:
           type: string
         slug:
-          type: string
-        homepageTemplate:
-          type: string
-        trackpageTemplate:
-          type: string
-        additionalCss:
-          type: string
-        additionalJavaScript:
           type: string
     update-application:
       title: Update Application request
@@ -609,20 +599,10 @@ components:
       required:
         - name
         - slug
-        - homepageTemplate
-        - trackpageTemplate
       properties:
         name:
           type: string
         slug:
-          type: string
-        homepageTemplate:
-          type: string
-        trackpageTemplate:
-          type: string
-        additionalCss:
-          type: string
-        additionalJavaScript:
           type: string
     application:
       title: Application
@@ -631,8 +611,6 @@ components:
         - id
         - name
         - slug
-        - homepageTemplate
-        - trackpageTemplate
       properties:
         id:
           type: string
@@ -642,14 +620,6 @@ components:
         slug:
           type: string
         logo:
-          type: string
-        homepageTemplate:
-          type: string
-        trackpageTemplate:
-          type: string
-        additionalCss:
-          type: string
-        additionalJavaScript:
           type: string
     create-track:
       title: Create Track request

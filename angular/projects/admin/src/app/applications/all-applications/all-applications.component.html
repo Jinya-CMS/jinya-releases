@@ -1,5 +1,5 @@
 @if (loading) {
-  <app-loading-spinner/>
+  <app-loading-spinner />
 } @else {
   @if (applications.length === 0) {
     <div class="cosmo-message is--information">
@@ -22,7 +22,7 @@
             class="cosmo-side-list__item"
             (click)="selectApp(app)"
             [class.is--active]="selectedApplication?.id === app.id"
-          >{{ app.name }}</a
+            >{{ app.name }}</a
           >
         }
         <button class="cosmo-button is--full-width" i18n="@@new-application" (click)="createApplication.open = true">
@@ -48,11 +48,11 @@
               <button class="cosmo-button" (click)="createTrack.open = true" i18n="@@create-track">Create track</button>
             </div>
             <div class="cosmo-toolbar__group">
-              <button class="cosmo-button" (click)="createPushTokenDialog.open = true" i18n="@@create-push-token">Create
-                push token
+              <button class="cosmo-button" (click)="createPushTokenDialog.open = true" i18n="@@create-push-token">
+                Create push token
               </button>
-              <button class="cosmo-button" (click)="resetPushTokenDialog.open = true" i18n="@@reset-push-token">Reset
-                push token
+              <button class="cosmo-button" (click)="resetPushTokenDialog.open = true" i18n="@@reset-push-token">
+                Reset push token
               </button>
             </div>
           </div>
@@ -86,7 +86,7 @@
                   <dd>{{ selectedApplication.slug }}</dd>
                   <dt i18n="@@application-link-label">Link</dt>
                   <dd>
-                    <a target="_blank" [href]="location.origin + '/' + selectedApplication.slug">
+                    <a target="_blank" [href]="'/' + selectedApplication.slug">
                       {{ location.origin }}/{{ selectedApplication.slug }}
                     </a>
                   </dd>
@@ -107,14 +107,14 @@
                 } @else {
                   <table class="cosmo-table">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th i18n="@@application-track-name">Name</th>
-                      <th i18n="@@application-track-slug">Slug</th>
-                      <th i18n="@@application-track-default">Default</th>
-                      <th i18n="@@application-track-link">Link</th>
-                      <th i18n="@@application-track-actions">Actions</th>
-                    </tr>
+                      <tr>
+                        <th>#</th>
+                        <th i18n="@@application-track-name">Name</th>
+                        <th i18n="@@application-track-slug">Slug</th>
+                        <th i18n="@@application-track-default">Default</th>
+                        <th i18n="@@application-track-link">Link</th>
+                        <th i18n="@@application-track-actions">Actions</th>
+                      </tr>
                     </thead>
                     <tbody>
                       @for (track of tracks; track track) {
@@ -124,33 +124,44 @@
                           <td>{{ track.slug }}</td>
                           <td style="text-align: center">
                             @if (track.isDefault) {
-                              <lucide-icon name="circle-check" color="var(--positive-color)"/>
+                              <lucide-icon name="circle-check" color="var(--positive-color)" />
                             } @else {
-                              <lucide-icon name="circle-x" color="var(--negative-color)"/>
+                              <lucide-icon name="circle-x" color="var(--negative-color)" />
                             }
                           </td>
                           <td>
-                            <a target="_blank" [href]="location.origin + '/' + selectedApplication.slug">
+                            <a target="_blank" [href]="'/' + selectedApplication.slug + '/' + track.slug">
                               {{ location.origin }}/{{ selectedApplication.slug }}/{{ track.slug }}
                             </a>
                           </td>
                           <td>
-                            <div class="cosmo-toolbar__group">
-                              <button
-                                class="cosmo-button is--small"
-                                i18n="@@application-track-edit"
-                                (click)="editTrack(track, editTrackDialog)"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                class="cosmo-button is--small"
-                                i18n="@@application-track-delete"
-                                [disabled]="trackHasVersions[track.id]"
-                                (click)="openDeleteTrack(track, deleteTrackConfirm)"
-                              >
-                                Delete
-                              </button>
+                            <div class="cosmo-toolbar">
+                              <div class="cosmo-toolbar__group">
+                                <a
+                                  [routerLink]="'/application/' + selectedApplication.id + '/track/' + track.id"
+                                  class="cosmo-button is--small"
+                                  i18n="@@application-track-details"
+                                >
+                                  Details
+                                </a>
+                              </div>
+                              <div class="cosmo-toolbar__group">
+                                <button
+                                  class="cosmo-button is--small"
+                                  i18n="@@application-track-edit"
+                                  (click)="editTrack(track, editTrackDialog)"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  class="cosmo-button is--small"
+                                  i18n="@@application-track-delete"
+                                  [disabled]="trackHasVersions[track.id]"
+                                  (click)="openDeleteTrack(track, deleteTrackConfirm)"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
                           </td>
                         </tr>
@@ -194,7 +205,7 @@
           </ng-container>
         </app-confirm>
 
-        <app-add-track-dialog (saved)="trackAdded($event)" [selectedApplication]="selectedApplication" #createTrack/>
+        <app-add-track-dialog (saved)="trackAdded($event)" [selectedApplication]="selectedApplication" #createTrack />
         <app-edit-track-dialog
           (saved)="updateTrack($event)"
           [selectedApplication]="selectedApplication"
@@ -258,7 +269,7 @@
                 </div>
               }
               <ng-container i18n="@@new-token-message">
-                The push token was created successfully, see below for the token.<br/>
+                The push token was created successfully, see below for the token.<br />
                 Please copy it now, since it won't be displayed again.
               </ng-container>
               <div class="code">
@@ -266,8 +277,12 @@
               </div>
             </div>
             <div class="cosmo-modal__button-bar">
-              <button class="cosmo-button" [class.is--primary]="!tokenCopied" (click)="copyToken()"
-                      i18n="@@new-token-copy">
+              <button
+                class="cosmo-button"
+                [class.is--primary]="!tokenCopied"
+                (click)="copyToken()"
+                i18n="@@new-token-copy"
+              >
                 Copy token
               </button>
               <button class="cosmo-button" (click)="newToken = null" i18n="@@new-token-close" [disabled]="!tokenCopied">
@@ -280,5 +295,5 @@
     </div>
   }
 
-  <app-add-application-dialog (saved)="appCreated($event)" #createApplication/>
+  <app-add-application-dialog (saved)="appCreated($event)" #createApplication />
 }

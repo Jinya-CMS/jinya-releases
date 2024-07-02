@@ -9,8 +9,8 @@ import { RequestBuilder } from '../../request-builder';
 
 export interface CreateNewVersion$Params {
   versionNumber: string;
-  applicationSlug: string;
-  trackSlug: string;
+  applicationId: string;
+  trackId: string;
       body: Blob
 }
 
@@ -18,8 +18,8 @@ export function createNewVersion(http: HttpClient, rootUrl: string, params: Crea
   const rb = new RequestBuilder(rootUrl, createNewVersion.PATH, 'post');
   if (params) {
     rb.path('versionNumber', params.versionNumber, {});
-    rb.path('applicationSlug', params.applicationSlug, {});
-    rb.path('trackSlug', params.trackSlug, {});
+    rb.path('applicationId', params.applicationId, {});
+    rb.path('trackId', params.trackId, {});
     rb.body(params.body, 'application/octet-stream');
   }
 

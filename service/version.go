@@ -207,6 +207,18 @@ func DeleteVersion(applicationId string, trackId string, id string) (errDetails 
 			log.Println(err.Error())
 		}
 	}
+
+	err = storage.DeleteVersion(applicationId, trackId, id)
+	if err != nil {
+		errDetails = &utils.ErrorDetails{
+			EntityType: "version",
+			ErrorType:  "storage",
+			Message:    "Failed to delete binary",
+		}
+		log.Println(err.Error())
+		status = http.StatusInternalServerError
+		return
+	}
 	return
 }
 
@@ -267,8 +279,9 @@ func PushVersion(r *http.Request, applicationSlug string, trackSlug string, vers
 }
 
 func performUpload(r *http.Request, app *models.Application, track *models.Track, versionNumber string) (errDetails *utils.ErrorDetails, status int) {
+	status = http.StatusNoContent
 	versionToUploadBinaryFor, err := models.GetVersionByTrackAndVersion(track.Id, versionNumber)
-	if versionToUploadBinaryFor == nil {
+	if err != nil {
 		versionToUploadBinaryFor, err = models.CreateVersion(models.Version{
 			ApplicationId: app.Id,
 			TrackId:       track.Id,

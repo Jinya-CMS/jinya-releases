@@ -14,21 +14,13 @@ import (
 )
 
 type createApplicationRequest struct {
-	Name                 string `json:"name"`
-	Slug                 string `json:"slug"`
-	HomepageTemplate     string `json:"homepageTemplate"`
-	TrackpageTemplate    string `json:"trackpageTemplate"`
-	AdditionalCss        string `json:"additionalCss,omitempty"`
-	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 type updateApplicationRequest struct {
-	Name                 string `json:"name"`
-	Slug                 string `json:"slug"`
-	HomepageTemplate     string `json:"homepageTemplate"`
-	TrackpageTemplate    string `json:"trackpageTemplate"`
-	AdditionalCss        string `json:"additionalCss,omitempty"`
-	AdditionalJavaScript string `json:"additionalJavaScript,omitempty"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 func GetAllApplications() (applications []models.Application, errDetails *utils.ErrorDetails) {
@@ -97,12 +89,8 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 	}
 
 	app := models.Application{
-		Name:                 body.Name,
-		Slug:                 body.Slug,
-		HomepageTemplate:     body.HomepageTemplate,
-		TrackpageTemplate:    body.TrackpageTemplate,
-		AdditionalCss:        &body.AdditionalCss,
-		AdditionalJavaScript: &body.AdditionalJavaScript,
+		Name: body.Name,
+		Slug: body.Slug,
 	}
 
 	application, err = models.CreateApplication(app)
@@ -120,14 +108,6 @@ func CreateApplication(reader io.Reader) (application *models.Application, errDe
 			status = http.StatusBadRequest
 			errDetails.ErrorType = "request"
 			errDetails.Message = "Name missing"
-		} else if errors.Is(err, models.ErrHomepageTemplateEmpty) {
-			status = http.StatusBadRequest
-			errDetails.ErrorType = "request"
-			errDetails.Message = "Homepage template missing"
-		} else if errors.Is(err, models.ErrTrackpageTemplateEmpty) {
-			status = http.StatusBadRequest
-			errDetails.ErrorType = "request"
-			errDetails.Message = "Trackpage template missing"
 		} else if errors.As(err, &pgErr) {
 			errDetails.ErrorType = "database"
 
@@ -179,13 +159,9 @@ func UpdateApplication(id string, reader io.Reader) (application *models.Applica
 	}
 
 	app := models.Application{
-		Id:                   id,
-		Name:                 body.Name,
-		Slug:                 body.Slug,
-		HomepageTemplate:     body.HomepageTemplate,
-		TrackpageTemplate:    body.TrackpageTemplate,
-		AdditionalCss:        &body.AdditionalCss,
-		AdditionalJavaScript: &body.AdditionalJavaScript,
+		Id:   id,
+		Name: body.Name,
+		Slug: body.Slug,
 	}
 
 	application, err = models.UpdateApplication(app)

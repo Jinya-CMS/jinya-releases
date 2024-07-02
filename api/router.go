@@ -85,7 +85,7 @@ func SetupApiRouter(router *mux.Router) {
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track/{trackId}/version").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getAllVersions))))
 	router.Methods("GET").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(getVersionById))))
 	router.Methods("DELETE").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{id}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(deleteVersion))))
-	router.Methods("POST").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{versionNumber}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(uploadVersion))))
+	router.Methods("POST").Path("/api/admin/application/{applicationId}/track/{trackId}/version/{version}").Handler(mw.RequireAuthorization()(contentTypeJson()(http.HandlerFunc(uploadVersion))))
 
 	router.Methods("POST").Path("/api/push/{applicationSlug}/{trackSlug}/{versionNumber}").Handler(pushTokenMiddleware()(http.HandlerFunc(pushVersion)))
 }
