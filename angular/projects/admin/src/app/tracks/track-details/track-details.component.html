@@ -1,8 +1,8 @@
 @if (loading) {
-  <app-loading-spinner/>
+  <app-loading-spinner />
 } @else {
   <span class="cosmo-title"
-  >{{ application.name }} <small>{{ track.name }}</small> –
+    >{{ application.name }} <small>{{ track.name }}</small> –
     <ng-container i18n="@@track-details-version-title">Versions</ng-container></span
   >
   <div class="cosmo-toolbar">
@@ -14,13 +14,13 @@
   </div>
   <table class="cosmo-table" style="width: 100%">
     <thead>
-    <tr>
-      <th>#</th>
-      <th i18n="@@track-details-version-number">Version</th>
-      <th i18n="@@track-details-version-upload-date">Upload date</th>
-      <th i18n="@@track-details-version-download-link">Download link</th>
-      <th i18n="@@track-details-version-actions">Actions</th>
-    </tr>
+      <tr>
+        <th>#</th>
+        <th i18n="@@track-details-version-number">Version</th>
+        <th i18n="@@track-details-version-upload-date">Upload date</th>
+        <th i18n="@@track-details-version-download-link">Download link</th>
+        <th i18n="@@track-details-version-actions">Actions</th>
+      </tr>
     </thead>
     <tbody>
       @for (version of versions; track version) {
@@ -72,5 +72,5 @@
     </ng-container>
   </app-confirm>
 
-  <app-upload-version-dialog [application]="application" [track]="track" (saved)="loadVersions()" #uploadVersion/>
+  <app-upload-version-dialog [application]="application" [track]="track" (saved)="loadVersions()" #uploadVersion />
 }
