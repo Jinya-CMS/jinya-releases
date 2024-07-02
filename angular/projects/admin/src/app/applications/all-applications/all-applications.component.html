@@ -47,6 +47,14 @@
             <div class="cosmo-toolbar__group">
               <button class="cosmo-button" (click)="createTrack.open = true" i18n="@@create-track">Create track</button>
             </div>
+            <div class="cosmo-toolbar__group">
+              <button class="cosmo-button" (click)="createPushTokenDialog.open = true" i18n="@@create-push-token">
+                Create push token
+              </button>
+              <button class="cosmo-button" (click)="resetPushTokenDialog.open = true" i18n="@@reset-push-token">
+                Reset push token
+              </button>
+            </div>
           </div>
           <div class="cosmo-tab">
             <nav class="cosmo-tab__links">
@@ -55,15 +63,17 @@
                 [class.is--active]="activeTab === ActiveTab.Details"
                 (click)="activeTab = ActiveTab.Details"
                 i18n="@@application-details"
-                >Details</a
               >
+                Details
+              </a>
               <a
                 class="cosmo-tab__link"
                 [class.is--active]="activeTab === ActiveTab.Tracks"
                 (click)="activeTab = ActiveTab.Tracks"
                 i18n="@@application-tracks"
-                >Tracks</a
               >
+                Tracks
+              </a>
             </nav>
             <div class="cosmo-tab__content">
               @if (activeTab === ActiveTab.Details) {
@@ -76,7 +86,7 @@
                   <dd>{{ selectedApplication.slug }}</dd>
                   <dt i18n="@@application-link-label">Link</dt>
                   <dd>
-                    <a target="_blank" [href]="location.origin + '/' + selectedApplication.slug">
+                    <a target="_blank" [href]="'/' + selectedApplication.slug">
                       {{ location.origin }}/{{ selectedApplication.slug }}
                     </a>
                   </dd>
@@ -120,27 +130,38 @@
                             }
                           </td>
                           <td>
-                            <a target="_blank" [href]="location.origin + '/' + selectedApplication.slug">
+                            <a target="_blank" [href]="'/' + selectedApplication.slug + '/' + track.slug">
                               {{ location.origin }}/{{ selectedApplication.slug }}/{{ track.slug }}
                             </a>
                           </td>
                           <td>
-                            <div class="cosmo-toolbar__group">
-                              <button
-                                class="cosmo-button is--small"
-                                i18n="@@application-track-edit"
-                                (click)="editTrack(track, editTrackDialog)"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                class="cosmo-button is--small"
-                                i18n="@@application-track-delete"
-                                [disabled]="trackHasVersions[track.id]"
-                                (click)="openDeleteTrack(track, deleteTrackConfirm)"
-                              >
-                                Delete
-                              </button>
+                            <div class="cosmo-toolbar">
+                              <div class="cosmo-toolbar__group">
+                                <a
+                                  [routerLink]="'/application/' + selectedApplication.id + '/track/' + track.id"
+                                  class="cosmo-button is--small"
+                                  i18n="@@application-track-details"
+                                >
+                                  Details
+                                </a>
+                              </div>
+                              <div class="cosmo-toolbar__group">
+                                <button
+                                  class="cosmo-button is--small"
+                                  i18n="@@application-track-edit"
+                                  (click)="editTrack(track, editTrackDialog)"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  class="cosmo-button is--small"
+                                  i18n="@@application-track-delete"
+                                  [disabled]="trackHasVersions[track.id]"
+                                  (click)="openDeleteTrack(track, deleteTrackConfirm)"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
                           </td>
                         </tr>
@@ -206,6 +227,70 @@
             Do you really want to delete the track {{ selectedTrack?.name }} in app {{ selectedApplication.name }}?
           </ng-container>
         </app-confirm>
+
+        <app-confirm
+          title="Create push token"
+          confirmLabel="Create token"
+          declineLabel="Cancel"
+          i18n-title="@@create-push-token-title"
+          i18n-declineLabel="@@create-push-token-decline"
+          i18n-confirmLabel="@@create-push-token-confirm"
+          #createPushTokenDialog
+          (decline)="createPushTokenDialog.open = false"
+          (confirm)="createPushToken(createPushTokenDialog)"
+        >
+          <ng-container i18n="@@create-push-token-message">
+            Do you want to create a new push token for the app {{ selectedApplication.name }}?
+          </ng-container>
+        </app-confirm>
+        <app-confirm
+          negative
+          title="Reset push tokens"
+          confirmLabel="Reset tokens"
+          declineLabel="Cancel"
+          i18n-title="@@reset-push-tokens-title"
+          i18n-declineLabel="@@reset-push-tokens-decline"
+          i18n-confirmLabel="@@reset-push-tokens-confirm"
+          #resetPushTokenDialog
+          (decline)="resetPushTokenDialog.open = false"
+          (confirm)="resetTokens(resetPushTokenDialog)"
+        >
+          <ng-container i18n="@@reset-push-tokens-message">
+            Do you want to delete all push tokens for the app {{ selectedApplication.name }}?
+          </ng-container>
+        </app-confirm>
+        <div class="cosmo-modal__container" [class.is--closed]="!newToken">
+          <div class="cosmo-modal is--warning">
+            <h1 class="cosmo-modal__title" i18n="@@new-token-title">Token created</h1>
+            <div class="cosmo-modal__content">
+              @if (tokenCopied) {
+                <div class="cosmo-message is--information" i18n="@@new-token-copied">
+                  You copied the token and can now close the dialog.
+                </div>
+              }
+              <ng-container i18n="@@new-token-message">
+                The push token was created successfully, see below for the token.<br />
+                Please copy it now, since it won't be displayed again.
+              </ng-container>
+              <div class="code">
+                <kbd (keyup.control.c)="tokenCopied = true">{{ newToken }}</kbd>
+              </div>
+            </div>
+            <div class="cosmo-modal__button-bar">
+              <button
+                class="cosmo-button"
+                [class.is--primary]="!tokenCopied"
+                (click)="copyToken()"
+                i18n="@@new-token-copy"
+              >
+                Copy token
+              </button>
+              <button class="cosmo-button" (click)="newToken = null" i18n="@@new-token-close" [disabled]="!tokenCopied">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       }
     </div>
   }

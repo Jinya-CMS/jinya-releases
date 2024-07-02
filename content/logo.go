@@ -13,13 +13,13 @@ func GetLogo(w http.ResponseWriter, r *http.Request) {
 
 	app, err := models.GetApplicationBySlug(slug)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.NotFound(w, r)
 		return
 	}
 
 	logo, contentType, err := storage.DownloadLogo(app.Id)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.NotFound(w, r)
 		return
 	}
 

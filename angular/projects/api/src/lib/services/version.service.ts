@@ -9,16 +9,16 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { createVersion } from '../fn/version/create-version';
-import { CreateVersion$Params } from '../fn/version/create-version';
+import { createNewVersion } from '../fn/version/create-new-version';
+import { CreateNewVersion$Params } from '../fn/version/create-new-version';
 import { deleteVersion } from '../fn/version/delete-version';
 import { DeleteVersion$Params } from '../fn/version/delete-version';
 import { getAllVersions } from '../fn/version/get-all-versions';
 import { GetAllVersions$Params } from '../fn/version/get-all-versions';
 import { getVersionById } from '../fn/version/get-version-by-id';
 import { GetVersionById$Params } from '../fn/version/get-version-by-id';
-import { uploadVersionArtifact } from '../fn/version/upload-version-artifact';
-import { UploadVersionArtifact$Params } from '../fn/version/upload-version-artifact';
+import { pushNewVersion } from '../fn/version/push-new-version';
+import { PushNewVersion$Params } from '../fn/version/push-new-version';
 import { Version } from '../models/version';
 
 @Injectable({ providedIn: 'root' })
@@ -60,36 +60,36 @@ export class VersionService extends BaseService {
     );
   }
 
-  /** Path part for operation `createVersion()` */
-  static readonly CreateVersionPath = '/api/admin/application/{applicationId}/track/{trackId}/version';
+  /** Path part for operation `createNewVersion()` */
+  static readonly CreateNewVersionPath = '/api/admin/application/{applicationId}/track/{trackId}/version/{versionNumber}';
 
   /**
-   * Create version.
+   * Upload new version to the given application and track, if the version exists the binary is replaced.
    *
    *
    *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `createVersion()` instead.
+   * To access only the response body, use `createNewVersion()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method sends `application/octet-stream` and handles request body of type `application/octet-stream`.
    */
-  createVersion$Response(params: CreateVersion$Params, context?: HttpContext): Observable<StrictHttpResponse<Version>> {
-    return createVersion(this.http, this.rootUrl, params, context);
+  createNewVersion$Response(params: CreateNewVersion$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return createNewVersion(this.http, this.rootUrl, params, context);
   }
 
   /**
-   * Create version.
+   * Upload new version to the given application and track, if the version exists the binary is replaced.
    *
    *
    *
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `createVersion$Response()` instead.
+   * To access the full response (for headers, for example), `createNewVersion$Response()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method sends `application/octet-stream` and handles request body of type `application/octet-stream`.
    */
-  createVersion(params: CreateVersion$Params, context?: HttpContext): Observable<Version> {
-    return this.createVersion$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Version>): Version => r.body)
+  createNewVersion(params: CreateNewVersion$Params, context?: HttpContext): Observable<void> {
+    return this.createNewVersion$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
@@ -159,35 +159,35 @@ export class VersionService extends BaseService {
     );
   }
 
-  /** Path part for operation `uploadVersionArtifact()` */
-  static readonly UploadVersionArtifactPath = '/api/admin/application/{applicationId}/track/{trackId}/version/{id}/file';
+  /** Path part for operation `pushNewVersion()` */
+  static readonly PushNewVersionPath = '/api/push/{applicationSlug}/{trackSlug}/{versionNumber}';
 
   /**
-   * Upload version artifact binary.
+   * Push new version to the given application and track, if the version exists the binary is replaced.
    *
    *
    *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `uploadVersionArtifact()` instead.
+   * To access only the response body, use `pushNewVersion()` instead.
    *
    * This method sends `application/octet-stream` and handles request body of type `application/octet-stream`.
    */
-  uploadVersionArtifact$Response(params: UploadVersionArtifact$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return uploadVersionArtifact(this.http, this.rootUrl, params, context);
+  pushNewVersion$Response(params: PushNewVersion$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return pushNewVersion(this.http, this.rootUrl, params, context);
   }
 
   /**
-   * Upload version artifact binary.
+   * Push new version to the given application and track, if the version exists the binary is replaced.
    *
    *
    *
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `uploadVersionArtifact$Response()` instead.
+   * To access the full response (for headers, for example), `pushNewVersion$Response()` instead.
    *
    * This method sends `application/octet-stream` and handles request body of type `application/octet-stream`.
    */
-  uploadVersionArtifact(params: UploadVersionArtifact$Params, context?: HttpContext): Observable<void> {
-    return this.uploadVersionArtifact$Response(params, context).pipe(
+  pushNewVersion(params: PushNewVersion$Params, context?: HttpContext): Observable<void> {
+    return this.pushNewVersion$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }

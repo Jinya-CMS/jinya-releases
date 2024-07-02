@@ -7,17 +7,17 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 
-export interface UploadVersionArtifact$Params {
-  id: string;
+export interface CreateNewVersion$Params {
+  versionNumber: string;
   applicationId: string;
   trackId: string;
       body: Blob
 }
 
-export function uploadVersionArtifact(http: HttpClient, rootUrl: string, params: UploadVersionArtifact$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, uploadVersionArtifact.PATH, 'post');
+export function createNewVersion(http: HttpClient, rootUrl: string, params: CreateNewVersion$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, createNewVersion.PATH, 'post');
   if (params) {
-    rb.path('id', params.id, {});
+    rb.path('versionNumber', params.versionNumber, {});
     rb.path('applicationId', params.applicationId, {});
     rb.path('trackId', params.trackId, {});
     rb.body(params.body, 'application/octet-stream');
@@ -33,4 +33,4 @@ export function uploadVersionArtifact(http: HttpClient, rootUrl: string, params:
   );
 }
 
-uploadVersionArtifact.PATH = '/api/admin/application/{applicationId}/track/{trackId}/version/{id}/file';
+createNewVersion.PATH = '/api/admin/application/{applicationId}/track/{trackId}/version/{versionNumber}';

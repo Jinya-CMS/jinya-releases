@@ -1,4 +1,4 @@
-package service
+package utils
 
 type ErrorDetails struct {
 	EntityType string `json:"entityType"`

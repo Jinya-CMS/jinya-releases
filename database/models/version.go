@@ -13,7 +13,7 @@ type Version struct {
 	ApplicationId string    `json:"-" db:"application_id"`
 	TrackId       string    `json:"-" db:"track_id"`
 	Version       string    `json:"version" db:"version"`
-	Url           string    `json:"url,omitempty" db:"-"`
+	Url           string    `json:"url,omitempty" db:"url"`
 	UploadDate    time.Time `json:"uploadDate,omitempty" db:"upload_date"`
 }
 
@@ -21,6 +21,17 @@ var (
 	ErrVersionEmpty    = errors.New("version is empty")
 	ErrVersionNotFound = errors.New("version not found")
 )
+
+const getVersionsSelectAndJoin = `select v.id,
+       v.application_id,
+       v.track_id,
+       v.version,
+       v.upload_date,
+       '%s/' || a.slug || '/' || t.slug || '/' || v.version as url
+from version v
+         join track t on t.id = v.track_id
+         join application a on a.id = t.application_id
+ %s`
 
 func CreateVersion(version Version) (*Version, error) {
 	if version.Version == "" {
@@ -78,11 +89,9 @@ func GetVersionByTrackAndVersion(trackId string, versionString string) (*Version
 		return nil, ErrTrackNotFound
 	}
 
-	if err = db.Get(version, "SELECT id, application_id, track_id, version.version, upload_date FROM version WHERE track_id = $1 AND version = $2", trackId, versionString); err != nil {
-		return nil, err
-	}
+	err = db.Get(version, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where v.track_id = $1 and v.version = $2"), trackId, versionString)
 
-	return setUrl(version)
+	return version, err
 }
 
 func GetVersionById(applicationId string, trackId string, id string) (*Version, error) {
@@ -112,26 +121,9 @@ func GetVersionById(applicationId string, trackId string, id string) (*Version, 
 		return nil, ErrTrackNotFound
 	}
 
-	if err = db.Get(version, "SELECT id, application_id, track_id, version.version, upload_date  FROM version WHERE id = $1", id); err != nil {
-		return nil, err
-	}
+	err = db.Get(version, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where v.id = $1"), id)
 
-	return setUrl(version)
-}
-
-func setUrl(version *Version) (*Version, error) {
-	app, err := GetApplicationById(version.ApplicationId)
-	if err != nil {
-		return nil, err
-	}
-
-	track, err := GetTrackById(version.TrackId, version.ApplicationId)
-	if err != nil {
-		return nil, err
-	}
-
-	version.Url = fmt.Sprintf("%s/%s/%s/%s", config.LoadedConfiguration.ServerUrl, app.Slug, track.Slug, version.UploadDate.Format("2006-01-02"))
-	return version, nil
+	return version, err
 }
 
 func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
@@ -143,25 +135,17 @@ func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
 	defer db.Close()
 	versions := make([]Version, 0)
 
-	application, err := GetApplicationById(applicationId)
-	if err != nil {
+	if _, err = GetApplicationById(applicationId); err != nil {
 		return nil, err
 	}
 
-	track, err := GetTrackById(trackId, applicationId)
-	if err != nil {
+	if _, err = GetTrackById(trackId, applicationId); err != nil {
 		return nil, err
 	}
 
-	if err = db.Select(&versions, "SELECT id, application_id, track_id, version.version,  upload_date FROM version WHERE application_id = $1 AND track_id = $2 ORDER BY upload_date", applicationId, trackId); err != nil {
-		return nil, err
-	}
+	err = db.Select(&versions, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where v.application_id = $1 and v.track_id = $2 order by v.version desc"), applicationId, trackId)
 
-	for i, v := range versions {
-		versions[i].Url = fmt.Sprintf("%s/%s/%s/%s", config.LoadedConfiguration.ServerUrl, application.Slug, track.Slug, v.UploadDate.Format("2006-01-02"))
-	}
-
-	return versions, nil
+	return versions, err
 }
 
 func DeleteVersionById(applicationId string, trackId string, id string) error {
@@ -205,4 +189,18 @@ func DeleteVersionById(applicationId string, trackId string, id string) error {
 	}
 
 	return nil
+}
+
+func GetVersionBySlugsAndNumber(applicationSlug, trackSlug, versionNumber string) (*Version, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+	version := new(Version)
+
+	err = db.Get(version, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where a.slug = $1 and t.slug = $2 and v.version = $3"), applicationSlug, trackSlug, versionNumber)
+
+	return version, err
 }

@@ -9,6 +9,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { UiModule } from '../ui/ui.module';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { AuthenticationModule } from '../authentication/authentication.module';
+import { TracksModule } from './tracks/tracks.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -17,6 +18,7 @@ import { AuthenticationModule } from '../authentication/authentication.module';
     BrowserModule,
     NgIf,
     ApplicationsModule,
+    TracksModule,
     UiModule,
     OAuthModule.forRoot(),
     AuthenticationModule.forRoot(),
