@@ -3,12 +3,13 @@ module jinya-releases
 go 1.22
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/minio/minio-go/v7 v7.0.72
+	github.com/minio/minio-go/v7 v7.0.73
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/zitadel/oidc/v3 v3.25.1
 	github.com/zitadel/zitadel-go/v3 v3.0.0-next.2
@@ -18,11 +19,11 @@ require (
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -46,5 +47,4 @@ require (
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
 )
