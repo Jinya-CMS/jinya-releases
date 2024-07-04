@@ -1,0 +1,133 @@
+html, body {
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-image: url("/static/frontend/assets/background.webp");
+    background-size: cover;
+}
+
+.projects {
+    display: flex;
+    gap: 1rem;
+    flex-flow: row wrap;
+
+    a {
+        flex: 0 1 auto;
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 200;
+    font-family: Urbanist, sans-serif;
+}
+
+main {
+    padding-left: 30%;
+    padding-right: 30%;
+    padding-top: 10rem;
+    height: 100vh;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+article {
+    padding: 2rem 3rem;
+    background-color: var(--modal-background);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(24px);
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: column;
+    align-items: start;
+}
+
+footer {
+    padding: 1rem 2rem;
+    background-color: var(--modal-background);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(24px);
+    position: sticky;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    font-size: var(--font-size);
+    box-sizing: border-box;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+a[role=button] {
+    text-decoration: none;
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color-alpha-90);
+    backdrop-filter: blur(24px);
+    transition: all var(--transition-duration);
+    font-size: var(--font-size);
+
+    &:hover {
+        background-color: var(--primary-color);
+    }
+
+    &.is--secondary {
+        background-color: var(--primary-color-alpha-50);
+    }
+}
+
+table {
+    font-size: var(--font-size);
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+}
+
+thead th {
+    border-bottom: 0.125rem solid var(--primary-color);
+    padding: 0.5rem 0.25rem 0;
+    margin: 0;
+}
+
+tbody td {
+    padding: 0.5rem 0.25rem;
+    margin: 0;
+}
+
+tbody tr:nth-child(2n+1) {
+    background-color: var(--primary-color-alpha-05);
+}
+
+.back-link {
+    font-size: var(--font-size);
+    margin-bottom: 2rem;
+    text-decoration: none;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    svg {
+        fill: none;
+        stroke: var(--primary-color);
+        stroke-width: 2px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+}

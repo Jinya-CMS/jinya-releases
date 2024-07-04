@@ -9,6 +9,7 @@ import (
 	"jinya-releases/config"
 	"jinya-releases/content"
 	migrator "jinya-releases/database/migrations"
+	"jinya-releases/frontend"
 	"log"
 	"net/http"
 	"path"
@@ -157,6 +158,7 @@ func main() {
 
 	api.SetupApiRouter(router)
 	content.SetupContentRouter(router)
+	frontend.SetupFrontendRouter(router)
 
 	log.Println("Serving at localhost:8090...")
 	err = http.ListenAndServe(":8090", router)

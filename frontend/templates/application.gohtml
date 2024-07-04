@@ -1,0 +1,20 @@
+{{define "content"}}
+    <article>
+        <a class="back-link" href="/">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+                <path d="M6 8L2 12L6 16"/>
+                <path d="M2 12H22"/>
+            </svg>
+            Back to overview
+        </a>
+        <h1 class="cosmo-title">{{.Application.Name}}</h1>
+        <p>
+            Check below for a list of all release channels in {{.Application.Name}}
+        </p>
+        <div class="projects">
+            {{range .Tracks}}
+                <a href="/{{$.Application.Slug}}/{{.Slug}}" role="button"{{if not .IsDefault}} class="is--secondary"{{end}}>{{.Name}}</a>
+            {{end}}
+        </div>
+    </article>
+{{end}}
