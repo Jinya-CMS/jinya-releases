@@ -4,7 +4,7 @@ html, body {
     margin: 0;
 }
 
-body {
+html {
     background-image: url("/static/frontend/assets/background.webp");
     background-size: cover;
 }
@@ -38,6 +38,7 @@ main {
     flex-flow: column;
     justify-content: space-between;
     box-sizing: border-box;
+    overflow: auto;
 }
 
 article {
@@ -130,4 +131,10 @@ tbody tr:nth-child(2n+1) {
         stroke-linecap: round;
         stroke-linejoin: round;
     }
+}
+
+address {
+    font-size: var(--font-size);
+    font-style: normal;
+    font-weight: var(--font-weight-normal);
 }
