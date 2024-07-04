@@ -191,6 +191,20 @@ func DeleteVersionById(applicationId string, trackId string, id string) error {
 	return nil
 }
 
+func GetVersionBySlugs(applicationSlug, trackSlug string) ([]Version, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+	var versions []Version
+
+	err = db.Select(&versions, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where a.slug = $1 and t.slug = $2 order by v.version desc"), applicationSlug, trackSlug)
+
+	return versions, err
+}
+
 func GetVersionBySlugsAndNumber(applicationSlug, trackSlug, versionNumber string) (*Version, error) {
 	db, err := database.Connect()
 	if err != nil {
