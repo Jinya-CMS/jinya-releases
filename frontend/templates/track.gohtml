@@ -1,0 +1,36 @@
+{{define "content"}}
+    <article>
+        <a class="back-link" href="/{{.Application.Slug}}">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+                <path d="M6 8L2 12L6 16"/>
+                <path d="M2 12H22"/>
+            </svg>
+            Back to {{.Application.Name}}
+        </a>
+        <h1 class="cosmo-title">{{.Application.Name}} – {{.Track.Name}}</h1>
+        <p>
+            Please choose the version you would like to download. For the best experience, we recommend the most recent
+            one.
+        </p>
+        <a href="{{(index .Versions 0).Url}}" role="button">Download latest version</a>
+        <h2>Specific versions</h2>
+        <table role="grid">
+            <thead>
+            <tr>
+                <th>Version</th>
+                <th>Publish date</th>
+                <th>Download link</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .Versions}}
+                <tr>
+                    <td>{{.Version}}</td>
+                    <td>{{toTimeString .UploadDate}}</td>
+                    <td><a href="{{.Url}}">{{.Url}}</a></td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </article>
+{{end}}

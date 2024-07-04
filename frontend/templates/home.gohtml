@@ -1,0 +1,13 @@
+{{define "content"}}
+    <article>
+        <h1 class="cosmo-title">Jinya Projects</h1>
+        <p>
+            Check below for a list of all Jinya projects available for download
+        </p>
+        <div class="projects">
+            {{range .Applications}}
+                <a href="/{{.Slug}}" role="button">{{.Name}}</a>
+            {{end}}
+        </div>
+    </article>
+{{end}}

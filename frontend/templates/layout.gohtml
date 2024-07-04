@@ -1,0 +1,41 @@
+{{define "layout"}}
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="/static/frontend/css/jinya.css">
+        <link rel="stylesheet" type="text/css" href="/static/frontend/css/typography.css">
+        <link rel="stylesheet" type="text/css" href="/static/frontend/css/variables.css">
+        <link rel="stylesheet" type="text/css" href="/static/frontend/css/scrollbars.css">
+        <link rel="stylesheet" type="text/css" href="/static/frontend/css/albert-sans.css">
+        <link rel="stylesheet" type="text/css" href="/static/frontend/css/urbanist.css">
+        {{block "pageTitle" .}}
+            <title>Jinya Project</title>
+        {{end}}
+        <link rel="icon" href="/static/favicon-light.png" type="image/png"/>
+        <link rel="icon" href="/static/favicon-dark.png" media="(prefers-color-scheme: dark)" type="image/png"/>
+        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+        <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#19324c"/>
+        <meta name="msapplication-TileColor" content="#19324c"/>
+        <meta name="theme-color" content="#19324c"/>
+    </head>
+    <body>
+    <main class="container">
+        {{block "content" .}}{{end}}
+        <footer>
+            <div>
+                © Jinya Developers
+            </div>
+            <div class="footer-links">
+                <a href="/imprint">Imprint</a>
+                <a href="/imprint">Data Protection</a>
+            </div>
+        </footer>
+    </main>
+    </body>
+    </html>
+{{end}}
