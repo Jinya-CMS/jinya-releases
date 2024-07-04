@@ -8,7 +8,11 @@ import (
 
 func checkForPageOrJson(expectPage bool) func(request *http.Request, match *mux.RouteMatch) bool {
 	return func(request *http.Request, match *mux.RouteMatch) bool {
-		return strings.Contains(request.Header.Get("Accept"), "text/html") && expectPage
+		if expectPage {
+			return strings.Contains(request.Header.Get("Accept"), "text/html")
+		}
+
+		return true
 	}
 }
 
@@ -20,6 +24,6 @@ func SetupFrontendRouter(router *mux.Router) {
 	router.Methods("GET").Path("/{applicationSlug}").MatcherFunc(checkForPageOrJson(true)).HandlerFunc(getApplicationPage)
 	router.Methods("GET").Path("/{applicationSlug}/{trackSlug}").MatcherFunc(checkForPageOrJson(true)).HandlerFunc(getTrackPage)
 
-	router.Methods("GET").Path("/{applicationSlug}").MatcherFunc(checkForPageOrJson(true)).HandlerFunc(getApplicationJson)
-	router.Methods("GET").Path("/{applicationSlug}/{trackSlug}").MatcherFunc(checkForPageOrJson(true)).HandlerFunc(getTrackJson)
+	router.Methods("GET").Path("/{applicationSlug}").MatcherFunc(checkForPageOrJson(false)).HandlerFunc(getApplicationJson)
+	router.Methods("GET").Path("/{applicationSlug}/{trackSlug}").MatcherFunc(checkForPageOrJson(false)).HandlerFunc(getTrackJson)
 }
