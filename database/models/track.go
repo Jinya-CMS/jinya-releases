@@ -66,7 +66,7 @@ func GetAllTracks(applicationId string) ([]Track, error) {
 	return tracks, nil
 }
 
-func GetTrackById(id string, applicationId string) (*Track, error) {
+func GetTrackById(id, applicationId string) (*Track, error) {
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func GetTrackById(id string, applicationId string) (*Track, error) {
 	return track, nil
 }
 
-func GetTrackBySlug(slug string, applicationId string) (*Track, error) {
+func GetTrackBySlug(slug, applicationId string) (*Track, error) {
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -148,7 +148,7 @@ func UpdateTrack(track Track) (*Track, error) {
 	return GetTrackBySlug(track.Slug, track.ApplicationId)
 }
 
-func DeleteTrackById(id string, applicationId string) error {
+func DeleteTrackById(id, applicationId string) error {
 	db, err := database.Connect()
 	if err != nil {
 		return err

@@ -27,7 +27,7 @@ const getVersionsSelectAndJoin = `select v.id,
        v.track_id,
        v.version,
        v.upload_date,
-       '%s/' || a.slug || '/' || t.slug || '/' || v.version as url
+       '%s/content/version/' || a.slug || '/' || t.slug || '/' || v.version as url
 from version v
          join track t on t.id = v.track_id
          join application a on a.id = t.application_id
@@ -71,7 +71,7 @@ func CreateVersion(version Version) (*Version, error) {
 	return GetVersionByTrackAndVersion(version.TrackId, version.Version)
 }
 
-func GetVersionByTrackAndVersion(trackId string, versionString string) (*Version, error) {
+func GetVersionByTrackAndVersion(trackId, versionString string) (*Version, error) {
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func GetVersionByTrackAndVersion(trackId string, versionString string) (*Version
 	return version, err
 }
 
-func GetVersionById(applicationId string, trackId string, id string) (*Version, error) {
+func GetVersionById(applicationId, trackId, id string) (*Version, error) {
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func GetVersionById(applicationId string, trackId string, id string) (*Version, 
 	return version, err
 }
 
-func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
+func GetAllVersions(applicationId, trackId string) ([]Version, error) {
 	db, err := database.Connect()
 	if err != nil {
 		return nil, err
@@ -148,7 +148,7 @@ func GetAllVersions(applicationId string, trackId string) ([]Version, error) {
 	return versions, err
 }
 
-func DeleteVersionById(applicationId string, trackId string, id string) error {
+func DeleteVersionById(applicationId, trackId, id string) error {
 	db, err := database.Connect()
 	if err != nil {
 		return err
@@ -200,7 +200,7 @@ func GetVersionBySlugs(applicationSlug, trackSlug string) ([]Version, error) {
 	defer db.Close()
 	var versions []Version
 
-	err = db.Select(&versions, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where a.slug = $1 and t.slug = $2 order by v.version desc"), applicationSlug, trackSlug)
+	err = db.Select(&versions, fmt.Sprintf(getVersionsSelectAndJoin, config.LoadedConfiguration.ServerUrl, "where a.slug = $1 and t.slug = $2 order by v.version"), applicationSlug, trackSlug)
 
 	return versions, err
 }

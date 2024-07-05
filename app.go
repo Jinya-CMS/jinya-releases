@@ -10,8 +10,10 @@ import (
 	"jinya-releases/content"
 	migrator "jinya-releases/database/migrations"
 	"jinya-releases/frontend"
+	"jinya-releases/importer"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 )
@@ -118,51 +120,61 @@ func main() {
 		panic(err)
 	}
 
-	router := mux.NewRouter()
+	args := os.Args
+	if len(args) > 1 {
+		if args[1] == "import" {
+			importer.ImportFromFileSystem(args[2:])
+			return
+		} else {
+			log.Fatalf("Unknown argument '%s'", args[0])
+		}
+	} else {
+		router := mux.NewRouter()
 
-	router.PathPrefix("/openapi/admin").Handler(SpaHandler{
-		embedFS:      adminOpenapi,
-		indexPath:    "openapi/admin/index.html",
-		fsPrefixPath: "",
-		templated:    false,
-	})
-	router.PathPrefix("/openapi").Handler(SpaHandler{
-		embedFS:      openapi,
-		indexPath:    "openapi/index.html",
-		fsPrefixPath: "",
-		templated:    false,
-	})
-	router.PathPrefix("/admin/de").Handler(http.StripPrefix("/admin/de", SpaHandler{
-		embedFS:      angularAdmin,
-		indexPath:    "angular/dist/admin/browser/de/index.html",
-		fsPrefixPath: "angular/dist/admin/browser/de",
-		templated:    true,
-		templateData: config.LoadedConfiguration,
-	}))
-	router.PathPrefix("/admin/en").Handler(http.StripPrefix("/admin/en", SpaHandler{
-		embedFS:      angularAdmin,
-		indexPath:    "angular/dist/admin/browser/en/index.html",
-		fsPrefixPath: "angular/dist/admin/browser/en",
-		templated:    true,
-		templateData: config.LoadedConfiguration,
-	}))
-	router.PathPrefix("/admin").Handler(http.StripPrefix("/admin", LanguageHandler{
-		defaultLang: language.English,
-		langPathMapping: map[language.Tag]string{
-			language.English: "/admin/en",
-			language.German:  "/admin/de",
-		},
-	}))
+		router.PathPrefix("/openapi/admin").Handler(SpaHandler{
+			embedFS:      adminOpenapi,
+			indexPath:    "openapi/admin/index.html",
+			fsPrefixPath: "",
+			templated:    false,
+		})
+		router.PathPrefix("/openapi").Handler(SpaHandler{
+			embedFS:      openapi,
+			indexPath:    "openapi/index.html",
+			fsPrefixPath: "",
+			templated:    false,
+		})
+		router.PathPrefix("/admin/de").Handler(http.StripPrefix("/admin/de", SpaHandler{
+			embedFS:      angularAdmin,
+			indexPath:    "angular/dist/admin/browser/de/index.html",
+			fsPrefixPath: "angular/dist/admin/browser/de",
+			templated:    true,
+			templateData: config.LoadedConfiguration,
+		}))
+		router.PathPrefix("/admin/en").Handler(http.StripPrefix("/admin/en", SpaHandler{
+			embedFS:      angularAdmin,
+			indexPath:    "angular/dist/admin/browser/en/index.html",
+			fsPrefixPath: "angular/dist/admin/browser/en",
+			templated:    true,
+			templateData: config.LoadedConfiguration,
+		}))
+		router.PathPrefix("/admin").Handler(http.StripPrefix("/admin", LanguageHandler{
+			defaultLang: language.English,
+			langPathMapping: map[language.Tag]string{
+				language.English: "/admin/en",
+				language.German:  "/admin/de",
+			},
+		}))
 
-	router.PathPrefix("/static/").Handler(http.FileServerFS(static))
+		router.PathPrefix("/static/").Handler(http.FileServerFS(static))
 
-	api.SetupApiRouter(router)
-	content.SetupContentRouter(router)
-	frontend.SetupFrontendRouter(router)
+		api.SetupApiRouter(router)
+		content.SetupContentRouter(router)
+		frontend.SetupFrontendRouter(router)
 
-	log.Println("Serving at localhost:8090...")
-	err = http.ListenAndServe(":8090", router)
-	if err != nil {
-		panic(err)
+		log.Println("Serving at localhost:8090...")
+		err = http.ListenAndServe(":8090", router)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

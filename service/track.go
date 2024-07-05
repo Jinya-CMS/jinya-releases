@@ -54,7 +54,7 @@ func GetAllTracks(applicationId string) (tracks []models.Track, errDetails *util
 	return
 }
 
-func GetTrackById(trackId string, applicationId string) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
+func GetTrackById(trackId, applicationId string) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusOK
 	track, err := models.GetTrackById(trackId, applicationId)
 	if err != nil {
@@ -161,7 +161,7 @@ func CreateTrack(reader io.Reader, applicationId string) (track *models.Track, e
 	return
 }
 
-func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
+func UpdateTrack(trackId, applicationId string, reader io.Reader) (track *models.Track, errDetails *utils.ErrorDetails, status int) {
 	status = http.StatusNoContent
 
 	body := new(updateTrackRequest)
@@ -238,7 +238,7 @@ func UpdateTrack(trackId string, applicationId string, reader io.Reader) (track 
 	return
 }
 
-func DeleteTrack(trackId string, applicationId string) (errDetails *utils.ErrorDetails, status int) {
+func DeleteTrack(trackId, applicationId string) (errDetails *utils.ErrorDetails, status int) {
 	err := models.DeleteTrackById(trackId, applicationId)
 	status = http.StatusNoContent
 

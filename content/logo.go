@@ -1,6 +1,7 @@
 package content
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"io"
 	"jinya-releases/database/models"
@@ -17,7 +18,7 @@ func GetLogo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logo, contentType, err := storage.DownloadLogo(app.Id)
+	logo, contentType, contentLength, err := storage.DownloadLogo(app.Id)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -25,6 +26,7 @@ func GetLogo(w http.ResponseWriter, r *http.Request) {
 
 	defer logo.Close()
 
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", contentLength))
 	w.Header().Set("Content-Type", contentType)
 	_, _ = io.Copy(w, logo)
 }
