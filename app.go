@@ -126,7 +126,7 @@ func main() {
 			importer.ImportFromFileSystem(args[2:])
 			return
 		} else {
-			log.Fatalf("Unknown argument '%s'", args[0])
+			log.Fatalf("Unknown argument '%s'", args[1])
 		}
 	} else {
 		router := mux.NewRouter()
