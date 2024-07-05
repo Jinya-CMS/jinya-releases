@@ -105,7 +105,7 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 		Tracks      []models.Track
 	}{
 		Application: app,
-		Tracks:      tracks,
+		Tracks:      tracksWithVersions,
 	})
 }
 
