@@ -90,11 +90,11 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 
 	slices.SortFunc(tracksWithVersions, func(a, b models.Track) int {
 		if a.IsDefault {
-			return 1
+			return -1
 		}
 
 		if b.IsDefault {
-			return -1
+			return 1
 		}
 
 		return strings.Compare(a.Name, b.Name)
