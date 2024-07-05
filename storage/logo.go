@@ -61,6 +61,6 @@ func UploadLogo(r *http.Request) (errDetails *utils.ErrorDetails, status int) {
 	return
 }
 
-func DownloadLogo(id string) (io.ReadCloser, string, error) {
+func DownloadLogo(id string) (io.ReadCloser, string, int64, error) {
 	return GetFile(fmt.Sprintf(appLogoFormat, id))
 }

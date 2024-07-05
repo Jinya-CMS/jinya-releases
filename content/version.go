@@ -1,6 +1,8 @@
 package content
 
 import (
+	"fmt"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	"io"
 	"jinya-releases/database/models"
@@ -13,20 +15,29 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 	applicationSlug := mux.Vars(r)["applicationSlug"]
 	trackSlug := mux.Vars(r)["trackSlug"]
 
+	app, err := models.GetApplicationBySlug(applicationSlug)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
 	version, err := models.GetVersionBySlugsAndNumber(applicationSlug, trackSlug, versionNumber)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	logo, contentType, err := storage.DownloadVersion(version.ApplicationId, version.TrackId, version.Id)
+	v, contentType, contentLength, err := storage.DownloadVersion(version.ApplicationId, version.TrackId, version.Id)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	defer logo.Close()
+	defer v.Close()
 
+	mime := mimetype.Lookup(contentType)
 	w.Header().Set("Content-Type", contentType)
-	_, _ = io.Copy(w, logo)
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", contentLength))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s %s.%s"`, app.Name, version.Version, mime.Extension()))
+	_, _ = io.Copy(w, v)
 }

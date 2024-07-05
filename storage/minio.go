@@ -32,23 +32,23 @@ func SaveFile(path string, reader io.Reader, size int64, contentType string) err
 	return err
 }
 
-func GetFile(path string) (io.ReadCloser, string, error) {
+func GetFile(path string) (io.ReadCloser, string, int64, error) {
 	client, err := getMinioClient()
 	if err != nil {
-		return nil, "", err
+		return nil, "", 0, err
 	}
 
 	object, err := client.GetObject(context.Background(), config.LoadedConfiguration.StorageBucket, path, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, "", err
+		return nil, "", 0, err
 	}
 
 	objectStat, err := object.Stat()
 	if err != nil {
-		return nil, "", err
+		return nil, "", 0, err
 	}
 
-	return object, objectStat.ContentType, nil
+	return object, objectStat.ContentType, objectStat.Size, nil
 }
 
 func DeleteFile(path string) error {
