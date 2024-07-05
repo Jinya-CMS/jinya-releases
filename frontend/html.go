@@ -7,6 +7,8 @@ import (
 	"jinya-releases/database/models"
 	"log"
 	"net/http"
+	"slices"
+	"strings"
 	"time"
 )
 
@@ -75,6 +77,28 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/"+applicationSlug+"/"+tracks[0].Slug, http.StatusSeeOther)
 		return
 	}
+
+	tracksWithVersions := make([]models.Track, 0)
+	for _, track := range tracks {
+		versions, err := models.GetAllVersions(track.ApplicationId, track.Id)
+		if err != nil || len(versions) == 0 {
+			continue
+		}
+
+		tracksWithVersions = append(tracksWithVersions, track)
+	}
+
+	slices.SortFunc(tracksWithVersions, func(a, b models.Track) int {
+		if a.IsDefault {
+			return 1
+		}
+
+		if b.IsDefault {
+			return -1
+		}
+
+		return strings.Compare(a.Name, b.Name)
+	})
 
 	render(w, "application", struct {
 		Application *models.Application
