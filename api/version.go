@@ -54,7 +54,7 @@ func deleteVersion(w http.ResponseWriter, r *http.Request) {
 func pushVersion(w http.ResponseWriter, r *http.Request) {
 	applicationSlug := mux.Vars(r)["applicationSlug"]
 	trackSlug := mux.Vars(r)["trackSlug"]
-	versionNumber := mux.Vars(r)["version"]
+	versionNumber := mux.Vars(r)["versionNumber"]
 	encoder := json.NewEncoder(w)
 	errDetails, status := service.PushVersion(r, applicationSlug, trackSlug, versionNumber)
 	if errDetails != nil {
