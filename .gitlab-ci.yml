@@ -13,7 +13,7 @@ lint-angular:
     ANGULAR_DIR: $CI_PROJECT_DIR/angular
   script:
     - cd $ANGULAR_DIR
-    - npm install
+    - npm install -f
     - npm run lint
 
 build-angular:
@@ -23,7 +23,7 @@ build-angular:
     ANGULAR_DIR: $CI_PROJECT_DIR/angular
   script:
     - cd $ANGULAR_DIR
-    - npm install
+    - npm install -f
     - npm run build
   artifacts:
     paths:
