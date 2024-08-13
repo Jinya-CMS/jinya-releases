@@ -11,10 +11,10 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/minio/minio-go/v7 v7.0.74
+	github.com/minio/minio-go/v7 v7.0.75
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	github.com/zitadel/oidc/v3 v3.26.1
-	github.com/zitadel/zitadel-go/v3 v3.0.0-next.3
+	github.com/zitadel/oidc/v3 v3.27.0
+	github.com/zitadel/zitadel-go/v3 v3.0.0
 	go-simpler.org/env v0.12.0
 	golang.org/x/text v0.17.0
 )
@@ -45,8 +45,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.28.0 // indirect
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
+	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 )
