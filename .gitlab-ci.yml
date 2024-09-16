@@ -30,13 +30,13 @@ build-angular:
       - $ANGULAR_DIR/dist
 
 lint:
-  image: library/golang:1.22-alpine
+  image: library/golang:1.23-alpine
   stage: lint-golang
   script:
     - go vet .
 
 build:
-  image: library/golang:1.22-alpine
+  image: library/golang:1.23-alpine
   stage: build-golang
   script:
     - go build -o $CI_PROJECT_DIR/jinya-releases
