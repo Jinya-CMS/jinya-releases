@@ -199,6 +199,8 @@ github.com/zitadel/oidc/v3 v3.27.0 h1:zeYpyRH0UcgdCjVHUYzSsqf1jbSwVMPVxYKOnRXstg
 github.com/zitadel/oidc/v3 v3.27.0/go.mod h1:ZwBEqSviCpJVZiYashzo53bEGRGXi7amE5Q8PpQg9IM=
 github.com/zitadel/oidc/v3 v3.29.1 h1:zriEqPK+q/G2qo911tTgh7lnzwowzOUWduWYHVDfaq8=
 github.com/zitadel/oidc/v3 v3.29.1/go.mod h1:+I5BgvGO5C2ZJrQRjV34EjkyA7P3GXyYGZgXI8Sdw18=
+github.com/zitadel/oidc/v3 v3.30.0 h1:1IuZlK+X+JLExEA2PYgRlVvWHBhz/cMwT7VL/YrQabw=
+github.com/zitadel/oidc/v3 v3.30.0/go.mod h1:+I5BgvGO5C2ZJrQRjV34EjkyA7P3GXyYGZgXI8Sdw18=
 github.com/zitadel/schema v1.3.0 h1:kQ9W9tvIwZICCKWcMvCEweXET1OcOyGEuFbHs4o5kg0=
 github.com/zitadel/schema v1.3.0/go.mod h1:NptN6mkBDFvERUCvZHlvWmmME+gmZ44xzwRXwhzsbtc=
 github.com/zitadel/zitadel-go/v3 v3.0.0-next.3 h1:c/5d0nx8My4jpLZiIcajEw4TVp7BWfEzDxMtYQ1+IRI=
