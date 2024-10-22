@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { AppComponent } from './app.component';
 import { NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
@@ -37,6 +37,6 @@ import { TracksModule } from './tracks/tracks.module';
     )
   ],
   bootstrap: [AppComponent],
-  providers: [provideHttpClient()]
+  providers: [provideExperimentalZonelessChangeDetection(), provideHttpClient()]
 })
 export class AppModule {}

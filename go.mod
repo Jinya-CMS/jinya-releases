@@ -13,7 +13,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/minio/minio-go/v7 v7.0.78
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	github.com/zitadel/oidc/v3 v3.30.1
+	github.com/zitadel/oidc/v3 v3.31.0
 	github.com/zitadel/zitadel-go/v3 v3.2.0
 	go-simpler.org/env v0.12.0
 	golang.org/x/text v0.19.0

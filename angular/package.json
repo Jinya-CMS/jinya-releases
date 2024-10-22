@@ -18,7 +18,7 @@
   },
   "private": true,
   "dependencies": {
-     "@angular/animations": "18.2.8",
+    "@angular/animations": "18.2.8",
     "@angular/common": "18.2.8",
     "@angular/compiler": "18.2.8",
     "@angular/core": "18.2.8",
@@ -34,19 +34,18 @@
     "angular-oauth2-oidc": "17.0.2",
     "lucide-angular": "0.453.0",
     "rxjs": "7.8.1",
-    "tslib": "2.8.0",
-    "zone.js": "0.15.0"
+    "tslib": "2.8.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "18.2.9",
-    "@angular-eslint/builder": "18.3.1",
+    "@angular-eslint/builder": "18.4.0",
     "@angular/cli": "18.2.9",
     "@angular/compiler-cli": "18.2.8",
     "@eslint/js": "9.13.0",
-    "angular-eslint": "18.3.1",
+    "angular-eslint": "18.4.0",
     "eslint": "9.13.0",
     "prettier": "3.3.3",
-    "typescript": "5.6.3",
-    "typescript-eslint": "8.10.0"
+    "typescript": "5.4.5",
+    "typescript-eslint": "8.11.0"
   }
 }
