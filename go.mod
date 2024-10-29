@@ -11,10 +11,10 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/minio/minio-go/v7 v7.0.78
+	github.com/minio/minio-go/v7 v7.0.80
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/zitadel/oidc/v3 v3.31.0
-	github.com/zitadel/zitadel-go/v3 v3.2.0
+	github.com/zitadel/zitadel-go/v3 v3.2.1
 	go-simpler.org/env v0.12.0
 	golang.org/x/text v0.19.0
 )

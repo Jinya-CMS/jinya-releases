@@ -156,6 +156,8 @@ github.com/minio/minio-go/v7 v7.0.77 h1:GaGghJRg9nwDVlNbwYjSDJT1rqltQkBFDsypWX1v
 github.com/minio/minio-go/v7 v7.0.77/go.mod h1:AVM3IUN6WwKzmwBxVdjzhH8xq+f57JSbbvzqvUzR6eg=
 github.com/minio/minio-go/v7 v7.0.78 h1:LqW2zy52fxnI4gg8C2oZviTaKHcBV36scS+RzJnxUFs=
 github.com/minio/minio-go/v7 v7.0.78/go.mod h1:84gmIilaX4zcvAWWzJ5Z1WI5axN+hAbM5w25xf8xvC0=
+github.com/minio/minio-go/v7 v7.0.80 h1:2mdUHXEykRdY/BigLt3Iuu1otL0JTogT0Nmltg0wujk=
+github.com/minio/minio-go/v7 v7.0.80/go.mod h1:84gmIilaX4zcvAWWzJ5Z1WI5axN+hAbM5w25xf8xvC0=
 github.com/muhlemmer/gu v0.3.1 h1:7EAqmFrW7n3hETvuAdmFmn4hS8W+z3LgKtrnow+YzNM=
 github.com/muhlemmer/gu v0.3.1/go.mod h1:YHtHR+gxM+bKEIIs7Hmi9sPT3ZDUvTN/i88wQpZkrdM=
 github.com/muhlemmer/httpforwarded v0.1.0 h1:x4DLrzXdliq8mprgUMR0olDvHGkou5BJsK/vWUetyzY=
@@ -231,6 +233,8 @@ github.com/zitadel/zitadel-go/v3 v3.1.2 h1:E3I1sKaBayfZaDXs8EVObKxSnHR05ELj4hDl8
 github.com/zitadel/zitadel-go/v3 v3.1.2/go.mod h1:fq3hK8wsz3gpoyj8FaqyQ/OqiNGMy0cYQPb63cJxNPU=
 github.com/zitadel/zitadel-go/v3 v3.2.0 h1:w5AI++CNPrNuBEs9Ad13qRFVuzcCMLB1B9q9e5tqpDc=
 github.com/zitadel/zitadel-go/v3 v3.2.0/go.mod h1:fq3hK8wsz3gpoyj8FaqyQ/OqiNGMy0cYQPb63cJxNPU=
+github.com/zitadel/zitadel-go/v3 v3.2.1 h1:jOO1X/g5vLQgNsNibInAea/XEyLjM0D/akvq2zKUt6k=
+github.com/zitadel/zitadel-go/v3 v3.2.1/go.mod h1:fq3hK8wsz3gpoyj8FaqyQ/OqiNGMy0cYQPb63cJxNPU=
 go-simpler.org/env v0.12.0 h1:kt/lBts0J1kjWJAnB740goNdvwNxt5emhYngL0Fzufs=
 go-simpler.org/env v0.12.0/go.mod h1:cc/5Md9JCUM7LVLtN0HYjPTDcI3Q8TDaPlNTAlDU+WI=
 go.opentelemetry.io/otel v1.28.0 h1:/SqNcYk+idO0CxKEUOtKQClMK/MimZihKYMruSMViUo=
