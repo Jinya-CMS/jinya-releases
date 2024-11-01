@@ -6,15 +6,16 @@ import (
 )
 
 type Configuration struct {
-	PostgresUrl       string `env:"DATABASE_URL"`
-	OpenIDClientId    string `env:"OPENID_CLIENT_ID"`
-	OpenIDDomain      string `env:"OPENID_DOMAIN"`
-	OpenIDKeyFileData string `env:"OPENID_KEY_FILE_DATA"`
-	ServerUrl         string `env:"SERVER_URL"`
-	StorageSecretKey  string `env:"STORAGE_SECRET_KEY"`
-	StorageAccessKey  string `env:"STORAGE_ACCESS_KEY"`
-	StorageBucket     string `env:"STORAGE_BUCKET"`
-	StorageUrl        string `env:"STORAGE_URL"`
+	PostgresUrl            string `env:"DATABASE_URL"`
+	OidcFrontendClientId   string `env:"OIDC_FRONTEND_CLIENT_ID"`
+	OidcDomain             string `env:"OIDC_DOMAIN"`
+	OidcServerClientId     string `env:"OIDC_SERVER_CLIENT_ID"`
+	OidcServerClientSecret string `env:"OIDC_SERVER_CLIENT_SECRET"`
+	ServerUrl              string `env:"SERVER_URL"`
+	StorageSecretKey       string `env:"STORAGE_SECRET_KEY"`
+	StorageAccessKey       string `env:"STORAGE_ACCESS_KEY"`
+	StorageBucket          string `env:"STORAGE_BUCKET"`
+	StorageUrl             string `env:"STORAGE_URL"`
 }
 
 func (c Configuration) GetRedirectUrl() string {
