@@ -4,7 +4,8 @@ import { Application, ApplicationService } from 'api';
 
 @Component({
   selector: 'app-add-application-dialog',
-  templateUrl: './add-application-dialog.component.html'
+  templateUrl: './add-application-dialog.component.html',
+  standalone: false
 })
 export class AddApplicationDialogComponent {
   createApplicationForm = new FormGroup({

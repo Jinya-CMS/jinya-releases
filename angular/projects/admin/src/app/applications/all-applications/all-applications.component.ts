@@ -13,7 +13,8 @@ enum ActiveTab {
 @Component({
   selector: 'app-all-applications',
   templateUrl: './all-applications.component.html',
-  styleUrl: 'all-applications.component.scss'
+  styleUrl: 'all-applications.component.scss',
+  standalone: false
 })
 export class AllApplicationsComponent implements OnInit {
   @Input() id?: string;

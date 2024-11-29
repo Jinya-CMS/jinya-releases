@@ -4,7 +4,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-upload-version-dialog',
-  templateUrl: './upload-version-dialog.component.html'
+  templateUrl: './upload-version-dialog.component.html',
+  standalone: false
 })
 export class UploadVersionDialogComponent {
   @Input() application!: Application;

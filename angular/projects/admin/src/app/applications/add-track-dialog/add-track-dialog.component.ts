@@ -4,7 +4,8 @@ import { Application, Track, TrackService } from 'api';
 
 @Component({
   selector: 'app-add-track-dialog',
-  templateUrl: './add-track-dialog.component.html'
+  templateUrl: './add-track-dialog.component.html',
+  standalone: false
 })
 export class AddTrackDialogComponent {
   createTrackForm = new FormGroup({

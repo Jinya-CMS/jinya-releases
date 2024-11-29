@@ -4,7 +4,8 @@ import { Application, Track, TrackService } from 'api';
 
 @Component({
   selector: 'app-edit-track-dialog',
-  templateUrl: './edit-track-dialog.component.html'
+  templateUrl: './edit-track-dialog.component.html',
+  standalone: false
 })
 export class EditTrackDialogComponent {
   editTrackForm = new FormGroup({

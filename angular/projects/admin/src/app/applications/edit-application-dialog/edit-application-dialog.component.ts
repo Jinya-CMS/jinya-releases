@@ -4,7 +4,8 @@ import { Application, ApplicationService } from 'api';
 
 @Component({
   selector: 'app-edit-application-dialog',
-  templateUrl: './edit-application-dialog.component.html'
+  templateUrl: './edit-application-dialog.component.html',
+  standalone: false
 })
 export class EditApplicationDialogComponent {
   editApplicationForm = new FormGroup({

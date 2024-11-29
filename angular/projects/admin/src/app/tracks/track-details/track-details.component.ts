@@ -7,7 +7,8 @@ import { UploadVersionDialogComponent } from '../upload-version-dialog/upload-ve
 
 @Component({
   selector: 'app-track-details',
-  templateUrl: './track-details.component.html'
+  templateUrl: './track-details.component.html',
+  standalone: false
 })
 export class TrackDetailsComponent implements OnInit {
   versions!: Version[];
