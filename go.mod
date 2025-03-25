@@ -1,6 +1,8 @@
 module jinya-releases
 
-go 1.23.0
+go 1.23.7
+
+toolchain go1.24.1
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.8
@@ -13,7 +15,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/minio/minio-go/v7 v7.0.88
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	github.com/zitadel/zitadel-go/v3 v3.4.3
+	github.com/zitadel/zitadel-go/v3 v3.5.0
 	go-simpler.org/env v0.12.0
 	golang.org/x/text v0.23.0
 )
@@ -39,9 +41,9 @@ require (
 	github.com/muhlemmer/gu v0.3.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/zitadel/logging v0.6.1 // indirect
-	github.com/zitadel/oidc/v3 v3.36.0 // indirect
-	github.com/zitadel/schema v1.3.0 // indirect
+	github.com/zitadel/logging v0.6.2 // indirect
+	github.com/zitadel/oidc/v3 v3.37.0 // indirect
+	github.com/zitadel/schema v1.3.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
