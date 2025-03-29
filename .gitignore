@@ -93,3 +93,4 @@ fabric.properties
 /auth.lock
 /cms
 var
+node_modules
