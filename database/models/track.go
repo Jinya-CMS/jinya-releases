@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"errors"
 	"jinya-releases/database"
 )
@@ -17,6 +18,12 @@ var (
 	ErrTrackNotFound = errors.New("track not found")
 )
 
+func resetDefault(db *sql.Tx) error {
+	_, err := db.Exec("UPDATE track SET is_default = false WHERE is_default = true")
+
+	return err
+}
+
 func CreateTrack(track Track) (*Track, error) {
 	if track.Name == "" {
 		return nil, ErrNameEmpty
@@ -30,10 +37,29 @@ func CreateTrack(track Track) (*Track, error) {
 		return nil, err
 	}
 
+	tx, err := db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
 	defer db.Close()
+
+	if track.IsDefault {
+		err = resetDefault(tx)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
 
 	_, err = db.Exec("INSERT INTO track (application_id, name, slug, is_default) VALUES ($1, $2, $3, $4)", track.ApplicationId, track.Name, track.Slug, track.IsDefault)
 
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}
@@ -131,18 +157,39 @@ func UpdateTrack(track Track) (*Track, error) {
 
 	defer db.Close()
 
-	result, err := db.Exec("UPDATE track SET name = $1, slug = $2, is_default = $3 WHERE id = $4 AND application_id = $5", track.Name, track.Slug, track.IsDefault, track.Id, track.ApplicationId)
+	tx, err := db.Begin()
 	if err != nil {
+		return nil, err
+	}
+
+	if track.IsDefault {
+		err = resetDefault(tx)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	result, err := tx.Exec("UPDATE track SET name = $1, slug = $2, is_default = $3 WHERE id = $4 AND application_id = $5", track.Name, track.Slug, track.IsDefault, track.Id, track.ApplicationId)
+	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
 	affected, err := result.RowsAffected()
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
 	if affected == 0 {
+		tx.Rollback()
 		return nil, ErrTrackNotFound
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
 	}
 
 	return GetTrackBySlug(track.Slug, track.ApplicationId)

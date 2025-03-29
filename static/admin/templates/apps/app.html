@@ -1,0 +1,308 @@
+<div x-data="appsData">
+  <template x-if="loading">
+    <jinya-loader />
+  </template>
+  <template x-if="!loading">
+    <div class="cosmo-side-list">
+      <nav class="cosmo-side-list__items">
+        <template x-for="app in apps" :key="app.id">
+          <a
+            class="cosmo-side-list__item"
+            @click="selectApp(app)"
+            :class="{ 'is--active': selectedApp?.id === app.id }"
+            x-text="app.name"
+          >
+          </a>
+        </template>
+        <button class="cosmo-button is--full-width" x-localize:new-application="" @click="openCreateApplication">
+          New app
+        </button>
+      </nav>
+      <template x-if="selectedApp">
+        <div class="cosmo-side-list__content">
+          <span class="cosmo-title" x-text="selectedApp.name"></span>
+          <div class="cosmo-toolbar">
+            <div class="cosmo-toolbar__group">
+              <button class="cosmo-button" @click="openEditApplication" x-localize:edit-application=""></button>
+              <button
+                class="cosmo-button"
+                @click="deleteApplication"
+                x-localize:delete-application=""
+                :disabled="tracks.length > 0"
+              ></button>
+            </div>
+            <div class="cosmo-toolbar__group">
+              <button class="cosmo-button" @click="openCreateTrack" x-localize:create-track=""></button>
+            </div>
+            <div class="cosmo-toolbar__group">
+              <button class="cosmo-button" @click="createPushToken" x-localize:create-push-token=""></button>
+              <button class="cosmo-button" @click="resetPushTokens" x-localize:reset-push-token=""></button>
+            </div>
+          </div>
+          <div class="cosmo-tab">
+            <nav class="cosmo-tab__links">
+              <a
+                class="cosmo-tab__link"
+                :class="{ 'is--active': activeTab === 'details' }"
+                @click="activeTab = 'details'"
+                x-localize:application-details=""
+              ></a>
+              <a
+                class="cosmo-tab__link"
+                :class="{ 'is--active': activeTab === 'tracks' }"
+                @click="activeTab = 'tracks'"
+                x-localize:application-tracks=""
+              ></a>
+            </nav>
+            <div class="cosmo-tab__content">
+              <template x-if="activeTab === 'details'">
+                <dl class="cosmo-list is--key-value">
+                  <dt>#</dt>
+                  <dd x-text="selectedApp.id"></dd>
+                  <dt x-localize:application-name-label=""></dt>
+                  <dd x-text="selectedApp.name"></dd>
+                  <dt x-localize:application-slug-label=""></dt>
+                  <dd x-text="selectedApp.slug"></dd>
+                  <dt i18n="@@application-link-label">Link</dt>
+                  <dd>
+                    <a target="_blank" :href="'/' + selectedApp.slug" x-text="activeLink"></a>
+                  </dd>
+                </dl>
+              </template>
+              <template x-if="activeTab === 'tracks' && tracks.length === 0">
+                <div class="cosmo-message is--information">
+                  <span class="cosmo-message__header" x-localize:no-tracks-exist-title=""></span>
+                  <p class="cosmo-message__message" x-localize:no-tracks-exist-message=""></p>
+                  <div class="cosmo-button__container">
+                    <button
+                      class="cosmo-button is--information"
+                      x-localize:new-track=""
+                      @click="openCreateTrack"
+                    ></button>
+                  </div>
+                </div>
+              </template>
+              <template x-if="activeTab === 'tracks' && tracks.length > 0">
+                <table class="cosmo-table">
+                  <thead>
+                  <tr>
+                    <th>#</th>
+                    <th x-localize:application-track-name=""></th>
+                    <th x-localize:application-track-slug=""></th>
+                    <th x-localize:application-track-default=""></th>
+                    <th x-localize:application-track-link=""></th>
+                    <th x-localize:application-track-actions=""></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <template x-for="track in tracks" :key="track.id">
+                    <tr>
+                      <td x-text="track.id"></td>
+                      <td x-text="track.name"></td>
+                      <td x-text="track.slug"></td>
+                      <td style="text-align: center">
+                        <template x-if="track.isDefault">
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="var(--positive-color)"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M21.801 10A10 10 0 1 1 17 3.335" />
+                            <path d="m9 11 3 3L22 4" />
+                          </svg>
+                        </template>
+                        <template x-if="!track.isDefault">
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="var(--negative-color)"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="m15 9-6 6" />
+                            <path d="m9 9 6 6" />
+                          </svg>
+                        </template>
+                      </td>
+                      <td>
+                        <a
+                          target="_blank"
+                          :href="'/' + selectedApp.slug + '/' + track.slug"
+                          x-text="getTrackLink(track)"
+                        ></a>
+                      </td>
+                      <td>
+                        <div class="cosmo-toolbar">
+                          <div class="cosmo-toolbar__group">
+                            <a
+                              :href="'/apps/track?app=' + selectedApp.id + '&track=' + track.id"
+                              class="cosmo-button is--small"
+                              x-localize:application-track-details=""
+                            >
+                            </a>
+                          </div>
+                          <div class="cosmo-toolbar__group">
+                            <button
+                              class="cosmo-button is--small"
+                              x-localize:application-track-edit=""
+                              @click="openEditTrack(track)"
+                            ></button>
+                            <button
+                              class="cosmo-button is--small"
+                              x-localize:application-track-delete=""
+                              :disabled="trackHasVersions.has(track.id)"
+                              @click="deleteTrack(track)"
+                            ></button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+  <template x-if="createApp.open">
+    <div class="cosmo-modal__container">
+      <form class="cosmo-modal" @submit.prevent="createApplication">
+        <h1 class="cosmo-modal__title" x-localize:create-application-title=""></h1>
+        <div class="cosmo-modal__content">
+          <div class="cosmo-message is--negative" x-show="createApp.hasError">
+            <span class="cosmo-message__header" x-localize:create-application-exists-title=""></span>
+            <p class="cosmo-message__message" x-localize:create-application-exists-message=""></p>
+          </div>
+          <div class="cosmo-input__group">
+            <label for="add-app-name" class="cosmo-label" x-localize:application-name-label=""></label>
+            <input x-model="createApp.name" type="text" class="cosmo-input" required id="add-app-name" />
+            <label for="add-app-slug" class="cosmo-label" x-localize:application-slug-label=""></label>
+            <input x-model="createApp.slug" type="text" class="cosmo-input" required id="add-app-slug" />
+          </div>
+        </div>
+        <div class="cosmo-modal__button-bar">
+          <button class="cosmo-button" @click="createApp.open = false" x-localize:cancel=""></button>
+          <button class="cosmo-button" type="submit" x-localize:create-application=""></button>
+        </div>
+      </form>
+    </div>
+  </template>
+  <template x-if="editApp.open">
+    <div class="cosmo-modal__container">
+      <form class="cosmo-modal" @submit.prevent="editApplication">
+        <h1 class="cosmo-modal__title" x-localize:edit-application-title=""></h1>
+        <div class="cosmo-modal__content">
+          <div class="cosmo-message is--negative" x-show="editApp.hasError">
+            <span class="cosmo-message__header" x-localize:edit-application-exists-title=""></span>
+            <p class="cosmo-message__message" x-localize:edit-application-exists-message=""></p>
+          </div>
+          <div class="cosmo-input__group">
+            <label for="edit-app-name" class="cosmo-label" x-localize:application-name-label=""></label>
+            <input x-model="editApp.name" type="text" class="cosmo-input" required id="edit-app-name" />
+            <label for="edit-app-slug" class="cosmo-label" x-localize:application-slug-label=""></label>
+            <input x-model="editApp.slug" type="text" class="cosmo-input" required id="edit-app-slug" />
+          </div>
+        </div>
+        <div class="cosmo-modal__button-bar">
+          <button class="cosmo-button" @click="editApp.open = false" x-localize:cancel=""></button>
+          <button class="cosmo-button" type="submit" x-localize:save-application=""></button>
+        </div>
+      </form>
+    </div>
+  </template>
+  <template x-if="createTrackData.open">
+    <div class="cosmo-modal__container">
+      <form class="cosmo-modal" @submit.prevent="createTrack">
+        <h1 class="cosmo-modal__title" x-localize:create-track-title=""></h1>
+        <div class="cosmo-modal__content">
+          <div class="cosmo-message is--negative" x-show="createTrackData.hasError">
+            <span class="cosmo-message__header" x-localize:create-track-exists-title=""></span>
+            <p class="cosmo-message__message" x-localize:create-track-exists-message=""></p>
+          </div>
+          <div class="cosmo-input__group">
+            <label for="add-track-name" class="cosmo-label" x-localize:track-name-label=""></label>
+            <input x-model="createTrackData.name" type="text" class="cosmo-input" required id="add-track-name" />
+            <label for="add-track-slug" class="cosmo-label" x-localize:track-slug-label=""></label>
+            <input x-model="createTrackData.slug" type="text" class="cosmo-input" required id="add-track-slug" />
+            <div class="cosmo-input__group is--switch">
+              <input
+                type="checkbox"
+                class="cosmo-switch"
+                x-model="createTrackData.isDefault"
+                id="add-track-isDefault"
+              />
+              <label class="cosmo-label" x-localize:track-default-label="" for="add-track-isDefault"></label>
+            </div>
+          </div>
+        </div>
+        <div class="cosmo-modal__button-bar">
+          <button class="cosmo-button" @click="createTrackData.open = false" x-localize:cancel=""></button>
+          <button class="cosmo-button" type="submit" x-localize:create-track=""></button>
+        </div>
+      </form>
+    </div>
+  </template>
+  <template x-if="editTrackData.open">
+    <div class="cosmo-modal__container">
+      <form class="cosmo-modal" @submit.prevent="editTrack">
+        <h1 class="cosmo-modal__title" x-localize:edit-track-title=""></h1>
+        <div class="cosmo-modal__content">
+          <div class="cosmo-message is--negative" x-show="editTrackData.hasError">
+            <span class="cosmo-message__header" x-localize:update-track-exists-title=""></span>
+            <p class="cosmo-message__message" x-localize:update-track-exists-message=""></p>
+          </div>
+          <div class="cosmo-input__group">
+            <label for="edit-track-name" class="cosmo-label" x-localize:track-name-label=""></label>
+            <input x-model="editTrackData.name" type="text" class="cosmo-input" required id="edit-track-name" />
+            <label for="edit-track-slug" class="cosmo-label" x-localize:track-slug-label=""></label>
+            <input x-model="editTrackData.slug" type="text" class="cosmo-input" required id="edit-track-slug" />
+            <div class="cosmo-input__group is--switch">
+              <input type="checkbox" class="cosmo-switch" x-model="editTrackData.isDefault" id="edit-track-isDefault" />
+              <label class="cosmo-label" x-localize:track-default-label="" for="edit-track-isDefault"></label>
+            </div>
+          </div>
+        </div>
+        <div class="cosmo-modal__button-bar">
+          <button class="cosmo-button" @click="editTrackData.open = false" x-localize:cancel=""></button>
+          <button class="cosmo-button" type="submit" x-localize:update-track=""></button>
+        </div>
+      </form>
+    </div>
+  </template>
+  <template x-if="displayPushToken.open">
+    <div class="cosmo-modal__container">
+      <div class="cosmo-modal" :class="{ 'is--warning': !displayPushToken.copied }">
+        <h1 class="cosmo-modal__title" x-localize:new-token-title=""></h1>
+        <div class="cosmo-modal__content">
+          <p x-localize:new-token-message></p>
+          <p class="jinya-token">
+            <kbd x-text="displayPushToken.token"></kbd>
+          </p>
+          <p x-show="displayPushToken.copied" x-localize:new-token-copied></p>
+        </div>
+        <div class="cosmo-modal__button-bar">
+          <button class="cosmo-button" type="button" x-localize:new-token-copy="" @click="copyToken"></button>
+          <button
+            :disabled="!displayPushToken.copied"
+            class="cosmo-button"
+            type="button"
+            x-localize:new-token-close=""
+            @click="displayPushToken.open = false"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </template>
+</div>
