@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/text/language"
 	"html/template"
+	"jinya-releases/admin"
 	"jinya-releases/api"
 	"jinya-releases/config"
 	"jinya-releases/content"
@@ -25,8 +26,6 @@ var (
 	openapi embed.FS
 	//go:embed static
 	static embed.FS
-	//go:embed angular/dist/admin/browser
-	angularAdmin embed.FS
 )
 
 type SpaHandler struct {
@@ -137,36 +136,31 @@ func main() {
 			fsPrefixPath: "",
 			templated:    false,
 		})
-		router.PathPrefix("/openapi").Handler(SpaHandler{
-			embedFS:      openapi,
-			indexPath:    "openapi/index.html",
-			fsPrefixPath: "",
-			templated:    false,
-		})
-		router.PathPrefix("/admin/de").Handler(http.StripPrefix("/admin/de", SpaHandler{
-			embedFS:      angularAdmin,
-			indexPath:    "angular/dist/admin/browser/de/index.html",
-			fsPrefixPath: "angular/dist/admin/browser/de",
-			templated:    true,
-			templateData: config.LoadedConfiguration,
-		}))
-		router.PathPrefix("/admin/en").Handler(http.StripPrefix("/admin/en", SpaHandler{
-			embedFS:      angularAdmin,
-			indexPath:    "angular/dist/admin/browser/en/index.html",
-			fsPrefixPath: "angular/dist/admin/browser/en",
-			templated:    true,
-			templateData: config.LoadedConfiguration,
-		}))
-		router.PathPrefix("/admin").Handler(http.StripPrefix("/admin", LanguageHandler{
-			defaultLang: language.English,
-			langPathMapping: map[language.Tag]string{
-				language.English: "/admin/en",
-				language.German:  "/admin/de",
-			},
-		}))
+		//router.PathPrefix("/admin/de").Handler(http.StripPrefix("/admin/de", SpaHandler{
+		//	embedFS:      angularAdmin,
+		//	indexPath:    "angular/dist/admin/browser/de/index.html",
+		//	fsPrefixPath: "angular/dist/admin/browser/de",
+		//	templated:    true,
+		//	templateData: config.LoadedConfiguration,
+		//}))
+		//router.PathPrefix("/admin/en").Handler(http.StripPrefix("/admin/en", SpaHandler{
+		//	embedFS:      angularAdmin,
+		//	indexPath:    "angular/dist/admin/browser/en/index.html",
+		//	fsPrefixPath: "angular/dist/admin/browser/en",
+		//	templated:    true,
+		//	templateData: config.LoadedConfiguration,
+		//}))
+		//router.PathPrefix("/admin").Handler(http.StripPrefix("/admin", LanguageHandler{
+		//	defaultLang: language.English,
+		//	langPathMapping: map[language.Tag]string{
+		//		language.English: "/admin/en",
+		//		language.German:  "/admin/de",
+		//	},
+		//}))
 
 		router.PathPrefix("/static/").Handler(http.FileServerFS(static))
 
+		admin.SetupRouter(router)
 		api.SetupApiRouter(router)
 		content.SetupContentRouter(router)
 		frontend.SetupFrontendRouter(router)

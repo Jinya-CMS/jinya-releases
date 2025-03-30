@@ -1,44 +1,21 @@
 stages:
-  - lint-angular
-  - build-angular
-  - lint-golang
+  - lint
   - test
-  - build-golang
+  - build
   - deploy
 
-lint-angular:
+lint:
   image: library/node:latest
-  stage: lint-angular
-  variables:
-    ANGULAR_DIR: $CI_PROJECT_DIR/angular
+  stage: lint
   script:
-    - cd $ANGULAR_DIR
     - npm install -f
     - npm run lint
 
-build-angular:
-  image: library/node:latest
-  stage: build-angular
-  variables:
-    ANGULAR_DIR: $CI_PROJECT_DIR/angular
-  script:
-    - cd $ANGULAR_DIR
-    - npm install -f
-    - npm run build
-  artifacts:
-    paths:
-      - $ANGULAR_DIR/dist
-
-lint:
-  image: library/golang:1.23-alpine
-  stage: lint-golang
+build:
+  image: library/golang:1.24-alpine
+  stage: build
   script:
     - go vet .
-
-build:
-  image: library/golang:1.23-alpine
-  stage: build-golang
-  script:
     - go build -o $CI_PROJECT_DIR/$ARCH/jinya-releases
   artifacts:
     paths:

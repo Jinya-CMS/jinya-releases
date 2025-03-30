@@ -1,0 +1,86 @@
+<div x-data="trackData">
+  <template x-if="loading">
+    <jinya-loader />
+  </template>
+  <template x-if="!loading">
+    <div>
+      <div class="cosmo-title">
+        <span x-text="application.name"></span>
+        <small x-text="track.name"></small> – <span x-localize:track-details-version-title=""></span>
+      </div>
+      <div class="cosmo-toolbar">
+        <div class="cosmo-toolbar__group">
+          <button class="cosmo-button" @click="openUploadVersion" x-localize:track-details-version-new=""></button>
+        </div>
+      </div>
+      <div class="jinya-versions">
+        <table class="cosmo-table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th x-localize:track-details-version-number="">Version</th>
+              <th x-localize:track-details-version-upload-date="">Upload date</th>
+              <th x-localize:track-details-version-download-link="">Download link</th>
+              <th x-localize:track-details-version-actions="">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="version in versions">
+              <tr>
+                <td x-text="version.id"></td>
+                <td x-text="version.version"></td>
+                <td x-text="toDateString(version.uploadDate)"></td>
+                <td>
+                  <a target="_blank" :href="version.url" x-text="version.url"></a>
+                </td>
+                <td>
+                  <div class="cosmo-toolbar__group">
+                    <button
+                      class="cosmo-button is--small"
+                      x-localize:track-details-version-delete=""
+                      @click="deleteVersion(version)"
+                    ></button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+  <template x-if="uploadVersionData.open">
+    <div class="cosmo-modal__container">
+      <form class="cosmo-modal" @submit.prevent="uploadVersion">
+        <h1 class="cosmo-modal__title" x-localize:upload-version-title=""></h1>
+        <div class="cosmo-modal__content">
+          <div class="cosmo-message is--negative" x-show="uploadVersionData.hasError">
+            <span class="cosmo-message__header" x-localize:upload-version-error-title=""></span>
+            <p class="cosmo-message__message" x-localize:upload-version-error-message=""></p>
+          </div>
+          <div class="cosmo-input__group">
+            <label for="upload-version-number" class="cosmo-label" x-localize:version-number-label=""></label>
+            <input
+              x-model="uploadVersionData.number"
+              type="text"
+              class="cosmo-input"
+              required
+              id="upload-version-number"
+            />
+            <label for="upload-version-artifact" class="cosmo-label" x-localize:version-artifact-label=""></label>
+            <input
+              type="file"
+              class="cosmo-input"
+              id="upload-version-artifact"
+              @change="uploadVersionData.updateFile($event)"
+            />
+          </div>
+        </div>
+        <div class="cosmo-modal__button-bar">
+          <button class="cosmo-button" @click="uploadVersionData.open = false" x-localize:cancel=""></button>
+          <button class="cosmo-button" type="submit" x-localize:upload-version=""></button>
+        </div>
+      </form>
+    </div>
+  </template>
+</div>

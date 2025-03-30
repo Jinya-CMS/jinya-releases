@@ -9,15 +9,6 @@ services:
       POSTGRES_PASSWORD: jinya
       POSTGRES_DB: jinya
     restart: always
-  jinya-releases-postgres-test:
-    image: library/postgres:14-alpine
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_USER: jinya
-      POSTGRES_PASSWORD: jinya
-      POSTGRES_DB: jinya
-    restart: always
   jinya-releases-minio:
     image: quay.io/minio/minio
     ports:

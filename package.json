@@ -1,0 +1,27 @@
+{
+  "name": "jinya-fonts",
+  "version": "3.3.0",
+  "scripts": {
+    "lint": "npm run prettier && npm run eslint && npm run stylelint",
+    "prettier": "prettier static/admin/js --check",
+    "eslint": "eslint -c eslint.config.cjs static/admin/js/ static/admin/index.js",
+    "stylelint": "stylelint static/admin/css/**/*.css",
+    "format": "prettier static/admin --write"
+  },
+  "author": "Jinya Developers",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@gitlab.imanuel.dev:2289/jinya-cms/jinya-fonts.git"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "9.23.0",
+    "@types/alpinejs": "3.13.11",
+    "eslint": "9.23.0",
+    "eslint-config-prettier": "10.1.1",
+    "globals": "16.0.0",
+    "prettier": "3.5.3",
+    "stylelint": "16.17.0",
+    "stylelint-config-standard": "37.0.0"
+  }
+}

@@ -3,9 +3,9 @@
   "project": "09409dff-f690-461c-8aca-0e5552148985",
   "files": [
     {
-      "format": "json",
-      "source": "angular/projects/admin/src/locale/messages.json",
-      "target": "angular/projects/admin/src/locale/messages.%slug%.json",
+      "format": "simple_json",
+      "source": "static/admin/langs/messages.json",
+      "target": "static/admin/langs/messages.%slug%.json",
       "namePattern": "parentDirectory"
     }
   ]
