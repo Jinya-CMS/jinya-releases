@@ -85,88 +85,88 @@
               <template x-if="activeTab === 'tracks' && tracks.length > 0">
                 <table class="cosmo-table">
                   <thead>
-                  <tr>
-                    <th>#</th>
-                    <th x-localize:application-track-name=""></th>
-                    <th x-localize:application-track-slug=""></th>
-                    <th x-localize:application-track-default=""></th>
-                    <th x-localize:application-track-link=""></th>
-                    <th x-localize:application-track-actions=""></th>
-                  </tr>
+                    <tr>
+                      <th>#</th>
+                      <th x-localize:application-track-name=""></th>
+                      <th x-localize:application-track-slug=""></th>
+                      <th x-localize:application-track-default=""></th>
+                      <th x-localize:application-track-link=""></th>
+                      <th x-localize:application-track-actions=""></th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <template x-for="track in tracks" :key="track.id">
-                    <tr>
-                      <td x-text="track.id"></td>
-                      <td x-text="track.name"></td>
-                      <td x-text="track.slug"></td>
-                      <td style="text-align: center">
-                        <template x-if="track.isDefault">
-                          <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="var(--positive-color)"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          >
-                            <path d="M21.801 10A10 10 0 1 1 17 3.335" />
-                            <path d="m9 11 3 3L22 4" />
-                          </svg>
-                        </template>
-                        <template x-if="!track.isDefault">
-                          <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="var(--negative-color)"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="m15 9-6 6" />
-                            <path d="m9 9 6 6" />
-                          </svg>
-                        </template>
-                      </td>
-                      <td>
-                        <a
-                          target="_blank"
-                          :href="'/' + selectedApp.slug + '/' + track.slug"
-                          x-text="getTrackLink(track)"
-                        ></a>
-                      </td>
-                      <td>
-                        <div class="cosmo-toolbar">
-                          <div class="cosmo-toolbar__group">
-                            <a
-                              :href="'/apps/track?app=' + selectedApp.id + '&track=' + track.id"
-                              class="cosmo-button is--small"
-                              x-localize:application-track-details=""
+                    <template x-for="track in tracks" :key="track.id">
+                      <tr>
+                        <td x-text="track.id"></td>
+                        <td x-text="track.name"></td>
+                        <td x-text="track.slug"></td>
+                        <td style="text-align: center">
+                          <template x-if="track.isDefault">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="var(--positive-color)"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
                             >
-                            </a>
+                              <path d="M21.801 10A10 10 0 1 1 17 3.335" />
+                              <path d="m9 11 3 3L22 4" />
+                            </svg>
+                          </template>
+                          <template x-if="!track.isDefault">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="var(--negative-color)"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="m15 9-6 6" />
+                              <path d="m9 9 6 6" />
+                            </svg>
+                          </template>
+                        </td>
+                        <td>
+                          <a
+                            target="_blank"
+                            :href="'/' + selectedApp.slug + '/' + track.slug"
+                            x-text="getTrackLink(track)"
+                          ></a>
+                        </td>
+                        <td>
+                          <div class="cosmo-toolbar">
+                            <div class="cosmo-toolbar__group">
+                              <a
+                                :href="'/apps/track?app=' + selectedApp.id + '&track=' + track.id"
+                                class="cosmo-button is--small"
+                                x-localize:application-track-details=""
+                              >
+                              </a>
+                            </div>
+                            <div class="cosmo-toolbar__group">
+                              <button
+                                class="cosmo-button is--small"
+                                x-localize:application-track-edit=""
+                                @click="openEditTrack(track)"
+                              ></button>
+                              <button
+                                class="cosmo-button is--small"
+                                x-localize:application-track-delete=""
+                                :disabled="trackHasVersions.has(track.id)"
+                                @click="deleteTrack(track)"
+                              ></button>
+                            </div>
                           </div>
-                          <div class="cosmo-toolbar__group">
-                            <button
-                              class="cosmo-button is--small"
-                              x-localize:application-track-edit=""
-                              @click="openEditTrack(track)"
-                            ></button>
-                            <button
-                              class="cosmo-button is--small"
-                              x-localize:application-track-delete=""
-                              :disabled="trackHasVersions.has(track.id)"
-                              @click="deleteTrack(track)"
-                            ></button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
+                        </td>
+                      </tr>
+                    </template>
                   </tbody>
                 </table>
               </template>

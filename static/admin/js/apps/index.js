@@ -168,12 +168,14 @@ Alpine.data('appsData', () => ({
     }
   },
   async createPushToken() {
-    if (await confirm({
-      title: localize({ key: 'create-push-token-title' }),
-      message: localize({ key: 'create-push-token-message', values: this.selectedApp }),
-      declineLabel: localize({ key: 'create-push-token-decline' }),
-      approveLabel: localize({ key: 'create-push-token-confirm' }),
-    })) {
+    if (
+      await confirm({
+        title: localize({ key: 'create-push-token-title' }),
+        message: localize({ key: 'create-push-token-message', values: this.selectedApp }),
+        declineLabel: localize({ key: 'create-push-token-decline' }),
+        approveLabel: localize({ key: 'create-push-token-confirm' }),
+      })
+    ) {
       const token = await post(`/api/admin/application/${this.selectedApp.id}/token`);
       this.displayPushToken.open = true;
       this.displayPushToken.token = token.token;

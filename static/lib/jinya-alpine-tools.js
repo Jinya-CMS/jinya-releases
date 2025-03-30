@@ -205,6 +205,7 @@ function setupRouting(baseScriptPath, routerBasePath = '') {
   document.addEventListener('alpine:init', () => {
     window.PineconeRouter.settings.basePath = routerBasePath;
     window.PineconeRouter.settings.templateTargetId = 'app';
+    window.PineconeRouter.settings.includeQuery = false;
   });
 }
 

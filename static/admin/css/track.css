@@ -1,0 +1,4 @@
+.jinya-versions {
+  height: calc(var(--page-height) - var(--control-height) - var(--title-font-size) - 0.5rem);
+  overflow: auto;
+}

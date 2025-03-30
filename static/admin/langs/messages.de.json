@@ -81,7 +81,7 @@
   "track-details-version-edit": "Bearbeiten",
   "delete-version-confirm": "Version löschen",
   "delete-version-decline": "Nicht löschen",
-  "delete-version-message": "Soll die Version {versionName} in {trackName} und der App {appName} wirklich gelöscht werden?",
+  "delete-version-message": "Soll die Version {versionNumber} in {trackName} und der App {appName} wirklich gelöscht werden?",
   "upload-version-title": "Version hochladen",
   "upload-version-error-title": "Fehler aufgetreten",
   "upload-version-error-message": "Ein unbekannter Fehler ist aufgetreten, bitte prüfe die Serverprotokolle",

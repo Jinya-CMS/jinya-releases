@@ -80,7 +80,7 @@
   "delete-version-title": "Delete version",
   "delete-version-confirm": "Delete version",
   "delete-version-decline": "Don't delete",
-  "delete-version-message": "Do you really want to delete the version {versionName} in {trackName} and app {appName}?",
+  "delete-version-message": "Do you really want to delete the version {versionNumber} in {trackName} and app {appName}?",
   "upload-version-title": "Upload version",
   "upload-version-error-title": "Error occurred",
   "upload-version-error-message": "An unknown error occurred, please check the server logs",
