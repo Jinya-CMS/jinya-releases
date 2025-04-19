@@ -5,11 +5,11 @@ stages:
   - deploy
 
 lint:
-  image: library/node:latest
+  image: oven/bun:latest
   stage: lint
   script:
-    - npm install -f
-    - npm run lint
+    - bun install -f
+    - bun run lint
 
 build:
   image: library/golang:1.24-alpine
