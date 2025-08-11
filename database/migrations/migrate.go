@@ -1,9 +1,10 @@
 package migrations
 
 import (
-	"github.com/jmoiron/sqlx"
 	"jinya-releases/database"
 	dbMigrations "jinya-releases/migrations"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Migration interface {

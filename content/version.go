@@ -2,12 +2,13 @@ package content
 
 import (
 	"fmt"
-	"github.com/gabriel-vasile/mimetype"
-	"github.com/gorilla/mux"
 	"io"
 	"jinya-releases/database/models"
 	"jinya-releases/storage"
 	"net/http"
+
+	"github.com/gabriel-vasile/mimetype"
+	"github.com/gorilla/mux"
 )
 
 func GetVersion(w http.ResponseWriter, r *http.Request) {

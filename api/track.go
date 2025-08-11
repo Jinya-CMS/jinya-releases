@@ -2,9 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"jinya-releases/service"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func getAllTracks(w http.ResponseWriter, r *http.Request) {

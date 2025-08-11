@@ -1,9 +1,10 @@
 package database
 
 import (
+	"jinya-releases/config"
+
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"jinya-releases/config"
 )
 
 func Connect() (*sqlx.DB, error) {

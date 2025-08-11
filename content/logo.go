@@ -2,11 +2,12 @@ package content
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"io"
 	"jinya-releases/database/models"
 	"jinya-releases/storage"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func GetLogo(w http.ResponseWriter, r *http.Request) {

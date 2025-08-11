@@ -2,9 +2,10 @@ package models
 
 import (
 	"errors"
+	"jinya-releases/database"
+
 	"github.com/google/uuid"
 	"github.com/teris-io/shortid"
-	"jinya-releases/database"
 )
 
 type PushToken struct {

@@ -2,12 +2,13 @@ package storage
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"io"
 	"jinya-releases/database/models"
 	"jinya-releases/utils"
 	"net/http"
 	"slices"
+
+	"github.com/gorilla/mux"
 )
 
 const appLogoFormat = "application/%s/logo"

@@ -1,8 +1,9 @@
 package admin
 
 import (
-	"github.com/gorilla/mux"
 	"jinya-releases/admin/web"
+
+	"github.com/gorilla/mux"
 )
 
 func SetupRouter(router *mux.Router) {

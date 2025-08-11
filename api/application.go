@@ -2,10 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"jinya-releases/service"
 	"jinya-releases/storage"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func getAllApplications(w http.ResponseWriter, _ *http.Request) {

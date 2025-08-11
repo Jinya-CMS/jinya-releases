@@ -2,10 +2,11 @@ package frontend
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/iancoleman/orderedmap"
 	"jinya-releases/database/models"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/iancoleman/orderedmap"
 )
 
 func versionsToMap(versions []models.Version) *orderedmap.OrderedMap {

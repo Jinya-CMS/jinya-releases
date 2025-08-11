@@ -1,7 +1,6 @@
 package importer
 
 import (
-	"github.com/gabriel-vasile/mimetype"
 	"io"
 	"jinya-releases/database/models"
 	"jinya-releases/storage"
@@ -9,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gabriel-vasile/mimetype"
 )
 
 func ImportFromFileSystem(args []string) {

@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"embed"
-	"github.com/gorilla/mux"
 	"html/template"
 	"jinya-releases/database/models"
 	"log"
@@ -10,6 +9,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 //go:embed templates

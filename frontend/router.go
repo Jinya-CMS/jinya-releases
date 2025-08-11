@@ -1,9 +1,10 @@
 package frontend
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 func checkForPageOrJson(expectPage bool) func(request *http.Request, match *mux.RouteMatch) bool {

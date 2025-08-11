@@ -2,8 +2,6 @@ package main
 
 import (
 	"embed"
-	"github.com/gorilla/mux"
-	"golang.org/x/text/language"
 	"html/template"
 	"jinya-releases/admin"
 	"jinya-releases/api"
@@ -17,6 +15,9 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"golang.org/x/text/language"
 )
 
 var (

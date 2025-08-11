@@ -3,14 +3,15 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgerrcode"
 	"jinya-releases/database/models"
 	"jinya-releases/storage"
 	"jinya-releases/utils"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 )
 
 func GetAllVersions(applicationId, trackId string) (versions []models.Version, errDetails *utils.ErrorDetails, status int) {
