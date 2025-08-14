@@ -3,8 +3,6 @@ package storage
 import (
 	"fmt"
 	"io"
-	"jinya-releases/database/models"
-	"jinya-releases/utils"
 	"net/http"
 	"slices"
 
@@ -13,22 +11,8 @@ import (
 
 const appLogoFormat = "application/%s/logo"
 
-func UploadLogo(r *http.Request) (errDetails *utils.ErrorDetails, status int) {
+func UploadLogo(r *http.Request) error {
 	id := mux.Vars(r)["id"]
-
-	_, err := models.GetApplicationById(id)
-	if err != nil {
-		status = http.StatusNotFound
-		errDetails = &utils.ErrorDetails{
-			EntityType: "application",
-			Message:    "Application not found",
-			ErrorType:  "request",
-		}
-
-		return
-	}
-
-	status = http.StatusNoContent
 
 	contentType := r.Header.Get("Content-Type")
 	if !slices.Contains([]string{
@@ -40,28 +24,12 @@ func UploadLogo(r *http.Request) (errDetails *utils.ErrorDetails, status int) {
 		"image/svg+xml",
 		"image/webp",
 	}, contentType) {
-		errDetails = &utils.ErrorDetails{
-			EntityType: "application",
-			Message:    "file format not supported",
-			ErrorType:  "storage",
-		}
-		status = http.StatusUnsupportedMediaType
-		return
+		return fmt.Errorf("file format not supported")
 	}
 
-	err = SaveFile(fmt.Sprintf(appLogoFormat, id), r.Body, r.ContentLength, contentType)
-	if err != nil {
-		errDetails = &utils.ErrorDetails{
-			EntityType: "application",
-			Message:    "upload failed",
-			ErrorType:  "storage",
-		}
-		status = http.StatusConflict
-	}
-
-	return
+	return saveFile(fmt.Sprintf(appLogoFormat, id), r.Body, r.ContentLength, contentType)
 }
 
 func DownloadLogo(id string) (io.ReadCloser, string, int64, error) {
-	return GetFile(fmt.Sprintf(appLogoFormat, id))
+	return getFile(fmt.Sprintf(appLogoFormat, id))
 }
