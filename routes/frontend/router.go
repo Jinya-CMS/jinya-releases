@@ -18,27 +18,38 @@ func checkForPageOrJson(expectPage bool) func(request *http.Request, match *mux.
 }
 
 func SetupRouter(router *mux.Router) {
-	router.Methods(http.MethodGet).Path("/").HandlerFunc(getHomePage)
-	router.Methods(http.MethodGet).Path("/imprint").HandlerFunc(getImprintPage)
-	router.Methods(http.MethodGet).Path("/data-protection").HandlerFunc(getDataProtectionPage)
+	router.
+		Methods(http.MethodGet).
+		Path("/").
+		HandlerFunc(getHomePage)
+	router.
+		Methods(http.MethodGet).
+		Path("/imprint").
+		HandlerFunc(getImprintPage)
+	router.
+		Methods(http.MethodGet).
+		Path("/data-protection").
+		HandlerFunc(getDataProtectionPage)
 
 	router.
 		Methods(http.MethodGet).
-		Headers("Accept", "text/html").
+		MatcherFunc(checkForPageOrJson(true)).
 		Path("/{applicationSlug}").
 		HandlerFunc(getApplicationPage)
 	router.
 		Methods(http.MethodGet).
-		Headers("Accept", "text/html").
+		MatcherFunc(checkForPageOrJson(true)).
 		Path("/{applicationSlug}/{trackSlug}").
 		HandlerFunc(getTrackPage)
 
 	router.
 		Methods(http.MethodGet).
+		MatcherFunc(checkForPageOrJson(false)).
 		Path("/{applicationSlug}").
 		HandlerFunc(getApplicationJson)
 	router.
 		Methods(http.MethodGet).
+		MatcherFunc(checkForPageOrJson(false)).
 		Path("/{applicationSlug}/{trackSlug}").
 		HandlerFunc(getTrackJson)
 }

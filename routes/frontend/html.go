@@ -3,6 +3,7 @@ package frontend
 import (
 	"embed"
 	"html/template"
+	"jinya-releases/config"
 	"jinya-releases/database"
 	"log"
 	"net/http"
@@ -127,7 +128,13 @@ func getTrackPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	versions, err := database.Select[database.Version]("select * from version where track_id = $1 order by version desc", track.Id)
+	versions, err := database.Select[database.Version](`
+select v.*, $1 || '/content/version/' || a.slug || '/' || t.slug || '/' || v.version as url
+from version v
+		inner join application a on a.id = v.application_id
+		inner join track t on v.track_id = t.id
+where a.slug = $2 and t.slug = $3
+		`, config.LoadedConfiguration.ServerUrl, applicationSlug, trackSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
