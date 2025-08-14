@@ -3,12 +3,14 @@ package main
 import (
 	"embed"
 	"jinya-releases/config"
-	migrator "jinya-releases/database/migrations"
+	"jinya-releases/database"
+	"jinya-releases/routes"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
+	_ "github.com/sakirsensoy/genv/dotenv/autoload"
 )
 
 var (
@@ -45,12 +47,11 @@ func main() {
 		panic(err)
 	}
 
-	err = migrator.Migrate()
-	if err != nil {
-		panic(err)
-	}
+	database.SetupDatabase()
 
 	router := mux.NewRouter()
+
+	routes.SetupRoutes(router)
 
 	router.PathPrefix("/openapi/admin").Handler(SpaHandler{
 		embedFS:   adminOpenapi,

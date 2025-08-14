@@ -13,6 +13,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/minio/minio-go/v7 v7.0.95
+	github.com/sakirsensoy/genv v1.0.3
 	github.com/zitadel/zitadel-go/v3 v3.10.0
 	go-simpler.org/env v0.12.0
 )

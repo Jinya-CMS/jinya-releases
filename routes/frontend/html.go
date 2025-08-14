@@ -3,7 +3,7 @@ package frontend
 import (
 	"embed"
 	"html/template"
-	"jinya-releases/database/models"
+	"jinya-releases/database"
 	"log"
 	"net/http"
 	"slices"
@@ -37,14 +37,14 @@ func render(w http.ResponseWriter, name string, data any) {
 }
 
 func getHomePage(w http.ResponseWriter, r *http.Request) {
-	apps, err := models.GetAllApplications()
+	apps, err := database.Select[database.Application]("select * from application order by name")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	render(w, "home", struct {
-		Applications []models.Application
+		Applications []database.Application
 	}{
 		Applications: apps,
 	})
@@ -62,13 +62,13 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	applicationSlug := vars["applicationSlug"]
 
-	app, err := models.GetApplicationBySlug(applicationSlug)
+	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", applicationSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	tracks, err := models.GetAllTracks(app.Id)
+	tracks, err := database.Select[database.Track]("select * from track where application_id = $1 order by name", app.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -79,17 +79,17 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tracksWithVersions := make([]models.Track, 0)
+	tracksWithVersions := make([]database.Track, 0)
 	for _, track := range tracks {
-		versions, err := models.GetAllVersions(track.ApplicationId, track.Id)
-		if err != nil || len(versions) == 0 {
+		versionsCount, err := database.GetDbMap().SelectInt("select count(*) from version where track_id = $1", track.Id)
+		if err != nil || versionsCount == 0 {
 			continue
 		}
 
 		tracksWithVersions = append(tracksWithVersions, track)
 	}
 
-	slices.SortFunc(tracksWithVersions, func(a, b models.Track) int {
+	slices.SortFunc(tracksWithVersions, func(a, b database.Track) int {
 		if a.IsDefault {
 			return -1
 		}
@@ -102,8 +102,8 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 	})
 
 	render(w, "application", struct {
-		Application *models.Application
-		Tracks      []models.Track
+		Application database.Application
+		Tracks      []database.Track
 	}{
 		Application: app,
 		Tracks:      tracksWithVersions,
@@ -115,28 +115,28 @@ func getTrackPage(w http.ResponseWriter, r *http.Request) {
 	applicationSlug := vars["applicationSlug"]
 	trackSlug := vars["trackSlug"]
 
-	app, err := models.GetApplicationBySlug(applicationSlug)
+	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", applicationSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	track, err := models.GetTrackBySlug(trackSlug, app.Id)
+	track, err := database.SelectOne[database.Track]("select * from track where application_id = $1 and slug = $2", app.Id, trackSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	versions, err := models.GetAllVersions(app.Id, track.Id)
+	versions, err := database.Select[database.Version]("select * from version where track_id = $1 order by version desc", track.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	render(w, "track", struct {
-		Application *models.Application
-		Track       *models.Track
-		Versions    []models.Version
+		Application database.Application
+		Track       database.Track
+		Versions    []database.Version
 	}{
 		Application: app,
 		Track:       track,

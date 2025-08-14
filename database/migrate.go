@@ -29,9 +29,12 @@ func SetupDatabase() {
 		dbMap = &gorp.DbMap{Db: conn, Dialect: dialect}
 
 		AddTableWithName[Application]("application")
-		AddTableWithName[Version]("version")
-		AddTableWithName[Track]("track")
 		AddTableWithName[PushToken]("push_token")
+		track := AddTableWithName[Track]("track")
+		track.SetUniqueTogether("slug", "application_id")
+		track.SetUniqueTogether("name", "application_id")
+		version := AddTableWithName[Version]("version")
+		version.SetUniqueTogether("version", "application_id", "track_id")
 
 		err = dbMap.CreateTablesIfNotExists()
 		if err != nil {
@@ -67,6 +70,8 @@ alter table push_token
 		}
 
 		_, err = conn.Exec(`
+create extension if not exists "uuid-ossp";
+
 alter table application 
     alter column id set default uuid_generate_v4();
 alter table track 
@@ -82,6 +87,10 @@ alter table push_token
 
 		_, err = conn.Exec(`
 drop table if exists migrations;
+alter table version 
+    drop constraint if exists version_version_key;
+alter table version 
+	drop column if exists url;
 `)
 		if err != nil {
 			panic(err)

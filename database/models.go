@@ -8,14 +8,14 @@ import (
 
 type Application struct {
 	Id   uuid.UUID `json:"id" db:"id,primarykey"`
-	Name string    `json:"name" db:"name"`
+	Name string    `json:"name" db:"name,unique"`
 	Logo *string   `json:"logo" db:"logo"`
-	Slug string    `json:"slug" db:"slug"`
+	Slug string    `json:"slug" db:"slug,unique"`
 }
 
 type PushToken struct {
 	Id            uuid.UUID `json:"id" db:"id,primarykey"`
-	Token         string    `json:"token" db:"token"`
+	Token         string    `json:"token" db:"token,unique"`
 	ApplicationId string    `json:"-" db:"application_id"`
 }
 

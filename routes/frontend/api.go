@@ -2,14 +2,14 @@ package frontend
 
 import (
 	"encoding/json"
-	"jinya-releases/database/models"
+	"jinya-releases/database"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/iancoleman/orderedmap"
 )
 
-func versionsToMap(versions []models.Version) *orderedmap.OrderedMap {
+func versionsToMap(versions []database.Version) *orderedmap.OrderedMap {
 	versionMap := orderedmap.New()
 	for _, version := range versions {
 		versionMap.Set(version.Version, version.Url)
@@ -21,43 +21,17 @@ func versionsToMap(versions []models.Version) *orderedmap.OrderedMap {
 func getApplicationJson(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	applicationSlug := vars["applicationSlug"]
-
-	app, err := models.GetApplicationBySlug(applicationSlug)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	tracks, err := models.GetAllTracks(app.Id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	encoder := json.NewEncoder(w)
 
-	track := (*models.Track)(nil)
-
-	for _, t := range tracks {
-		if t.IsDefault {
-			track = &t
-			break
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if track == nil {
-		if len(tracks) >= 1 {
-			track = &tracks[0]
-		} else if len(tracks) == 0 {
-			_ = encoder.Encode([]any{})
-			return
-		}
-	}
-
-	versions, err := models.GetAllVersions(app.Id, tracks[0].Id)
+	versions, err := database.Select[database.Version](`
+select v.*
+from version v
+         inner join application a on a.id = v.application_id
+         inner join track t on v.track_id = t.id
+where a.slug = $1 and t.is_default
+`, applicationSlug)
 	if err != nil {
-		versions = []models.Version{}
+		versions = []database.Version{}
 	}
 
 	_ = encoder.Encode(versionsToMap(versions))
@@ -70,10 +44,15 @@ func getTrackJson(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 
-	w.Header().Set("Content-Type", "application/json")
-	versions, err := models.GetVersionBySlugs(applicationSlug, trackSlug)
+	versions, err := database.Select[database.Version](`
+select v.*
+from version v
+         inner join application a on a.id = v.application_id
+         inner join track t on v.track_id = t.id
+where a.slug = $1 and t.slug = $2 and t.is_default
+`, applicationSlug, trackSlug)
 	if err != nil {
-		versions = []models.Version{}
+		versions = []database.Version{}
 	}
 
 	_ = encoder.Encode(versionsToMap(versions))

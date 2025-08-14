@@ -22,7 +22,7 @@ func getMinioClient() (*minio.Client, error) {
 	})
 }
 
-func SaveFile(path string, reader io.Reader, size int64, contentType string) error {
+func saveFile(path string, reader io.Reader, size int64, contentType string) error {
 	client, err := getMinioClient()
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func SaveFile(path string, reader io.Reader, size int64, contentType string) err
 	return err
 }
 
-func GetFile(path string) (io.ReadCloser, string, int64, error) {
+func getFile(path string) (io.ReadCloser, string, int64, error) {
 	client, err := getMinioClient()
 	if err != nil {
 		return nil, "", 0, err
@@ -52,7 +52,7 @@ func GetFile(path string) (io.ReadCloser, string, int64, error) {
 	return object, objectStat.ContentType, objectStat.Size, nil
 }
 
-func DeleteFile(path string) error {
+func deleteFile(path string) error {
 	client, err := getMinioClient()
 	if err != nil {
 		return err

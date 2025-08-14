@@ -3,23 +3,23 @@ package content
 import (
 	"fmt"
 	"io"
-	"jinya-releases/database/models"
+	"jinya-releases/database"
 	"jinya-releases/storage"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-func GetLogo(w http.ResponseWriter, r *http.Request) {
+func getLogo(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
 
-	app, err := models.GetApplicationBySlug(slug)
+	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", slug)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	logo, contentType, contentLength, err := storage.DownloadLogo(app.Id)
+	logo, contentType, contentLength, err := storage.DownloadLogo(app.Id.String())
 	if err != nil {
 		http.NotFound(w, r)
 		return
