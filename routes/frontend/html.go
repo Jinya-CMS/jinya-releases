@@ -134,6 +134,7 @@ from version v
 		inner join application a on a.id = v.application_id
 		inner join track t on v.track_id = t.id
 where a.slug = $2 and t.slug = $3
+order by upload_date desc
 		`, config.LoadedConfiguration.ServerUrl, applicationSlug, trackSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
