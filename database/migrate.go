@@ -41,29 +41,41 @@ func SetupDatabase() {
 			panic(err)
 		}
 
+		// Introduced with JRWEB-4
 		_, err = conn.Exec(`
-alter table track
-	drop constraint if exists track_application_id_fkey;
-alter table version
-	drop constraint if exists version_track_id_fkey;
-alter table version
-	drop constraint if exists version_application_id_fkey;
-alter table push_token
-	drop constraint if exists push_token_application_id_fkey;
+create or replace function add_foreign_key_if_not_exists(from_table text, from_column text, to_table text, to_column text)
+returns void language plpgsql as
+$$
+declare 
+   fk_exists boolean;
+begin
+    fk_exists := case when exists (select true
+	from information_schema.table_constraints tc
+		inner join information_schema.constraint_column_usage ccu
+			using (constraint_catalog, constraint_schema, constraint_name)
+		inner join information_schema.key_column_usage kcu
+			using (constraint_catalog, constraint_schema, constraint_name)
+	where constraint_type = 'FOREIGN KEY'
+	  and ccu.table_name = to_table
+	  and ccu.column_name = to_column
+	  and tc.table_name = from_table
+	  and kcu.column_name = from_column) then true else false end;
+	if not fk_exists then
+		execute format('alter table %s add constraint %s_%s_fkey foreign key (%s) references %s(%s) on delete cascade', from_table, from_table, to_column, from_column, to_table, to_column);
+	end if;
+end
+$$;
 `)
 		if err != nil {
 			panic(err)
 		}
 
+		// Use function added in JRWEB-4 to create FK
 		_, err = conn.Exec(`
-alter table track
-	add constraint track_application_id_fkey foreign key (application_id) references application(id); 
-alter table version
-	add constraint version_track_id_fkey foreign key (track_id) references track(id);
-alter table version
-	add constraint version_application_id_fkey foreign key (application_id) references application(id);
-alter table push_token
-	add constraint push_token_application_id_fkey foreign key (application_id) references application(id);
+select add_foreign_key_if_not_exists('track', 'application_id', 'application', 'id');
+select add_foreign_key_if_not_exists('version', 'track_id', 'track', 'id');
+select add_foreign_key_if_not_exists('version', 'application_id', 'application', 'id');
+select add_foreign_key_if_not_exists('push_token', 'application_id', 'application', 'id');
 `)
 		if err != nil {
 			panic(err)
