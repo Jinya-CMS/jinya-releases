@@ -1,53 +1,41 @@
 import Alpine from './alpine.js';
 import PineconeRouter from './pinecone-router.js';
-import * as client from './openid-client/index.js';
+import { UserManager } from './openid-client/index.js';
 
-let authenticationConfiguration = {
-  openIdUrl: '',
-  openIdClientId: '',
-  openIdCallbackUrl: '',
-};
+let authenticationConfiguration = {};
+/** @type UserManager */
+let userManager = null;
 let scriptBasePath = '/static/js/';
+let baseRouterPath = '';
+let localStoragePrefix = '';
 let languages = {};
 
 export function setRedirect(redirect) {
-  sessionStorage.setItem('/jinya/login/redirect', redirect);
+  sessionStorage.setItem(`${localStoragePrefix}/login/redirect`, redirect);
 }
 
 export function getRedirect() {
-  return sessionStorage.getItem('/jinya/login/redirect');
+  return sessionStorage.getItem(`${localStoragePrefix}/login/redirect`);
 }
 
 export function deleteRedirect() {
-  sessionStorage.removeItem('/jinya/login/redirect');
+  sessionStorage.removeItem(`${localStoragePrefix}/login/redirect`);
 }
 
 export function hasAccessToken() {
-  return !!localStorage.getItem('/jinya/api/access-token');
+  return !!localStorage.getItem(`${localStoragePrefix}/api/access-token`);
 }
 
 export function getAccessToken() {
-  return localStorage.getItem('/jinya/api/access-token');
+  return localStorage.getItem(`${localStoragePrefix}/api/access-token`);
 }
 
 export function setAccessToken(code) {
-  localStorage.setItem('/jinya/api/access-token', code);
+  localStorage.setItem(`${localStoragePrefix}/api/access-token`, code);
 }
 
 export function deleteAccessToken() {
-  localStorage.removeItem('/jinya/api/access-token');
-}
-
-function setCodeVerifier(code) {
-  localStorage.setItem('/jinya/login/code-verifier', code);
-}
-
-function getCodeVerifier() {
-  return localStorage.getItem('/jinya/login/code-verifier');
-}
-
-function deleteCodeVerifier() {
-  localStorage.removeItem('/jinya/login/code-verifier');
+  localStorage.removeItem(`${localStoragePrefix}/api/access-token`);
 }
 
 export async function needsLogin(context) {
@@ -55,7 +43,7 @@ export async function needsLogin(context) {
     return null;
   }
 
-  const redirect = context.path.substring('/admin'.length);
+  const redirect = context.path.substring(baseRouterPath.length);
   setRedirect(redirect);
 
   return context.redirect('/login');
@@ -69,22 +57,23 @@ export async function needsLogout(context) {
   return null;
 }
 
-export async function performLogin(context) {
-  const config = await client.discovery(
-    new URL(window.jinyaConfig.openIdUrl),
-    window.jinyaConfig.openIdClientId,
-  );
+function getUserManager() {
+  return new UserManager(authenticationConfiguration);
+}
 
-  const tokenResponse = await client.authorizationCodeGrant(
-    config,
-    new URL(location.href),
-    {
-      pkceCodeVerifier: getCodeVerifier(),
-    },
-  );
-  setAccessToken(tokenResponse.access_token);
+export async function openIdLogin() {
+  await userManager.signinRedirect();
+}
+
+export async function performLogin(context) {
+  const user = await userManager.signinCallback();
+  setAccessToken(user.access_token);
   Alpine.store('authentication').login();
   context.redirect(getRedirect() ?? '/');
+}
+
+async function getUser() {
+  return (await userManager.getUser())?.profile;
 }
 
 export async function checkLogin() {
@@ -92,24 +81,8 @@ export async function checkLogin() {
     return false;
   }
 
-  const config = await client.discovery(
-    new URL(authenticationConfiguration.openIdUrl),
-    authenticationConfiguration.openIdClientId,
-  );
-
   try {
-    const response = await fetch(config.serverMetadata().userinfo_endpoint, {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAccessToken()}`,
-      },
-    });
-
-    return response.status === 200;
+    return !!(await getUser());
   } catch (error) {
     console.error(error);
     return false;
@@ -117,7 +90,7 @@ export async function checkLogin() {
 }
 
 export async function fetchScript({ route }) {
-  const [, , area, page] = route.split('/', 4);
+  const [, , area, page] = route.split('/');
   if (area) {
     await import(`${scriptBasePath}${area}/${page?.replaceAll(':', '') ?? 'index'}.js`);
     Alpine.store('navigation').navigate({
@@ -150,25 +123,6 @@ export function localize({ key, values = {} }) {
   return transformed;
 }
 
-export async function openIdLogin() {
-  const config = await client.discovery(
-    new URL(authenticationConfiguration.openIdUrl),
-    authenticationConfiguration.openIdClientId,
-  );
-  const redirectUrl = authenticationConfiguration.openIdCallbackUrl;
-  const codeVerifier = client.randomPKCECodeVerifier();
-  const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
-  const parameters = {
-    redirect_uri: redirectUrl,
-    scope: 'openid profile',
-    code_challenge: codeChallenge,
-    code_challenge_method: 'S256',
-  };
-  const redirectTo = client.buildAuthorizationUrl(config, parameters);
-  setCodeVerifier(codeVerifier);
-  window.location.href = redirectTo;
-}
-
 export function setupLocalization(Alpine, langs) {
   languages = langs;
 
@@ -193,10 +147,15 @@ export function setupLocalization(Alpine, langs) {
   });
 }
 
-function setupAuthentication(openIdUrl, openIdClientId, openIdCallbackUrl) {
-  authenticationConfiguration.openIdClientId = openIdClientId;
-  authenticationConfiguration.openIdUrl = openIdUrl;
-  authenticationConfiguration.openIdCallbackUrl = openIdCallbackUrl;
+async function setupAuthentication(openIdConfig) {
+  authenticationConfiguration = {
+    redirect_uri: `${location.origin}${baseRouterPath}/login/callback`,
+    post_logout_redirect_uri: location.origin,
+    scope: `openid profile email offline_access ${openIdConfig.additionalScopes}`,
+    code_challenge_method: 'S256',
+    ...openIdConfig,
+  };
+  userManager = await getUserManager();
 }
 
 function setupRouting(baseScriptPath, routerBasePath = '') {
@@ -235,10 +194,12 @@ async function setupAlpine(alpine, defaultArea, defaultPage) {
     needsLogin,
     needsLogout,
     performLogin,
+    user: await getUser(),
     loggedIn: await checkLogin(),
-    login() {
+    async login() {
       this.loggedIn = true;
-      history.replaceState(null, null, location.href.split('?')[0]);
+      this.user = await getUser();
+      window.PineconeRouter.context.navigate(getRedirect() ?? '/');
     },
     logout() {
       deleteAccessToken();
@@ -260,24 +221,25 @@ async function setupAlpine(alpine, defaultArea, defaultPage) {
 }
 
 export async function setup({
-                              defaultArea,
-                              defaultPage,
-                              baseScriptPath,
-                              routerBasePath = '',
-                              openIdUrl = undefined,
-                              openIdClientId = undefined,
-                              openIdCallbackUrl = undefined,
-                              languages = [],
-                              afterSetup = () => {
-                              },
-                            }) {
+  defaultArea,
+  defaultPage,
+  baseScriptPath,
+  storagePrefix,
+  routerBasePath = '',
+  openIdConfig = undefined,
+  languages = [],
+  afterSetup = () => {},
+}) {
+  baseRouterPath = routerBasePath;
+  localStoragePrefix = storagePrefix || '';
+  if (openIdConfig) {
+    await setupAuthentication(openIdConfig);
+  }
+
   window.Alpine = Alpine;
 
   Alpine.plugin(PineconeRouter);
 
-  if (openIdUrl && openIdClientId && openIdCallbackUrl) {
-    setupAuthentication(openIdUrl, openIdClientId, openIdCallbackUrl);
-  }
   if (Object.keys(languages ?? {}).length > 0) {
     setupLocalization(Alpine, languages);
   }
