@@ -9,9 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     defaultPage: '',
     baseScriptPath: '/static/admin/js/',
     routerBasePath: '/admin',
-    openIdClientId: window.jinyaConfig.openIdClientId,
-    openIdUrl: window.jinyaConfig.openIdUrl,
-    openIdCallbackUrl: window.jinyaConfig.openIdCallbackUrl,
+    storagePrefix: '/jinya/releases',
+    openIdConfig: jinyaOpenIdConfig,
     languages: { de: MessagesDe, en: MessagesEn },
   });
 });
