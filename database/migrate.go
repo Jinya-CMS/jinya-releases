@@ -4,7 +4,7 @@ import (
 	"context"
 	"jinya-releases/config"
 
-	"github.com/DerKnerd/gorp"
+	"github.com/DerKnerd/gorp/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 )
@@ -28,12 +28,12 @@ func SetupDatabase() {
 
 		dbMap = &gorp.DbMap{Db: conn, Dialect: dialect}
 
-		AddTableWithName[Application]("application")
-		AddTableWithName[PushToken]("push_token")
-		track := AddTableWithName[Track]("track")
+		dbMap.AddTableWithName[Application]("application")
+		dbMap.AddTableWithName[PushToken]("push_token")
+		track := dbMap.AddTableWithName[Track]("track")
 		track.SetUniqueTogether("slug", "application_id")
 		track.SetUniqueTogether("name", "application_id")
-		version := AddTableWithName[Version]("version")
+		version := dbMap.AddTableWithName[Version]("version")
 		version.SetUniqueTogether("version", "application_id", "track_id")
 
 		err = dbMap.CreateTablesIfNotExists()

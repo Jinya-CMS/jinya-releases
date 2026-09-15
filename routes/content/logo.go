@@ -13,7 +13,7 @@ import (
 func getLogo(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
 
-	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", slug)
+	app, err := database.GetDbMap().SelectOneType[database.Application]("select * from application where slug = $1", slug)
 	if err != nil {
 		http.NotFound(w, r)
 		return

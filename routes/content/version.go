@@ -16,13 +16,13 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 	applicationSlug := mux.Vars(r)["applicationSlug"]
 	trackSlug := mux.Vars(r)["trackSlug"]
 
-	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", applicationSlug)
+	app, err := database.GetDbMap().SelectOneType[database.Application]("select * from application where slug = $1", applicationSlug)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	version, err := database.SelectOne[database.Version](`
+	version, err := database.GetDbMap().SelectOneType[database.Version](`
 select v.*
 from version v
          inner join application a on a.id = v.application_id

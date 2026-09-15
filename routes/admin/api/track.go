@@ -14,7 +14,7 @@ func getAllTracks(w http.ResponseWriter, r *http.Request) {
 	applicationId := mux.Vars(r)["applicationId"]
 
 	encoder := json.NewEncoder(w)
-	tracks, err := database.Select[database.Track]("select * from track where application_id = $1", applicationId)
+	tracks, err := database.GetDbMap().SelectType[database.Track]("select * from track where application_id = $1", applicationId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = encoder.Encode(utils.ErrorDetails{
@@ -31,7 +31,7 @@ func getTrackById(w http.ResponseWriter, r *http.Request) {
 	trackId := mux.Vars(r)["id"]
 
 	encoder := json.NewEncoder(w)
-	track, err := database.Select[database.Track]("select * from track where application_id = $1 and id = $2", applicationId, trackId)
+	track, err := database.GetDbMap().SelectType[database.Track]("select * from track where application_id = $1 and id = $2", applicationId, trackId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = encoder.Encode(utils.ErrorDetails{
@@ -90,7 +90,7 @@ func updateTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbTrack, err := database.Get[database.Track](trackId)
+	dbTrack, err := database.GetDbMap().GetType[database.Track](trackId)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		_ = encoder.Encode(utils.ErrorDetails{

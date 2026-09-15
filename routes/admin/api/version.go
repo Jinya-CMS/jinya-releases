@@ -26,7 +26,7 @@ func getAllVersions(w http.ResponseWriter, r *http.Request) {
 	applicationId := mux.Vars(r)["applicationId"]
 	trackId := mux.Vars(r)["trackId"]
 	encoder := json.NewEncoder(w)
-	versions, err := database.Select[database.Version](baseVersionQuery, config.LoadedConfiguration.ServerUrl, applicationId, trackId)
+	versions, err := database.GetDbMap().SelectType[database.Version](baseVersionQuery, config.LoadedConfiguration.ServerUrl, applicationId, trackId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = encoder.Encode(utils.ErrorDetails{
@@ -43,7 +43,7 @@ func getVersionById(w http.ResponseWriter, r *http.Request) {
 	trackId := mux.Vars(r)["trackId"]
 	versionId := mux.Vars(r)["id"]
 	encoder := json.NewEncoder(w)
-	version, err := database.Select[database.Version](baseVersionQuery+" and id = $4", config.LoadedConfiguration.ServerUrl, applicationId, trackId, versionId)
+	version, err := database.GetDbMap().SelectType[database.Version](baseVersionQuery+" and id = $4", config.LoadedConfiguration.ServerUrl, applicationId, trackId, versionId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = encoder.Encode(utils.ErrorDetails{

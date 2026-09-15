@@ -33,7 +33,7 @@ func getApplicationJson(w http.ResponseWriter, r *http.Request) {
 	applicationSlug := vars["applicationSlug"]
 	encoder := json.NewEncoder(w)
 
-	versions, err := database.Select[database.Version](`
+	versions, err := database.GetDbMap().SelectType[database.Version](`
 select v.*, $1 || '/content/version/' || a.slug || '/' || t.slug || '/' || v.version as url
 from version v
          inner join application a on a.id = v.application_id
@@ -54,7 +54,7 @@ func getTrackJson(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 
-	versions, err := database.Select[database.Version](`
+	versions, err := database.GetDbMap().SelectType[database.Version](`
 select v.*, $1 || '/content/version/' || a.slug || '/' || t.slug || '/' || v.version as url
 from version v
          inner join application a on a.id = v.application_id

@@ -19,7 +19,7 @@ func pushVersion(w http.ResponseWriter, r *http.Request) {
 	versionNumber := mux.Vars(r)["versionNumber"]
 	encoder := json.NewEncoder(w)
 
-	track, err := database.SelectOne[database.Track]("select t.* from track t inner join application a on a.id = t.application_id and a.slug = $1 where t.slug = $2", applicationSlug, trackSlug)
+	track, err := database.GetDbMap().SelectOneType[database.Track]("select t.* from track t inner join application a on a.id = t.application_id and a.slug = $1 where t.slug = $2", applicationSlug, trackSlug)
 	if err != nil {
 		log.Printf("Could not find track: %v", err)
 		w.WriteHeader(http.StatusNotFound)

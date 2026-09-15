@@ -38,7 +38,7 @@ func render(w http.ResponseWriter, name string, data any) {
 }
 
 func getHomePage(w http.ResponseWriter, r *http.Request) {
-	apps, err := database.Select[database.Application]("select * from application order by name")
+	apps, err := database.GetDbMap().SelectType[database.Application]("select * from application order by name")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -63,13 +63,13 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	applicationSlug := vars["applicationSlug"]
 
-	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", applicationSlug)
+	app, err := database.GetDbMap().SelectOneType[database.Application]("select * from application where slug = $1", applicationSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	tracks, err := database.Select[database.Track]("select * from track where application_id = $1 order by name", app.Id)
+	tracks, err := database.GetDbMap().SelectType[database.Track]("select * from track where application_id = $1 order by name", app.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -103,7 +103,7 @@ func getApplicationPage(w http.ResponseWriter, r *http.Request) {
 	})
 
 	render(w, "application", struct {
-		Application database.Application
+		Application *database.Application
 		Tracks      []database.Track
 	}{
 		Application: app,
@@ -116,19 +116,19 @@ func getTrackPage(w http.ResponseWriter, r *http.Request) {
 	applicationSlug := vars["applicationSlug"]
 	trackSlug := vars["trackSlug"]
 
-	app, err := database.SelectOne[database.Application]("select * from application where slug = $1", applicationSlug)
+	app, err := database.GetDbMap().SelectOneType[database.Application]("select * from application where slug = $1", applicationSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	track, err := database.SelectOne[database.Track]("select * from track where application_id = $1 and slug = $2", app.Id, trackSlug)
+	track, err := database.GetDbMap().SelectOneType[database.Track]("select * from track where application_id = $1 and slug = $2", app.Id, trackSlug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	versions, err := database.Select[database.Version](`
+	versions, err := database.GetDbMap().SelectType[database.Version](`
 select v.*, $1 || '/content/version/' || a.slug || '/' || t.slug || '/' || v.version as url
 from version v
 		inner join application a on a.id = v.application_id
@@ -142,8 +142,8 @@ order by upload_date desc
 	}
 
 	render(w, "track", struct {
-		Application database.Application
-		Track       database.Track
+		Application *database.Application
+		Track       *database.Track
 		Versions    []database.Version
 	}{
 		Application: app,

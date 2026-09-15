@@ -14,7 +14,7 @@ import (
 
 func getAllApplications(w http.ResponseWriter, _ *http.Request) {
 	encoder := json.NewEncoder(w)
-	applications, err := database.Select[database.Application]("select * from application")
+	applications, err := database.GetDbMap().SelectType[database.Application]("select * from application")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = encoder.Encode(utils.ErrorDetails{
@@ -31,7 +31,7 @@ func getApplicationById(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 
-	application, err := database.Get[database.Application](id)
+	application, err := database.GetDbMap().GetType[database.Application](id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = encoder.Encode(utils.ErrorDetails{
