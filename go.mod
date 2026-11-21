@@ -11,7 +11,7 @@ require (
 	github.com/jackc/pgx/v5 v5.13.0
 	github.com/minio/minio-go/v7 v7.4.1
 	github.com/sakirsensoy/genv v1.2.0
-	github.com/zitadel/zitadel-go/v3 v3.30.0
+	github.com/zitadel/zitadel-go/v3 v3.30.1
 	go-simpler.org/env v0.12.0
 )
 
